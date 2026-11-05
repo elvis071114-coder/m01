@@ -8,10 +8,11 @@
 
 - **網頁版**：https://elvis071114-coder.github.io/m01/
   - 用你自己的**免費 Gemini 金鑰**（到 [aistudio.google.com/apikey](https://aistudio.google.com/apikey) 用 Google 帳號建立）。
-  - 記憶存在你自己的瀏覽器裡。換手機、換瀏覽器或清除瀏覽器資料就會是空的，記得偶爾到「設定 → 資料」下載備份。
+  - 記憶存在你自己的瀏覽器裡。用 **Google 登入**（設定 → ACCOUNT）的話，會另外存一份到你自己 Google 雲端硬碟的隱藏資料夾，換手機、換電腦登入同一個帳號就能接著聊。
   - 手機可以把網頁「加到主畫面」，像 App 一樣打開。
 - **電腦版 App（Mac／Windows）**：在網頁版的「下載 App」分頁下載。
-  - 可以用免費的本地 AI（Ollama，不用網路），也可以改用 Gemini 或 Claude。
+  - 可以選用免費的本地 AI（Ollama，不用網路），也可以只用 Gemini 或 Claude。
+  - 一樣可以用 Google 登入，和網頁版、其他電腦同步。
   - 會上網查資料、查天氣，可以用 Fish Audio 把回覆唸出來，記憶存在電腦裡的資料夾。
   - 有新版本時會自動提醒。
 
@@ -22,6 +23,7 @@
 - **最少兩張**：「張眼（平常）」和「張嘴」。說話時兩張會交替，做出對嘴的效果。
 - 其他表情都是選填，沒放的會用平常的圖代替。
 - 建議用**去背 PNG**，每張的**尺寸一樣、角色位置一樣**，切換時才不會跳動。
+- 可以**一次選好幾張，或直接選 zip**：檔名有表情名稱（例如下表的建議檔名，或「開心」「害羞」這種中文）就會自動放到對的格子。
 - 請用**你自己畫的**，或**作者同意你使用**的圖片。
 
 ### 範例角色
@@ -29,7 +31,7 @@
 還沒有自己的角色圖，可以先用附的範例角色（12 種表情，在 [`character/`](character/) 資料夾）：
 
 - **網頁版**：到「設定 → CHARACTER SPRITES」按 **套用範例角色**，一鍵放好。
-- **電腦版**：在網頁版的「下載 App」分頁下載範例角色圖（zip），解壓縮後把圖片拖到對應的格子。
+- **電腦版**：到「設定 → CHARACTER SPRITES」按 **套用範例角色**（要連網路）。也可以在網頁版的「下載 App」分頁下載範例角色圖（zip），再用「一次放多張圖片或 zip」直接選這個 zip。
 
 角色靈感來自社群的 **Claude娘** 二創形象，圖片是為這個 App 用 AI 製作的。
 
@@ -65,10 +67,11 @@ An AI companion with long-term memory. She remembers what you've said and the fi
 
 - **Web version**: https://elvis071114-coder.github.io/m01/
   - Uses your own **free Gemini key** (create one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey) with a Google account).
-  - Memory is stored in your own browser. Switching phones or browsers, or clearing browser data, starts empty — download a backup now and then (Settings → Data).
+  - Memory is stored in your own browser. **Sign in with Google** (Settings → Account) to keep a copy in a hidden folder of your own Google Drive and pick up on any phone or computer.
   - On phones, “Add to Home Screen” to open it like an app.
 - **Desktop app (Mac / Windows)**: download it from the “Get App” tab of the web version.
-  - Runs a free local AI (Ollama, works offline), or Gemini / Claude.
+  - Optional free local AI (Ollama, works offline), or just Gemini / Claude.
+  - Sign in with Google to sync with the web version and your other computers.
   - Looks things up on the web, checks the weather, can read replies aloud with Fish Audio, and saves memory to a folder on your computer.
   - Tells you when a new version is out.
 
@@ -79,6 +82,7 @@ You decide what she looks like: add images in Settings → CHARACTER SPRITES, or
 - **At least two**: “Eyes open (neutral)” and “Mouth open”. They alternate while she talks to lip-sync.
 - Every other expression is optional; missing ones fall back to the neutral image.
 - Use **transparent PNGs**, all the **same size with the character in the same spot**, so switching doesn't jump.
+- You can **pick many pictures at once, or a zip**: files named after an expression (like the suggested names below) go into the right slot automatically.
 - Please use art **you made yourself** or that **the artist has allowed you to use**.
 
 ### Sample character
@@ -86,7 +90,7 @@ You decide what she looks like: add images in Settings → CHARACTER SPRITES, or
 No pictures yet? Use the included sample character (12 expressions, in the [`character/`](character/) folder):
 
 - **Web version**: Settings → CHARACTER SPRITES → **Use the sample character**, done in one click.
-- **Desktop app**: download the sample character (zip) from the “Get App” tab of the web version, unzip it and drag each picture onto the matching slot.
+- **Desktop app**: Settings → CHARACTER SPRITES → **Use the sample character** (needs internet). Or download the sample character zip from the “Get App” tab of the web version and pick it with “Add many pictures or a zip”.
 
 The character concept is inspired by the community’s **“Claude-chan”** fan personification; the images were made with AI for this app.
 
@@ -110,3 +114,6 @@ The character concept is inspired by the community’s **“Claude-chan”** fan
 - Her answers are AI-generated and can be wrong. Double-check anything important (health, money, legal).
 - Your keys stay in your own browser or computer and are never sent to us.
 - This is an Alpha version and is still being updated.
+
+
+隱私權政策 Privacy Policy: https://elvis071114-coder.github.io/m01/privacy.html

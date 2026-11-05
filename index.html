@@ -456,6 +456,19 @@ body.exiting .stage{animation-delay:.06s}body.exiting .frame{animation-delay:.12
 .slot.dropon{outline:2px dashed var(--accent);outline-offset:3px}
 .hbtn2.has-update{position:relative}.hbtn2.has-update::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ff4d4d;box-shadow:0 0 0 2px var(--bg)}
 .upd-box{display:flex;flex-direction:column;gap:4px;margin:8px 0 10px;padding:10px 12px;background:var(--panel2);border-left:3px solid #ff4d4d}.upd-box b{margin:0!important}.upd-box span{font-size:13px}.upd-box a{font-weight:700;color:var(--accent)}.upd-box small{color:var(--dim);font-size:12px}
+#lmBox{display:flex;flex-direction:column;gap:6px}#lmBox .lm-h{font-size:13px;font-weight:700;color:var(--muted)}#lmBox .row button.sure{color:#ff6b6b;border-color:#ff6b6b}
+#lmBox .lm-bar{height:6px;background:var(--panel3);overflow:hidden}#lmBox .lm-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+#cloudMerge{position:fixed;inset:0;z-index:46;display:grid;place-items:center;padding:20px;background:rgba(5,5,8,.82);backdrop-filter:blur(4px)}#cloudMerge[hidden]{display:none}
+#cloudMerge .g-card{width:min(480px,100%);padding:22px;background:#101013;border:1px solid var(--line2);border-left:4px solid var(--accent)}#cloudMerge .g-tag{font-family:var(--font-hud);font-size:11.5px;letter-spacing:.24em;color:var(--accent)}
+#cloudMerge h2{margin:8px 0 6px;font-size:21px}#cloudMerge p{font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 10px}#cloudMerge .acts{display:flex;gap:8px;flex-wrap:wrap}
+#aiPick{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:20px;background:rgba(5,5,8,.82);backdrop-filter:blur(4px)}#aiPick[hidden]{display:none}
+#aiPick .g-card{width:min(520px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:22px 22px 18px;background:#101013;border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+#aiPick .g-tag{font-family:var(--font-hud);font-size:11.5px;letter-spacing:.24em;color:var(--accent)}#aiPick h2{margin:8px 0 6px;font-size:21px}
+#aiPick p{margin:0 0 8px;font-size:14px;line-height:1.6;color:var(--muted)}#aiPick ol{margin:0 0 10px;padding-left:1.3em;font-size:14px;line-height:1.65}
+#aiPick .opt{border:1px solid var(--line2);background:var(--panel);padding:12px 14px;margin:10px 0;display:flex;flex-direction:column;gap:6px}#aiPick .opt b{font-size:15.5px}
+#aiPick input{width:100%;box-sizing:border-box;padding:10px 12px;font-size:16px;background:var(--panel2);color:var(--ink);border:1px solid var(--line2)}
+#aiPick .acts{display:flex;gap:8px;flex-wrap:wrap}#aiPick .msg{min-height:1.1em;font-size:13px;color:var(--accent);margin:0}
+#aiPick .skip{background:none;border:none;color:var(--muted);font-size:13.5px;cursor:pointer;margin-top:4px}
 #helpPop.about{width:min(460px,calc(100vw - 24px));max-height:min(72vh,640px);overflow:auto}
 #helpPop .cl{border-left:2px solid var(--line2);padding:2px 0 2px 10px;margin:6px 0}#helpPop .cl[open]{border-left-color:var(--accent)}
 #helpPop .cl summary{cursor:pointer;font-weight:700;font-size:13.5px;list-style:none}#helpPop .cl summary::-webkit-details-marker{display:none}#helpPop .cl summary::before{content:"▸ ";color:var(--accent)}#helpPop .cl[open] summary::before{content:"▾ "}
@@ -547,6 +560,7 @@ body.kb .tabs{padding-top:4px}
 #ghKey .g-main{background:var(--accent);color:#111;border:none}#ghKey .g-sub{background:var(--panel);color:var(--ink);border:1px solid var(--line2)}
 #ghKey .g-skip{background:none;border:none;color:var(--muted);font-weight:400!important;font-size:13.5px!important}
 #ghKey .g-msg{min-height:1.2em;font-size:13px;color:var(--accent);margin:0 0 8px}
+#ghKey .g-acc{padding:12px 14px;margin:0 0 14px;background:var(--panel);border:1px solid var(--line2)}#ghKey .g-acc p{font-size:13.5px}
 #ghKey .g-hint{font-size:12.5px;color:var(--dim);margin-top:10px}
 </style>
 </head>
@@ -648,6 +662,7 @@ body.kb .tabs{padding-top:4px}
           </div>
           <div class="pane" id="pDl" hidden data-i18n="none"></div>
           <div class="pane" id="pSet" hidden>
+            <div id="cloudSec" data-i18n="none"></div>
             <div class="sec">AI<button class="help" data-help="localai" aria-label="說明">?</button></div>
             <p class="note" id="aiState">檢查中…</p>
             <p class="note">平常切換模型和思考程度，用聊天輸入框上方的按鈕就好；這裡是設定金鑰的地方。</p>
@@ -665,6 +680,7 @@ body.kb .tabs{padding-top:4px}
               <div class="inline"><button class="sbtn" id="ckClear">刪除金鑰</button></div>
             </div>
             <div id="ollamaBox" class="subbox">
+              <div id="lmBox" data-i18n="none"></div>
               <label class="field" for="lcModel">聊天模型（Ollama 模型名稱）<input id="lcModel" placeholder="qwen2.5:7b"></label>
               <label class="field" for="lcVision">看圖模型（選填，留空就不看圖）<input id="lcVision" placeholder="例如 gemma3:4b"></label>
               <label class="field" for="lcUrl">Ollama 位址<input id="lcUrl" placeholder="http://localhost:11434"></label>
@@ -687,6 +703,9 @@ body.kb .tabs{padding-top:4px}
             </div>
             <div class="sec">CHARACTER SPRITES<button class="help" data-help="sprites" aria-label="說明">?</button></div>
             <p class="note">最少放兩張：「嘴巴閉上」和「嘴巴張開」。說話時兩張會快速交替，角色也會跟著晃動；只放一張的話，說話時會用晃動來表示。閉眼和開心是選填。建議用去背 PNG，每張的尺寸和角色位置要一樣；也可以直接把圖片拖到格子上。圖片只存在你自己的帳號裡，別人看不到；太大的圖會自動壓縮。</p>
+            <div class="inline sp-bulk"><label class="pbtn pick">一次放多張圖片或 zip<input type="file" id="spriteMulti" multiple accept="image/png,image/jpeg,image/webp,image/gif,.zip,application/zip" class="fileover"></label><button class="sbtn" id="sampleBtn" hidden>套用範例角色</button></div>
+            <p class="note">可以一次選好幾張，或直接選整個 zip：檔名有表情名稱就會自動放到對的格子（例如 Eyes_open、Mouth_open、Happy，或 張眼、張嘴、開心）。也可以把一整批圖片拖到下面的格子區。</p>
+            <p class="note" id="sampleNote" hidden>範例角色：角色靈感來自社群的 Claude娘 二創形象，圖片是用 AI 製作的。</p>
             <div class="slots" id="slots"></div>
             <input type="file" id="spriteFile" accept="image/png,image/webp,image/gif,image/jpeg" hidden>
             <div class="sec">PROFILE<button class="help" data-help="profile" aria-label="說明">?</button></div>
@@ -806,7 +825,10 @@ window.GH_MODE=true;
         const docs=rows.map(([k,v])=>snap(k,v));return{docs,size:docs.length,empty:!docs.length,docChanges:()=>[],metadata:{fromCache:false,hasPendingWrites:false}};
       }};
   }
-  const localDB={doc:docRef,collection:colRef};
+  // every saved document under a path prefix (used by cloud sync)
+  async function all(prefix){const d=await idb();return new Promise((ok,no)=>{const out=[];const rq=d.transaction("docs","readonly").objectStore("docs").openCursor(IDBKeyRange.bound(prefix,prefix+"\uffff"));
+    rq.onsuccess=()=>{const c=rq.result;if(c){out.push([c.key,c.value]);c.continue()}else ok(out)};rq.onerror=()=>no(rq.error)})}
+  const localDB={doc:docRef,collection:colRef,all};
   window.localKV={get:async k=>{const d=await idb();return new Promise((ok,no)=>{const r=d.transaction("docs","readonly").objectStore("docs").get("__kv/"+k);r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})},set:async(k,v)=>tx("readwrite",st=>{st.put(v,"__kv/"+k)})};
 
   /* ---------- helpers for model output ---------- */
@@ -1024,7 +1046,10 @@ window.GH_MODE=true;
           return{docs,size:docs.length,empty:!docs.length,docChanges:()=>[],metadata:{fromCache:false,hasPendingWrites:false}};
         }};
     }
-    return{doc:docRef,collection:colRef,async isEmpty(){return!(await ls([ROOT])).length}};
+    async function all(prefix){const out=[];const segs=prefix.replace(/\/$/,"").split("/");
+      async function walk(parts,path){for(const x of await ls(parts)){if(x.dir)await walk([...parts,x.name],path+"/"+x.name);else if(x.name.endsWith(".json")){try{out.push([path+"/"+x.name.slice(0,-5),JSON.parse(await getText([...parts,x.name]))])}catch(e){}}}}
+      await walk([ROOT,...segs],segs.join("/"));return out}
+    return{doc:docRef,collection:colRef,all,async isEmpty(){return!(await ls([ROOT])).length}};
   };
 })();
 /* ===== Folder storage: keeps all memory as files inside the user's Companion folder ===== */
@@ -1064,6 +1089,257 @@ window.GH_MODE=true;
       async isEmpty(){try{const d=await rootDir.getDirectoryHandle(ROOT);for await(const _ of d.keys())return false;return true}catch(e){return true}}};
   }
   window.makeFolderDB=makeFolderDB;
+})();
+</script>
+<script>/* ===== Google sign-in + cloud sync: everything is copied to the user's own Google Drive app-data folder ===== */
+(function(){
+  const G_WEB_ID="993727503948-jejnfo3n3d83fnpl3puuugg6qd1reirp.apps.googleusercontent.com";
+  const G_APP_ID="993727503948-3gbtkjv217715hsi7g0o5e759fked4c9.apps.googleusercontent.com";
+  const G_APP_SECRET=""; // desktop-app client: Google treats this one as public
+  const SCOPE="openid email profile https://www.googleapis.com/auth/drive.appdata";
+  const API=()=>window.__M01_GAPI||"https://www.googleapis.com";
+  const AUTH=()=>window.__M01_GAUTH||"https://accounts.google.com/o/oauth2/v2/auth";
+  const H={"X-M01":"1"},PRE="data/users/",META="m01sync/meta",KEYS=["gemini","claude","fish"];
+  const web=()=>!!window.GH_MODE;
+  const en=()=>{try{return typeof isEN==="function"?isEN():localStorage.getItem("m01lang")==="en"}catch(e){return false}};
+  const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}return null};
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const rand=n=>{const a=new Uint8Array(n);crypto.getRandomValues(a);return Array.from(a,b=>"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[b%62]).join("")};
+  const hash=t=>{let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)};
+  const st={token:null,exp:0,busy:false,state:"idle",err:"",last:+(LS("m01.g.last")||0),dirty:new Set(),meta:null,base:null,wait:null,pendingReload:false,needAuth:false,lastGesture:0};
+  const user=()=>{try{return JSON.parse(LS("m01.g.user")||"null")}catch(e){return null}};
+  const signedIn=()=>!!user();
+  const isFirst=()=>{const em=(user()||{}).email||"";return st.meta.owner!==em&&st.meta.prevOwner!==em};
+
+  /* ---------- which cloud file a document belongs to ---------- */
+  function shard(path){const rest=path.slice(PRE.length).split("/").slice(1);const id=rest[rest.length-1]||"";
+    if(rest.length===1)return /^sprite_/.test(id)?"s_"+id.replace(/[^A-Za-z0-9_]/g,""):"root";
+    const coll=(rest[rest.length-2]||"x").replace(/[^A-Za-z0-9]/g,"");return coll+"_"+(parseInt(hash(id),36)%8)}
+
+  /* ---------- local bookkeeping: when each document last changed ---------- */
+  let metaT=null;
+  async function loadMeta(){if(st.meta)return st.meta;let m=null;try{m=(await st.base.doc(META).get()).data()}catch(e){}
+    st.meta=Object.assign({docs:{},seen:{},keys:{},owner:"",dirty:[]},m||{});
+    const old=Date.now()-90*864e5;for(const [p,e] of Object.entries(st.meta.docs))if(e.del&&e.t<old)delete st.meta.docs[p];
+    (st.meta.dirty||[]).forEach(x=>st.dirty.add(x));return st.meta}
+  function saveMeta(now){clearTimeout(metaT);const go=()=>{if(!st.meta||!st.base)return Promise.resolve();st.meta.dirty=[...st.dirty];return st.base.doc(META).set(st.meta).catch(()=>{})};if(now)return go();metaT=setTimeout(go,1500);return Promise.resolve()}
+  function mark(path,del){if(!path||!path.startsWith(PRE)||!st.meta)return;st.meta.docs[path]=del?{t:Date.now(),del:1}:{t:Date.now()};st.dirty.add(shard(path));saveMeta();schedule()}
+
+  /* every write the app makes goes through here, so we know what to upload */
+  function wrap(base){
+    st.base=base;loadMeta();
+    function d(ref){return Object.assign({},ref,{
+      async set(x){const r=await ref.set(x);mark(ref.path);return r},
+      async update(x){const r=await ref.update(x);mark(ref.path);return r},
+      async delete(){const r=await ref.delete();mark(ref.path,true);return r},
+      collection(sub){return c(ref.collection(sub))}})}
+    function c(ref){return Object.assign({},ref,{doc(id){return d(ref.doc(id))},async add(x){const r=d(ref.doc());await r.set(x);return r}})}
+    return Object.assign({},base,{doc:p=>d(base.doc(p)),collection:p=>c(base.collection(p))});
+  }
+
+  /* ---------- tokens ---------- */
+  async function deskToken(){
+    if(st.token&&Date.now()<st.exp-60e3)return st.token;
+    let j=null;try{j=await (await fetch("/gtoken?op=refresh",{method:"POST",headers:H,body:new URLSearchParams({client_id:G_APP_ID,client_secret:G_APP_SECRET,grant_type:"refresh_token"}).toString()})).json()}catch(e){}
+    if(j&&j.status===200&&j.body&&j.body.access_token){st.token=j.body.access_token;st.exp=Date.now()+(+j.body.expires_in||3600)*1000;st.needAuth=false;return st.token}
+    if(j&&j.body&&/invalid_grant|not_signed_in|unauthorized_client/.test(JSON.stringify(j.body))){st.needAuth=true;st.err="expired"}
+    return null}
+  function webToken(){
+    if(st.token&&Date.now()<st.exp-60e3)return st.token;
+    try{const t=JSON.parse(LS("m01.g.tok")||"null");if(t&&Date.now()<t.exp-60e3){st.token=t.t;st.exp=t.exp;return st.token}}catch(e){}
+    st.needAuth=true;return null}
+  const token=async()=>web()?webToken():deskToken();
+  let gisP=null;
+  function loadGIS(){if(window.google&&google.accounts&&google.accounts.oauth2)return Promise.resolve();if(gisP)return gisP;
+    gisP=new Promise((ok,no)=>{const s=document.createElement("script");s.src=window.__M01_GIS||"https://accounts.google.com/gsi/client";s.async=true;s.onload=()=>ok();s.onerror=()=>{gisP=null;no(new Error("gis"))};document.head.appendChild(s)});return gisP}
+  let tc=null;
+  /* must run inside a click / key press, or the browser blocks Google's window */
+  function webAuth(prompt){return new Promise((ok,no)=>{
+    const go=()=>{try{
+      if(!tc)tc=google.accounts.oauth2.initTokenClient({client_id:G_WEB_ID,scope:SCOPE,callback:()=>{}});
+      tc.callback=r=>{if(r&&r.access_token){st.token=r.access_token;st.exp=Date.now()+(+r.expires_in||3600)*1000;LS("m01.g.tok",JSON.stringify({t:st.token,exp:st.exp}));st.needAuth=false;ok(st.token)}else no(new Error(r&&(r.error||r.type)||"denied"))};
+      tc.error_callback=e=>no(new Error(e&&e.type||"popup"));
+      const u=user();tc.requestAccessToken(Object.assign({prompt},u&&u.email?{login_hint:u.email}:{}));
+    }catch(e){no(e)}};
+    if(window.google&&google.accounts&&google.accounts.oauth2)go();else loadGIS().then(go,no)})}
+
+  /* ---------- Google Drive (app-data folder) ---------- */
+  async function g(path,opt={},retry){
+    const t=await token();if(!t)throw{code:"auth"};
+    let r;try{r=await fetch(API()+path,Object.assign({},opt,{headers:Object.assign({},opt.headers||{},{Authorization:"Bearer "+t})}))}catch(e){throw{code:"offline"}}
+    if(r.status===401){st.token=null;st.exp=0;if(web()){LS("m01.g.tok",null);st.needAuth=true;throw{code:"auth"}}if(!retry)return g(path,opt,true);throw{code:"auth"}}
+    if(!r.ok)throw{code:"http",status:r.status};
+    return r}
+  async function listFiles(){const out={};let pt="";
+    for(let i=0;i<20;i++){const j=await (await g("/drive/v3/files?spaces=appDataFolder&pageSize=1000&fields=nextPageToken,files(id,name,version)"+(pt?"&pageToken="+encodeURIComponent(pt):""))).json();
+      for(const f of j.files||[])if(!out[f.name])out[f.name]=f;if(!j.nextPageToken)break;pt=j.nextPageToken}
+    return out}
+  const download=async id=>await (await g("/drive/v3/files/"+id+"?alt=media")).json();
+  async function upload(name,obj,file){const body=JSON.stringify(obj);
+    if(file)return await (await g("/upload/drive/v3/files/"+file.id+"?uploadType=media&fields=id,version",{method:"PATCH",headers:{"Content-Type":"application/json"},body})).json();
+    const b="m01"+rand(12),meta=JSON.stringify({name,parents:["appDataFolder"],mimeType:"application/json"});
+    return await (await g("/upload/drive/v3/files?uploadType=multipart&fields=id,version",{method:"POST",headers:{"Content-Type":"multipart/related; boundary="+b},
+      body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`})).json()}
+
+  /* ---------- AI keys travel with the account too ---------- */
+  async function getKey(p){try{const j=await (await fetch("/secret?p="+p+"&reveal=1",{headers:H})).json();return j.key||""}catch(e){return""}}
+  async function syncKeys(files){
+    const f=files["m01-keys.json"];let remote={};if(f){try{remote=await download(f.id)||{}}catch(e){}}
+    let push=false;const m=st.meta;m.keys=m.keys||{};
+    for(const p of KEYS){const loc=await getKey(p),r=remote[p]&&remote[p].v||"";
+      if(web()&&p!=="gemini")continue;
+      if(!loc&&r){await fetch("/secret?p="+p,{method:"PUT",headers:H,body:r});m.keys[p]=hash(r);st.changed=true}
+      else if(loc&&loc!==r){if(!r||m.keys[p]!==hash(loc)){remote[p]={v:loc,t:Date.now()};push=true;m.keys[p]=hash(loc)}
+        else{await fetch("/secret?p="+p,{method:"PUT",headers:H,body:r});m.keys[p]=hash(r);st.changed=true}}
+      else if(loc)m.keys[p]=hash(loc)}
+    if(push)await upload("m01-keys.json",remote,f)}
+
+  /* ---------- the sync itself ---------- */
+  function mergeDoc(p,a,b){try{
+    if(/\/logs\/[^/]+$/.test(p)&&Array.isArray(a&&a.items)&&Array.isArray(b&&b.items)){const k=x=>[x.t,x.role,String(x.text||"").slice(0,80)].join("|");const mp=new Map();for(const x of [...b.items,...a.items])if(!mp.has(k(x)))mp.set(k(x),x);return Object.assign({},b,a,{items:[...mp.values()].sort((x,y)=>(x.t||0)-(y.t||0))})}
+    if(/\/convs$/.test(p)&&Array.isArray(a&&a.list)&&Array.isArray(b&&b.list)){const mp=new Map();for(const c of [...b.list,...a.list]){const o=mp.get(c.id);if(!o||(c.upd||0)>(o.upd||0))mp.set(c.id,c)}return Object.assign({},b,a,{list:[...mp.values()]})}
+    if(/\/memory$/.test(p)&&Array.isArray(a&&a.facts)&&Array.isArray(b&&b.facts)){const k=x=>typeof x==="string"?x:JSON.stringify(x&&x.text!==undefined?x.text:x);const mp=new Map();for(const x of [...b.facts,...a.facts])if(!mp.has(k(x)))mp.set(k(x),x);return Object.assign({},b,a,{facts:[...mp.values()]})}
+  }catch(e){}return null}
+  async function content(sh){const docs={};const now=Date.now();
+    for(const [p,e] of Object.entries(st.meta.docs)){if(shard(p)!==sh)continue;
+      if(e.del){if(now-e.t<90*864e5)docs[p]={t:e.t,del:1};continue}
+      let v;try{v=(await st.base.doc(p).get()).data()}catch(e){}
+      docs[p]=v===undefined?{t:e.t,del:1}:{t:e.t,d:v}}
+    return{v:1,docs}}
+  async function firstStamp(files){
+    // documents saved before signing in have no time yet: decide which side wins where both have something
+    const local=st.base.all?await st.base.all(PRE):[];const m=st.meta;const fresh=local;
+    if(!fresh.length)return;
+    const cloudHas=Object.keys(files).some(n=>/^m01-(root|logs_)/.test(n));
+    const localHas=fresh.some(([p])=>/\/logs\//.test(p));
+    let pick="cloud";if(!cloudHas)pick="local";else if(localHas)pick=await askMerge();
+    const t=pick==="local"?Date.now():1;for(const [p] of fresh){m.docs[p]={t};st.dirty.add(shard(p))}}
+  async function full(first){
+    const files=await listFiles();const m=st.meta;
+    if(first)await firstStamp(files);
+    await syncKeys(files);
+    const remoteShards=new Set();
+    for(const [name,f] of Object.entries(files)){const mm=name.match(/^m01-(.+)\.json$/);if(!mm||mm[1]==="keys")continue;const sh=mm[1];remoteShards.add(sh);
+      if(m.seen[sh]===f.version&&!first)continue;
+      let rem=null;try{rem=await download(f.id)}catch(e){continue}
+      const rd=(rem&&rem.docs)||{};
+      for(const [p,e] of Object.entries(rd)){if(!p.startsWith(PRE))continue;const me=m.docs[p]||{},lt=me.t||0,base=me.s||0;
+        if(e.t===lt)continue;
+        // both sides changed since the last sync: combine chats / memories instead of dropping one side
+        const both=lt>base&&e.t>base&&!me.del&&!e.del;let merged=null;
+        if(both){let loc;try{loc=(await st.base.doc(p).get()).data()}catch(x){}if(loc!==undefined)merged=mergeDoc(p,loc,e.d)}
+        if(merged){await st.base.doc(p).set(merged);m.docs[p]={t:Math.max(Date.now(),e.t+1),s:e.t};st.dirty.add(sh);st.changed=true}
+        else if(e.t>lt){if(e.del)await st.base.doc(p).delete();else await st.base.doc(p).set(e.d);m.docs[p]=e.del?{t:e.t,s:e.t,del:1}:{t:e.t,s:e.t};st.changed=true}
+        else st.dirty.add(sh)}
+      for(const p of Object.keys(m.docs))if(shard(p)===sh&&!rd[p])st.dirty.add(sh);
+      m.seen[sh]=f.version}
+    for(const p of Object.keys(m.docs)){const sh=shard(p);if(!remoteShards.has(sh))st.dirty.add(sh)}
+    await pushDirty(files)}
+  async function pushDirty(files){
+    const todo=[...st.dirty];st.dirty.clear();
+    try{for(const sh of todo){const c=await content(sh);const r=await upload("m01-"+sh+".json",c,files["m01-"+sh+".json"]);if(r&&r.version)st.meta.seen[sh]=r.version;
+        for(const [p,e] of Object.entries(c.docs)){const me=st.meta.docs[p];if(me&&me.t===e.t)me.s=e.t}}
+      if(todo.length){const now=await listFiles();for(const sh of todo){const f=now["m01-"+sh+".json"];if(f)st.meta.seen[sh]=f.version}}}
+    catch(e){todo.forEach(x=>st.dirty.add(x));saveMeta();throw e}
+    st.meta.owner=(user()||{}).email||"";saveMeta(true)}
+  function done(){st.last=Date.now();LS("m01.g.last",String(st.last));st.err="";st.state="idle";paint()}
+  function fail(e){st.state="idle";st.err=e&&e.code==="auth"?"auth":e&&e.code==="offline"?"offline":"error";if(st.err==="auth")st.needAuth=true;paint()}
+  /* before the app reads its memory: bring everything up to date */
+  async function bootSync(){
+    if(!signedIn()||!st.base)return false;await loadMeta();
+    if(web()&&!webToken()&&st.wait){try{await Promise.race([st.wait,sleep(9000)])}catch(e){}}
+    st.state="sync";st.changed=false;paint();
+    try{await Promise.race([full(isFirst()),sleep(25000).then(()=>{throw{code:"offline"}})]);done()}catch(e){fail(e)}
+    return st.changed}
+  /* while the app is open: upload changes; if another device changed something, reload to pick it up */
+  let liveT=null;
+  function schedule(ms){if(!signedIn())return;clearTimeout(liveT);liveT=setTimeout(live,ms||12000)}
+  async function live(){
+    if(!signedIn()||st.busy||!st.base)return;st.busy=true;st.state="sync";paint();
+    try{const files=await listFiles();const m=st.meta;
+      const changed=Object.entries(files).some(([n,f])=>{const mm=n.match(/^m01-(.+)\.json$/);return mm&&mm[1]!=="keys"&&m.seen[mm[1]]!==undefined&&m.seen[mm[1]]!==f.version||mm&&mm[1]!=="keys"&&m.seen[mm[1]]===undefined});
+      if(changed){st.pendingReload=true;tryReload()}else await pushDirty(files);
+      done()}catch(e){fail(e)}finally{st.busy=false}}
+  function idle(){return !(typeof S!=="undefined"&&(S.busy||S.streaming))&&!(($("input")||{}).value||"").trim()&&[...document.querySelectorAll("#setupPop,#tour,#aiPick,#ghKey,#cloudMerge")].every(e=>e.hidden)}
+  async function reload(){try{sessionStorage.setItem("m01.autoboot","1")}catch(e){}try{await Promise.race([saveMeta(true),sleep(3000)])}catch(e){}location.reload()}
+  function tryReload(){if(!st.pendingReload)return;if(idle())reload();else setTimeout(tryReload,15000)}
+  document.addEventListener("visibilitychange",()=>{if(!signedIn())return;if(document.hidden){if(st.dirty.size)live()}else schedule(800)});
+  setInterval(()=>{if(signedIn()&&document.body.classList.contains("booted"))schedule(500)},5*60e3);
+
+  /* ---------- sign in / out ---------- */
+  async function userinfo(){const j=await (await g("/oauth2/v3/userinfo")).json();const u={email:j.email||"",name:j.name||"",pic:j.picture||""};LS("m01.g.user",JSON.stringify(u));return u}
+  async function s256(v){try{const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v));return{c:btoa(String.fromCharCode(...new Uint8Array(d))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""),m:"S256"}}catch(e){return{c:v,m:"plain"}}}
+  async function deskSignIn(){
+    const ver=rand(64),ch=await s256(ver),state="m01g"+rand(24),redirect=location.origin+"/oauth";
+    const url=AUTH()+"?"+new URLSearchParams({client_id:G_APP_ID,redirect_uri:redirect,response_type:"code",scope:SCOPE,code_challenge:ch.c,code_challenge_method:ch.m,state,access_type:"offline",prompt:"consent"}).toString();
+    await fetch("/secret?p=gcode",{method:"DELETE",headers:H}).catch(()=>{});
+    window.__gAuthUrl=url;st.state="waiting";st.cancel=false;paint();
+    if(typeof APP_MODE!=="undefined"&&APP_MODE)fetch("/open?url="+encodeURIComponent(url),{headers:H}).catch(()=>{});else window.open(url,"_blank");
+    for(let i=0;i<240;i++){await sleep(1500);if(st.cancel)throw{code:"cancel"};
+      let k="";try{k=(await (await fetch("/secret?p=gcode&reveal=1",{headers:H})).json()).key||""}catch(e){}
+      if(!k)continue;const sp=k.indexOf(" "),s0=k.slice(0,sp),c0=k.slice(sp+1);if(s0!==state)continue;
+      await fetch("/secret?p=gcode",{method:"DELETE",headers:H}).catch(()=>{});
+      if(c0.startsWith("!"))throw{code:"cancel"};
+      const j=await (await fetch("/gtoken?op=exchange",{method:"POST",headers:H,body:new URLSearchParams({client_id:G_APP_ID,client_secret:G_APP_SECRET,code:c0,code_verifier:ver,redirect_uri:redirect,grant_type:"authorization_code"}).toString()})).json();
+      if(!(j&&j.status===200&&j.body&&j.body.access_token))throw{code:"error"};
+      st.token=j.body.access_token;st.exp=Date.now()+(+j.body.expires_in||3600)*1000;return}
+    throw{code:"cancel"}}
+  async function signIn(){
+    if(st.state==="waiting"||st.state==="signin")return;const E=en();st.err="";
+    try{
+      if(web()){st.state="signin";paint();await webAuth("consent")}else await deskSignIn();
+      st.state="sync";paint();const u=await userinfo();st.needAuth=false;
+      if(typeof toast==="function")toast(E?`Signed in as ${u.email} — syncing…`:`已登入 ${u.email}，同步中…`,4000);
+      await loadMeta();st.changed=false;await full(isFirst());done();
+      if(st.changed){toast(E?"Loaded your memories from the cloud.":"已從雲端載入你的記憶。",3000);await sleep(900);reload()}
+      else toast(E?"Sync is on. Your memories are backed up to your Google Drive.":"同步開好了！記憶會自動存到你的 Google 雲端硬碟。",5000);
+    }catch(e){st.state="idle";if(e&&e.code==="cancel"){st.err="";paint();return}
+      if(!user()){LS("m01.g.tok",null)}st.err=e&&e.code==="offline"?"offline":"signin";paint();
+      if(typeof toast==="function")toast(E?"Google sign-in didn’t finish. Try again.":"Google 登入沒有完成，請再試一次。",5000)}}
+  async function signOut(){
+    const E=en();try{if(web()){const t=st.token;if(t&&window.google&&google.accounts&&google.accounts.oauth2)google.accounts.oauth2.revoke(t,()=>{})}else await fetch("/secret?p=google",{method:"DELETE",headers:H})}catch(e){}
+    LS("m01.g.user",null);LS("m01.g.tok",null);st.token=null;st.exp=0;st.needAuth=false;st.err="";
+    if(st.meta){st.meta.prevOwner=st.meta.owner||st.meta.prevOwner||"";st.meta.seen={};st.meta.owner="";saveMeta(true)}
+    paint();if(typeof toast==="function")toast(E?"Signed out. Everything stays on this device.":"已登出。資料還是留在這台裝置上。",4000)}
+  async function reconnect(){if(!web()){return signIn()}
+    try{await webAuth("");st.err="";st.needAuth=false;paint();live()}catch(e){try{await webAuth("consent");st.err="";paint();live()}catch(e2){}}}
+
+  /* ---------- first sign-in when both sides already have memories ---------- */
+  function askMerge(){return new Promise(ok=>{const E=en();let box=document.getElementById("cloudMerge");
+    if(!box){box=document.createElement("div");box.id="cloudMerge";box.dataset.i18n="none";document.body.appendChild(box)}
+    box.innerHTML=`<div class="g-card" role="dialog" aria-modal="true"><div class="g-tag">CLOUD SYNC</div><h2>${E?"Both sides have memories":"兩邊都有記憶"}</h2>
+      <p>${E?"Your Google account already has M-01 memories, and this device has some too. They’ll be combined. Where the same thing was changed on both, which should win?":"你的 Google 帳號裡已經有 M-01 的記憶，這台裝置上也有一些。兩邊會合併在一起；同一份資料兩邊都有的話，要以哪邊為準？"}</p>
+      <div class="acts"><button class="pbtn" id="cmCloud">${E?"Use the cloud’s (recommended)":"以雲端的為準（建議）"}</button><button class="sbtn" id="cmLocal">${E?"Use this device’s":"以這台的為準"}</button></div>
+      <p class="note" style="margin-top:10px">${E?"Chats from both sides are kept either way.":"不管選哪個，兩邊的聊天記錄都會保留。"}</p></div>`;
+    box.hidden=false;
+    box.querySelector("#cmCloud").onclick=()=>{box.hidden=true;ok("cloud")};box.querySelector("#cmLocal").onclick=()=>{box.hidden=true;ok("local")}})}
+
+  /* ---------- settings section ---------- */
+  function ago(t){if(!t)return"";const E=en(),m=Math.round((Date.now()-t)/60e3);return m<1?(E?"just now":"剛剛"):m<60?(E?`${m} min ago`:`${m} 分鐘前`):new Date(t).toLocaleString(E?"en":"zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}
+  function paint(){const box=document.getElementById("cloudSec");if(!box)return;const E=en(),u=user(),e=s=>typeof esc==="function"?esc(s):String(s);
+    let h=`<div class="sec">ACCOUNT · CLOUD SYNC</div>`;
+    if(st.state==="waiting")h+=`<p class="note">${E?"Google’s sign-in page is open in your browser. Sign in there and you’ll be brought back here automatically.":"已經在瀏覽器打開 Google 登入頁。在那邊登入完，會自動回到這裡。"}</p><div class="inline"><button class="sbtn" id="gCancel">${E?"Cancel":"取消"}</button></div>`;
+    else if(!u)h+=`<p class="note">${E?"Sign in with Google and your chats, memories, character pictures and AI keys are saved to a hidden folder in <b>your own</b> Google Drive. Sign in with the same account on another computer or phone and pick up where you left off. Only M-01 can read that folder — the developer can’t see it.":"用 Google 帳號登入後，對話、記憶、角色圖和 AI 金鑰會自動存到<b>你自己</b> Google 雲端硬碟裡的隱藏資料夾。換電腦、換手機登入同一個帳號，就能接著聊。只有 M-01 能讀這個資料夾，開發者看不到。"}</p>
+        <div class="inline"><button class="pbtn" id="gIn"${st.state==="signin"||st.state==="sync"?" disabled":""}>${st.state==="sync"?(E?"Syncing…":"同步中…"):(E?"Sign in with Google":"用 Google 登入")}</button></div>${st.err==="signin"?`<p class="note warnnote">${E?"Sign-in didn’t finish. Try again.":"登入沒有完成，請再試一次。"}</p>`:st.err==="offline"?`<p class="note warnnote">${E?"Can’t reach Google — check your connection.":"連不到 Google，請確認網路。"}</p>`:""}`;
+    else{const s=st.state==="sync"?(E?"Syncing…":"同步中…"):st.needAuth||st.err==="auth"?(E?"Connection expired — press Reconnect to keep syncing.":"連線過期了，按「重新連線」繼續同步。"):st.err==="offline"?(E?"Offline — will sync when you’re back online.":"目前離線，連上網路後會自動同步。"):st.err?(E?"The last sync didn’t finish; it will retry.":"上次同步沒有完成，等一下會自動再試。"):st.last?(E?`Synced ${ago(st.last)}`:`上次同步：${ago(st.last)}`):"";
+      h+=`<p class="note">${E?"Signed in as":"已登入"} <b>${e(u.email)}</b>${s?`<br>${s}`:""}</p>
+        <div class="inline">${st.needAuth||st.err==="auth"?`<button class="pbtn" id="gRe">${E?"Reconnect":"重新連線"}</button>`:`<button class="sbtn" id="gNow"${st.state==="sync"?" disabled":""}>${E?"Sync now":"立即同步"}</button>`}<button class="sbtn" id="gOut">${E?"Sign out":"登出"}</button></div>
+        <p class="note" style="margin:0">${E?"Changes are saved to your Google Drive automatically. Signing out keeps everything on this device, and nothing in the cloud is deleted.":"有變動會自動存到你的 Google 雲端硬碟。登出後資料還是留在這台裝置上，雲端的也不會被刪掉。"}</p>`}
+    box.innerHTML=h;
+    const b=id=>box.querySelector("#"+id);
+    if(b("gIn"))b("gIn").onclick=signIn;if(b("gOut"))b("gOut").onclick=signOut;if(b("gCancel"))b("gCancel").onclick=()=>{st.cancel=true;st.state="idle";paint()};
+    if(b("gNow"))b("gNow").onclick=()=>{st.pendingReload=false;live().then(()=>{if(st.pendingReload)reload()})};if(b("gRe"))b("gRe").onclick=reconnect}
+
+  /* a click or key press is our chance to quietly renew an expired web sign-in */
+  let tries=0;
+  function gesture(){if(!web()||!signedIn()||tries>=3||Date.now()-st.lastGesture<120e3)return;
+    try{const t=JSON.parse(LS("m01.g.tok")||"null");if(t&&Date.now()<t.exp-60e3)return}catch(e){}
+    if(!(window.google&&google.accounts&&google.accounts.oauth2))return;st.lastGesture=Date.now();tries++;
+    st.wait=webAuth("").then(()=>{st.wait=null;if(document.body.classList.contains("booted"))schedule(300)},()=>{st.wait=null;paint()})}
+  addEventListener("pointerdown",gesture,true);addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")gesture()},true);
+  if(web())setTimeout(()=>loadGIS().catch(()=>{}),signedIn()?0:2500);
+  new MutationObserver(()=>paint()).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+  window.cloud={wrap,bootSync,ready:()=>st.base?loadMeta():Promise.resolve(),signIn,signOut,paint,signedIn,user,live,schedule,loadGIS,_st:st};
 })();
 </script>
 <script>
@@ -1991,11 +2267,68 @@ function renderSlots(){
     d.querySelector(".up input").onchange=e=>{const f=e.target.files[0];e.target.value="";if(f)handleSpriteFile(f,k)};
     d.addEventListener("dragover",e=>{e.preventDefault();e.stopPropagation();d.classList.add("dropon")});
     d.addEventListener("dragleave",()=>d.classList.remove("dropon"));
-    d.addEventListener("drop",e=>{e.preventDefault();e.stopPropagation();d.classList.remove("dropon");if(typeof dragN!=="undefined")dragN=0;try{$("drop").classList.remove("show")}catch(x){}const f=e.dataTransfer&&e.dataTransfer.files[0];if(f)handleSpriteFile(f,k)});
+    d.addEventListener("drop",e=>{e.preventDefault();e.stopPropagation();d.classList.remove("dropon");if(typeof dragN!=="undefined")dragN=0;try{$("drop").classList.remove("show")}catch(x){}const fl=e.dataTransfer&&e.dataTransfer.files;if(fl&&(fl.length>1||/\.zip$/i.test(fl[0]&&fl[0].name||"")))handleSpriteBatch([...fl]);else{const f=fl&&fl[0];if(f)handleSpriteFile(f,k)}});
     const rm=d.querySelector(".rm");if(rm)rm.onclick=()=>{const s2={...sprites()};delete s2[k];delete S.spriteData[k];if(S.db)queueWrite(()=>S.db.doc(`data/users/${S.uid}/sprite_${k}`).delete());S.settings.sprites=s2;if(k==="idle")delete S.settings.avatar;saveSettingsQuiet();renderSlots();renderStage()};
     el.appendChild(d);
   }
 }
+
+/* ---------- many sprites at once: several images or a zip, matched by file name ---------- */
+const SPRITE_NAMES=[["talk",/mouthopen|mouth|talk|speak|張嘴|张嘴|說話|说话/],["blink",/eyesclosed|eyeclosed|closed|blink|閉眼|闭眼|眨眼/],["sleep",/asleep|sleep|睡/],
+ ["idle",/eyesopen|eyeopen|idle|neutral|normal|default|base|張眼|张眼|平常|正常/],["happy",/happy|smile|joy|開心|开心|高興|高兴/],["shy",/shy|blush|embarrass|害羞|臉紅|脸红/],
+ ["angry",/angry|mad|annoyed|生氣|生气|憤怒|愤怒/],["smug",/smug|proud|得意|驕傲|骄傲/],["think",/think|ponder|思考/],["surprised",/surpris|shock|驚訝|惊讶|吃驚|吃惊/],
+ ["worried",/worr|nervous|anxious|擔心|担心|緊張|紧张/],["sad",/sad|cry|unhappy|難過|难过|傷心|伤心|哭/]];
+function spriteKeyFor(name){const s=String(name).split(/[\\/]/).pop().replace(/\.[a-z0-9]+$/i,"").toLowerCase().replace(/[\s_\-.()（）\[\]]+/g,"");for(const [k,re] of SPRITE_NAMES)if(re.test(s))return k;return null}
+async function unzipImages(file){
+  const buf=new Uint8Array(await file.arrayBuffer()),dv=new DataView(buf.buffer);let eocd=-1;
+  for(let i=buf.length-22;i>=Math.max(0,buf.length-65558);i--){if(dv.getUint32(i,true)===0x06054b50){eocd=i;break}}
+  if(eocd<0)throw new Error(isEN()?"That zip file can't be read.":"讀不到這個 zip 檔。");
+  const n=dv.getUint16(eocd+10,true);let p=dv.getUint32(eocd+16,true);const out=[];
+  for(let k=0;k<n;k++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const flag=dv.getUint16(p+8,true),method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),nlen=dv.getUint16(p+28,true),elen=dv.getUint16(p+30,true),clen=dv.getUint16(p+32,true),loff=dv.getUint32(p+42,true);
+    const raw=buf.subarray(p+46,p+46+nlen);let name;try{name=new TextDecoder(flag&0x800?"utf-8":"big5").decode(raw)}catch(e){name=new TextDecoder().decode(raw)}
+    p+=46+nlen+elen+clen;
+    if(/\/$/.test(name)||/__MACOSX|(^|\/)\._/.test(name)||!/\.(png|jpe?g|webp|gif)$/i.test(name))continue;
+    const ln=dv.getUint16(loff+26,true),le=dv.getUint16(loff+28,true),st=loff+30+ln+le,data=buf.subarray(st,st+csize);
+    let bytes;if(method===0)bytes=data;
+    else if(method===8){if(typeof DecompressionStream==="undefined")throw new Error(isEN()?"This browser can't open zip files — unzip it first and pick the images.":"這個瀏覽器打不開 zip，請先解壓縮再選圖片。");
+      bytes=new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer())}
+    else continue;
+    const base=name.split("/").pop(),type=/\.png$/i.test(base)?"image/png":/\.webp$/i.test(base)?"image/webp":/\.gif$/i.test(base)?"image/gif":"image/jpeg";
+    out.push(new File([bytes],base,{type}));
+  }
+  return out;
+}
+async function handleSpriteBatch(files){
+  const en=isEN();let list=[];
+  for(const f of files){if(/\.zip$/i.test(f.name)||/zip/.test(f.type)){try{list.push(...await unzipImages(f))}catch(e){toast(e.message||String(e),7000);return}}else list.push(f)}
+  const pick={},skipped=[];
+  for(const f of list){const k=spriteKeyFor(f.name);if(!k||pick[k]){skipped.push(f.name);continue}pick[k]=f}
+  const keys=Object.keys(pick);
+  if(!keys.length){toast(en?"Couldn't tell which expression each file is. Name them like Eyes_open.png, Mouth_open.png, Happy.png (or 張眼、張嘴、開心).":"認不出檔名是哪個表情。請把檔名取成像 Eyes_open.png、Mouth_open.png、Happy.png（或 張眼、張嘴、開心）。",9000);return}
+  let i=0,ok=0;
+  for(const k of keys){i++;toast((en?"Adding pictures ":"放圖片中 ")+i+"/"+keys.length+"…");if(await handleSpriteFile(pick[k],k,true)!==false)ok++}
+  renderSlots();renderStage();flashMood("wave");
+  const names=keys.map(k=>(SLOTS.find(x=>x[0]===k)||[])[1]).filter(Boolean);
+  toast((en?`Added ${ok} picture${ok===1?"":"s"}`:`放好 ${ok} 張：${names.join("、")}`)+(skipped.length?(en?` · skipped: ${skipped.slice(0,4).join(", ")}`:`。沒用到：${skipped.slice(0,4).join("、")}`):""),9000);
+}
+const SAMPLE_SPRITES={idle:"Eyes_open",blink:"Eyes_closed",talk:"Mouth_open",happy:"Happy",shy:"Shy",angry:"Angry",smug:"Smug",think:"Thinking",surprised:"Surprised",worried:"Worried",sad:"Sad",sleep:"Asleep"};
+const SAMPLE_BASE=window.GH_MODE?"character/":"https://elvis071114-coder.github.io/m01/character/";
+async function applySample(btn){
+  const en=isEN(),label=btn.textContent;btn.disabled=true;let done=0,fail=0;
+  for(const [k,n] of Object.entries(SAMPLE_SPRITES)){btn.textContent=(en?"Loading ":"載入中 ")+(done+fail+1)+"/12…";
+    try{const r=await fetch(SAMPLE_BASE+n+".png");if(!r.ok)throw 0;const bl=await r.blob();if(await handleSpriteFile(new File([bl],n+".png",{type:"image/png"}),k,true)===false)throw 0;done++}catch(e){fail++}}
+  btn.disabled=false;btn.textContent=label;renderSlots();renderStage();flashMood("wave");
+  toast(!done?(en?"Couldn't download the sample character — is the computer online?":"下載不到範例角色，電腦有連上網路嗎？"):fail?(en?`Loaded ${done} of 12 — some images couldn't be downloaded.`:`載入了 ${done}／12 張，有些圖片下載失敗。`):(en?"Sample character added!":"範例角色套用好了！"),6000);
+}
+(function(){
+  const inp=$("spriteMulti");if(inp)inp.onchange=e=>{const fs=[...e.target.files];e.target.value="";if(fs.length)handleSpriteBatch(fs)};
+  const sb=$("sampleBtn"),sn=$("sampleNote");if(sb&&typeof LOCAL_CFG!=="undefined"){sb.hidden=false;if(sn)sn.hidden=false;sb.onclick=()=>applySample(sb)}
+  const area=$("slots");if(area){area.addEventListener("dragover",e=>{e.preventDefault();e.stopPropagation()});
+    area.addEventListener("drop",e=>{e.preventDefault();e.stopPropagation();if(typeof dragN!=="undefined")dragN=0;try{$("drop").classList.remove("show")}catch(x){}const fs=[...(e.dataTransfer&&e.dataTransfer.files||[])];if(fs.length)handleSpriteBatch(fs)})}
+})();
+
 function fileToDataURL(f){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>no(new Error("讀不到這個檔案"));r.readAsDataURL(f)})}
 async function shrinkImage(f){
   // desktop app: saved as a file on this computer, so keep it sharp; web: each saved doc must stay under 256 KB
@@ -2025,10 +2358,10 @@ async function shrinkImage(f){
   }finally{URL.revokeObjectURL(url)}
 }
 $("spriteFile").onchange=e=>{const f=e.target.files[0];const k=e.target.dataset.slot;e.target.value="";if(f&&k)handleSpriteFile(f,k)};
-async function handleSpriteFile(f,k){
+async function handleSpriteFile(f,k,quiet){
   if(/heic|heif/i.test(f.type)||/\.hei[cf]$/i.test(f.name)){toast("HEIC 格式不支援。請在「預覽程式」打開圖片 → 檔案 → 輸出 → 格式選 PNG，再上傳。",8000);return}
   if(!/^image\//.test(f.type)&&!/\.(png|jpe?g|webp|gif)$/i.test(f.name)){toast("請選擇圖片檔（PNG、JPG、WebP 或 GIF）",5000);return}
-  toast("處理圖片中…");
+  if(!quiet)toast("處理圖片中…");
   try{
     let ohash="";try{ohash=[...new Uint8Array(await crypto.subtle.digest("SHA-256",await f.arrayBuffer()))].map(b=>b.toString(16).padStart(2,"0")).join("")}catch(e){}
     const data=await shrinkImage(f);
@@ -2036,10 +2369,10 @@ async function handleSpriteFile(f,k){
     S.settings.sprites={...sprites(),[k]:{db:true,t:Date.now(),hash:ohash}};
     if(S.db){
       await queueWrite(()=>S.db.doc(`data/users/${S.uid}/sprite_${k}`).set({data,t:Date.now()}));
-      saveSettingsQuiet();toast("已更新："+SLOTS.find(x=>x[0]===k)[1]);
+      saveSettingsQuiet();if(!quiet)toast("已更新："+SLOTS.find(x=>x[0]===k)[1]);
     }else toast("已套用，但瀏覽器不允許儲存，重新整理後會消失",5000);
-    renderSlots();renderStage();flashMood(k==="happy"?"happy":"wave");
-  }catch(err){console.warn(err);toast("上傳失敗："+(err.message||err.code||"請再試一次"),6000)}
+    if(!quiet){renderSlots();renderStage();flashMood(k==="happy"?"happy":"wave")}
+  }catch(err){console.warn(err);toast("上傳失敗："+(err.message||err.code||"請再試一次"),6000);return false}
 }
 async function loadSprites(){
   const sp=sprites();const ks=Object.keys(sp).filter(k=>sp[k]&&sp[k].db);if(!ks.length||!S.db)return;
@@ -2128,7 +2461,7 @@ const I18N={
 "靜音":"Mute","取消靜音":"Unmute","音量":"Volume","放開以上傳檔案":"Drop to upload","電量":"Battery","介面音效":"Interface sounds","介面音效開關":"Interface sounds","離開":"Exit","夥伴":"Partner",
 "無痕模式":"Incognito mode","對話說明":"Chat help","上傳檔案或圖片":"Upload a file or image","輸入訊息，或問我之前講過的事":"Type a message, or ask about anything we talked about","語音輸入":"Voice input",
 "聊天說明":"Chat help","說明":"Help","例如：喜歡喝珍珠奶茶、對花生過敏":"e.g. loves bubble tea, allergic to peanuts","搜尋所有對話與檔案":"Search all chats and files","例如：Elvis":"e.g. Elvis","自訂顏色":"Custom colour","開始":"Start","關閉說明":"Close help","統計":"Stats",
-"語言 Language":"Language 語言","。":".","請從 M-01 App 打開":"Please open this from the M-01 app","測試你的金鑰可以用哪些模型…":"Checking which models your key can use…","想一下…":"Thinking…","平常切換模型和思考程度，用聊天輸入框上方的按鈕就好；這裡是設定金鑰的地方。":"Switch models and thinking level with the button above the chat input; this is where API keys are set.","Gemini 3.6 Flash：建議，聰明又穩定":"Gemini 3.6 Flash: recommended, smart and steady","Gemini 3.8 Flash：最聰明，但免費額度最少":"Gemini 3.8 Flash: smartest, smallest free quota","Gemini 3.5 Flash-Lite：最快、免費次數最多":"Gemini 3.5 Flash-Lite: fastest, most free usage","思考程度":"Thinking","Gemini 3.5 Flash-Lite：免費額度多、速度快（預設）":"Gemini 3.5 Flash-Lite: more free usage, fast (default)","Gemini 3.8 Flash：比較聰明（可能需要付費方案）":"Gemini 3.8 Flash: smarter (may need a paid plan)","仔細想一想…":"Thinking it through…","Gemini 3.8 Flash 現在不能用（可能需要付費方案），已自動改用 3.5 Flash-Lite":"Gemini 3.8 Flash isn't available (may need a paid plan) — switched to 3.5 Flash-Lite","簡短：一兩句，回得快":"Short: a sentence or two, fast","一般（建議）":"Normal (recommended)","詳細：想清楚再回答，比較長":"Detailed: thinks it through, longer","儲值、建立金鑰，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", top up, create a key and paste it below — it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","設定會自動儲存":"Settings save automatically","✓ 已自動儲存":"✓ Saved","已套用（未登入，不會保存）":"Applied (not signed in, won't be saved)","已套用「傲嬌 Claude」說話風格":"Applied the \"Tsundere Claude\" style","改完會自動儲存並測試連線":"Changes save and test automatically","Gemini（Google：有免費額度，比本地聰明）":"Gemini (Google: free tier, smarter than local)","Claude（最聰明：需要 API 金鑰，按用量付費）":"Claude (smartest: needs an API key, pay per use)","Gemini API 金鑰":"Gemini API key","Gemini 模型":"Gemini model","Gemini 3.8 Flash：比較聰明（建議）":"Gemini 3.8 Flash: smarter (recommended)","Gemini 3.5 Flash-Lite：更快、免費額度比較多":"Gemini 3.5 Flash-Lite: faster, more free usage","⚠️ 還沒貼上 Gemini API 金鑰。":"⚠️ No Gemini API key yet.","還沒設定 Gemini API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Gemini API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 API 金鑰，請到「設定 → AI」貼上金鑰。":"No API key yet — add one in Settings → AI.","連不到 Gemini，請確認電腦有網路。":"Can't reach Gemini — is this computer online?","到":"Get a free key at","用 Google 帳號免費建立金鑰（Google AI Plus／Pro 訂閱是給 Gemini App 用的，跟 API 金鑰分開計算），貼到下面就會自動儲存並測試。免費額度每分鐘、每天有次數上限，用完等一下就會恢復。注意：免費方案的對話內容 Google 可能會拿去改進他們的產品。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。":"with your Google account (Google AI Plus/Pro subscriptions are for the Gemini app and are separate from API keys) and paste it below — it saves and tests itself. The free tier has per-minute and per-day limits that reset after a while. Note: on the free tier Google may use your conversations to improve its products. The key is stored only in this computer's app settings — never in the memory folder or backups.","，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", paste it below and it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","來源 ▸":"Sources ▸","來源 ▾":"Sources ▾","AI 來源":"AI source","本地 AI（Ollama：免費、資料不出電腦）":"Local AI (Ollama: free, data stays on this computer)","Claude（比較聰明：需要 API 金鑰，按用量付費）":"Claude (smarter: needs an API key, pay per use)","API 金鑰":"API key","Claude 模型":"Claude model","Haiku 5.5：快又便宜（估計每則不到 NT$0.1）":"Haiku 5.5: fast and cheap (est. under NT$0.1 per message)","Sonnet 5.5：比較聰明（估計每則 NT$0.5～1）":"Sonnet 5.5: smarter (est. NT$0.5–1 per message)","儲存並測試":"Save & test","刪除金鑰":"Delete key","測試中…":"Testing…","Claude 連線成功":"Connected to Claude","已刪除金鑰":"Key deleted","⚠️ 還沒貼上 Claude API 金鑰。":"⚠️ No Claude API key yet.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Claude API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰。":"No Claude API key yet — add one in Settings → AI.","連不到 Claude，請確認電腦有網路。":"Can't reach Claude — is this computer online?","把 M-01 App 從這台電腦移除。Ollama 本身不會被移除。":"Remove the M-01 app from this computer. Ollama itself is not removed.","一併刪除記憶資料（會移到垃圾桶，後悔還救得回來）":"Also delete memory data (moved to the Trash, so you can still get it back)","一併刪除記憶資料（會移到資源回收筒，後悔還救得回來）":"Also delete memory data (moved to the Recycle Bin, so you can still get it back)","一併刪除聊天模型（可以騰出 2～5GB）":"Also delete the chat model (frees 2–5GB)","解除安裝 App…":"Uninstall app…","需要 Anthropic 的 API 金鑰。它跟 claude.ai 的訂閱是分開計費的：到":"You need an Anthropic API key. It's billed separately from a claude.ai subscription: top up and create a key at","儲值、建立金鑰，再貼到下面。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", then paste it below. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","記憶資料夾":"Memory folder","版本資訊與注意事項":"Version & notes","新手教學":"Guided tour","下載 App":"Get App","她之後會主動問你的事。不想被問的可以刪掉。":"Things she’ll ask you about later. Delete any you don’t want her to bring up.","朗讀":"Read aloud","語音還沒設定。":"Voice isn't set up yet.","Fish Audio API 金鑰":"Fish Audio API key","貼上金鑰":"Paste your key","口音":"Accent","自動（中文回覆用中文聲音，英文回覆用英文聲音）":"Auto (Chinese voice for Chinese replies, English voice for English replies)","中文（一律用中文聲音）":"Chinese (always the Chinese voice)","英文（一律用英文聲音）":"English (always the English voice)","中文聲音（fish.audio 聲音網址或 ID）":"Chinese voice (fish.audio voice link or ID)","英文聲音（fish.audio 聲音網址或 ID）":"English voice (fish.audio voice link or ID)","口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，英文的聲音就是英文口音。所以下面可以各選一個。到 fish.audio 打開聲音的頁面，複製網址貼上；留空的話會用另一個欄位的聲音，兩個都空就用預設聲音。":"The accent comes from the voice: a Chinese voice sounds Chinese, an English voice sounds English — so you can pick one of each below. Open a voice page on fish.audio and paste its link; if one is empty the other is used, and if both are empty the default voice is used.","例如 https://fish.audio/m/…":"e.g. https://fish.audio/m/…","請用你自己建立、或主人明確允許使用的聲音。不要用模仿真實人物（聲優、藝人、網紅等）的聲音模型。":"Only use voices you made yourself or that the owner clearly allows. Don't use voice models that imitate real people (voice actors, celebrities, streamers…).","語音模型":"Voice model","S2.1 Pro Free：免費（有合理使用限制）":"S2.1 Pro Free: free (fair-use limits)","S2.1 Pro：付費，比較穩定（要先到 Fish Audio 儲值 API 額度）":"S2.1 Pro: paid, more reliable (needs Fish Audio API credit)","回覆完自動唸出來":"Read replies aloud automatically","語氣跟著表情變（開心、害羞、生氣…）":"Tone follows her expression (happy, shy, annoyed…)","試聽":"Test voice","打開資料夾":"Open folder","更換位置…":"Move…","Google 雲端硬碟備份教學":"Google Drive backup guide","編輯":"Edit","取消":"Cancel","更新":"Update","確定刪除？":"Delete?","編輯訊息":"Edit message","已刪除這則訊息和她的回覆":"Deleted this message and her reply","等她回完再編輯，或先按「停止」":"Wait until she finishes, or press Stop first","內容不能是空的":"The message can't be empty","她還在回覆中…按 Esc 或「停止」可以中斷":"She's still replying… press Esc or Stop to interrupt","上一則卡住了，已經重置，請再傳一次":"The last message got stuck and was reset — please send again","最初的對話":"First chat","無痕對話（不會保存）":"Incognito chat (not saved)","無痕模式：這段對話不會被保存，她也不會記住，也不會讀取你過去的記憶。關掉無痕就會回到一般對話。":"Incognito: this chat isn't saved, she won't remember it, and she won't read your past memories. Turn incognito off to go back.","橘":"Orange","藍":"Blue","綠":"Green","粉":"Pink","紫":"Purple","紅":"Red","黃":"Yellow","還沒有重點。聊天時提到重要的事，夥伴會自動記下。":"No notes yet. When something important comes up, your partner saves it automatically.",
+"語言 Language":"Language 語言","。":".","請從 M-01 App 打開":"Please open this from the M-01 app","測試你的金鑰可以用哪些模型…":"Checking which models your key can use…","想一下…":"Thinking…","平常切換模型和思考程度，用聊天輸入框上方的按鈕就好；這裡是設定金鑰的地方。":"Switch models and thinking level with the button above the chat input; this is where API keys are set.","Gemini 3.6 Flash：建議，聰明又穩定":"Gemini 3.6 Flash: recommended, smart and steady","Gemini 3.8 Flash：最聰明，但免費額度最少":"Gemini 3.8 Flash: smartest, smallest free quota","Gemini 3.5 Flash-Lite：最快、免費次數最多":"Gemini 3.5 Flash-Lite: fastest, most free usage","思考程度":"Thinking","Gemini 3.5 Flash-Lite：免費額度多、速度快（預設）":"Gemini 3.5 Flash-Lite: more free usage, fast (default)","Gemini 3.8 Flash：比較聰明（可能需要付費方案）":"Gemini 3.8 Flash: smarter (may need a paid plan)","仔細想一想…":"Thinking it through…","Gemini 3.8 Flash 現在不能用（可能需要付費方案），已自動改用 3.5 Flash-Lite":"Gemini 3.8 Flash isn't available (may need a paid plan) — switched to 3.5 Flash-Lite","簡短：一兩句，回得快":"Short: a sentence or two, fast","一般（建議）":"Normal (recommended)","詳細：想清楚再回答，比較長":"Detailed: thinks it through, longer","儲值、建立金鑰，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", top up, create a key and paste it below — it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","設定會自動儲存":"Settings save automatically","✓ 已自動儲存":"✓ Saved","已套用（未登入，不會保存）":"Applied (not signed in, won't be saved)","已套用「傲嬌 Claude」說話風格":"Applied the \"Tsundere Claude\" style","改完會自動儲存並測試連線":"Changes save and test automatically","Gemini（Google：有免費額度，比本地聰明）":"Gemini (Google: free tier, smarter than local)","Claude（最聰明：需要 API 金鑰，按用量付費）":"Claude (smartest: needs an API key, pay per use)","Gemini API 金鑰":"Gemini API key","Gemini 模型":"Gemini model","Gemini 3.8 Flash：比較聰明（建議）":"Gemini 3.8 Flash: smarter (recommended)","Gemini 3.5 Flash-Lite：更快、免費額度比較多":"Gemini 3.5 Flash-Lite: faster, more free usage","⚠️ 還沒貼上 Gemini API 金鑰。":"⚠️ No Gemini API key yet.","還沒設定 Gemini API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Gemini API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 API 金鑰，請到「設定 → AI」貼上金鑰。":"No API key yet — add one in Settings → AI.","連不到 Gemini，請確認電腦有網路。":"Can't reach Gemini — is this computer online?","到":"Get a free key at","用 Google 帳號免費建立金鑰（Google AI Plus／Pro 訂閱是給 Gemini App 用的，跟 API 金鑰分開計算），貼到下面就會自動儲存並測試。免費額度每分鐘、每天有次數上限，用完等一下就會恢復。注意：免費方案的對話內容 Google 可能會拿去改進他們的產品。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。":"with your Google account (Google AI Plus/Pro subscriptions are for the Gemini app and are separate from API keys) and paste it below — it saves and tests itself. The free tier has per-minute and per-day limits that reset after a while. Note: on the free tier Google may use your conversations to improve its products. The key is stored only in this computer's app settings — never in the memory folder or backups.","，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", paste it below and it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","來源 ▸":"Sources ▸","來源 ▾":"Sources ▾","AI 來源":"AI source","本地 AI（Ollama：免費、資料不出電腦）":"Local AI (Ollama: free, data stays on this computer)","Claude（比較聰明：需要 API 金鑰，按用量付費）":"Claude (smarter: needs an API key, pay per use)","API 金鑰":"API key","Claude 模型":"Claude model","Haiku 5.5：快又便宜（估計每則不到 NT$0.1）":"Haiku 5.5: fast and cheap (est. under NT$0.1 per message)","Sonnet 5.5：比較聰明（估計每則 NT$0.5～1）":"Sonnet 5.5: smarter (est. NT$0.5–1 per message)","儲存並測試":"Save & test","刪除金鑰":"Delete key","測試中…":"Testing…","Claude 連線成功":"Connected to Claude","已刪除金鑰":"Key deleted","⚠️ 還沒貼上 Claude API 金鑰。":"⚠️ No Claude API key yet.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Claude API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰。":"No Claude API key yet — add one in Settings → AI.","連不到 Claude，請確認電腦有網路。":"Can't reach Claude — is this computer online?","把 M-01 App 從這台電腦移除。Ollama 本身不會被移除。":"Remove the M-01 app from this computer. Ollama itself is not removed.","一併刪除記憶資料（會移到垃圾桶，後悔還救得回來）":"Also delete memory data (moved to the Trash, so you can still get it back)","一併刪除記憶資料（會移到資源回收筒，後悔還救得回來）":"Also delete memory data (moved to the Recycle Bin, so you can still get it back)","一併刪除聊天模型（可以騰出 2～5GB）":"Also delete the chat model (frees 2–5GB)","解除安裝 App…":"Uninstall app…","需要 Anthropic 的 API 金鑰。它跟 claude.ai 的訂閱是分開計費的：到":"You need an Anthropic API key. It's billed separately from a claude.ai subscription: top up and create a key at","儲值、建立金鑰，再貼到下面。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", then paste it below. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","記憶資料夾":"Memory folder","版本資訊與注意事項":"Version & notes","新手教學":"Guided tour","下載 App":"Get App","一次放多張圖片或 zip":"Add many pictures or a zip","套用範例角色":"Use the sample character","可以一次選好幾張，或直接選整個 zip：檔名有表情名稱就會自動放到對的格子（例如 Eyes_open、Mouth_open、Happy，或 張眼、張嘴、開心）。也可以把一整批圖片拖到下面的格子區。":"Pick several pictures at once, or a whole zip: files named after an expression go into the right slot automatically (e.g. Eyes_open, Mouth_open, Happy). You can also drop a batch of pictures onto the slots below.","範例角色：角色靈感來自社群的 Claude娘 二創形象，圖片是用 AI 製作的。":"Sample character: inspired by the community’s “Claude-chan” fan personification; the images were made with AI.","她之後會主動問你的事。不想被問的可以刪掉。":"Things she’ll ask you about later. Delete any you don’t want her to bring up.","朗讀":"Read aloud","語音還沒設定。":"Voice isn't set up yet.","Fish Audio API 金鑰":"Fish Audio API key","貼上金鑰":"Paste your key","口音":"Accent","自動（中文回覆用中文聲音，英文回覆用英文聲音）":"Auto (Chinese voice for Chinese replies, English voice for English replies)","中文（一律用中文聲音）":"Chinese (always the Chinese voice)","英文（一律用英文聲音）":"English (always the English voice)","中文聲音（fish.audio 聲音網址或 ID）":"Chinese voice (fish.audio voice link or ID)","英文聲音（fish.audio 聲音網址或 ID）":"English voice (fish.audio voice link or ID)","口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，英文的聲音就是英文口音。所以下面可以各選一個。到 fish.audio 打開聲音的頁面，複製網址貼上；留空的話會用另一個欄位的聲音，兩個都空就用預設聲音。":"The accent comes from the voice: a Chinese voice sounds Chinese, an English voice sounds English — so you can pick one of each below. Open a voice page on fish.audio and paste its link; if one is empty the other is used, and if both are empty the default voice is used.","例如 https://fish.audio/m/…":"e.g. https://fish.audio/m/…","請用你自己建立、或主人明確允許使用的聲音。不要用模仿真實人物（聲優、藝人、網紅等）的聲音模型。":"Only use voices you made yourself or that the owner clearly allows. Don't use voice models that imitate real people (voice actors, celebrities, streamers…).","語音模型":"Voice model","S2.1 Pro Free：免費（有合理使用限制）":"S2.1 Pro Free: free (fair-use limits)","S2.1 Pro：付費，比較穩定（要先到 Fish Audio 儲值 API 額度）":"S2.1 Pro: paid, more reliable (needs Fish Audio API credit)","回覆完自動唸出來":"Read replies aloud automatically","語氣跟著表情變（開心、害羞、生氣…）":"Tone follows her expression (happy, shy, annoyed…)","試聽":"Test voice","打開資料夾":"Open folder","更換位置…":"Move…","Google 雲端硬碟備份教學":"Google Drive backup guide","編輯":"Edit","取消":"Cancel","更新":"Update","確定刪除？":"Delete?","編輯訊息":"Edit message","已刪除這則訊息和她的回覆":"Deleted this message and her reply","等她回完再編輯，或先按「停止」":"Wait until she finishes, or press Stop first","內容不能是空的":"The message can't be empty","她還在回覆中…按 Esc 或「停止」可以中斷":"She's still replying… press Esc or Stop to interrupt","上一則卡住了，已經重置，請再傳一次":"The last message got stuck and was reset — please send again","最初的對話":"First chat","無痕對話（不會保存）":"Incognito chat (not saved)","無痕模式：這段對話不會被保存，她也不會記住，也不會讀取你過去的記憶。關掉無痕就會回到一般對話。":"Incognito: this chat isn't saved, she won't remember it, and she won't read your past memories. Turn incognito off to go back.","橘":"Orange","藍":"Blue","綠":"Green","粉":"Pink","紫":"Purple","紅":"Red","黃":"Yellow","還沒有重點。聊天時提到重要的事，夥伴會自動記下。":"No notes yet. When something important comes up, your partner saves it automatically.",
 "檢查中…":"Checking…","聊天模型（Ollama 模型名稱）":"Chat model (Ollama model name)","看圖模型（選填，留空就不看圖）":"Vision model (optional — leave empty to skip images)","Ollama 位址":"Ollama address","儲存並測試連線":"Save & test connection",
 "例如 gemma3:4b":"e.g. gemma3:4b",
 "記憶目前存在 App 裡。選「文件」裡的 Companion 資料夾，所有記憶就會存進去，再由 Google 雲端硬碟同步。":"Memory is currently stored inside the app. Choose the Companion folder in Documents and everything will be saved there, then synced by Google Drive.",
@@ -2343,7 +2676,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="0.9.19",APP_STAGE="Alpha",APP_BUILD="2026-11-05 20:00";
+const APP_VER="0.9.22",APP_STAGE="Alpha",APP_BUILD="2026-11-05 21:30";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -2354,6 +2687,9 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"0.9.22",d:"11/05 21:30",add:[["電腦版和 GitHub 網頁版可以用 Google 帳號登入：對話、記憶、角色圖和 AI 金鑰會自動同步到你自己 Google 雲端硬碟的隱藏資料夾，換電腦、換手機都能接著聊","Desktop app and GitHub web version: sign in with Google — chats, memories, character pictures and AI keys sync to a hidden folder in your own Google Drive, so you can pick up on any computer or phone"],["兩台裝置同一天都有聊天的話，兩邊的對話會合併，不會蓋掉","If two devices both chatted, the chats are combined instead of one overwriting the other"],["電腦版第一次打開不用再設定資料夾，改成問要不要用 Google 登入","Desktop app: first launch no longer walks you through the folder — it offers Google sign-in instead"]],fix:[]},
+ {v:"0.9.21",d:"11/05 21:00",add:[["電腦版的本地 AI 變成可選：安裝時可以選不要，只用 Gemini 或 Claude，省下 2～5GB","Desktop app: local AI is now optional — skip it at install and use Gemini or Claude, saving 2–5GB"],["「設定 → AI」可以看本地模型佔多少空間、刪掉，或之後再下載（有進度條）","Settings → AI: see how much space each local model uses, delete it, or download one later (with progress)"],["第一次打開、沒有本地 AI 時，會請你選一個 AI（貼上免費的 Gemini 金鑰就能開始）","First run without local AI asks you to pick one (paste a free Gemini key to start)"]],fix:[["沒裝 Ollama 時，打開 App 不會再等 30 秒","Opening the app no longer waits 30 seconds when Ollama isn’t installed"]]},
+ {v:"0.9.20",d:"11/05 20:30",add:[["角色圖可以一次放好幾張或直接選 zip，會依檔名自動放到對的格子","Add many character pictures at once (or a zip) — they go into the right slots by file name"],["電腦版和 GitHub 網頁版：一鍵「套用範例角色」","Desktop app and GitHub web version: one-click “Use the sample character”"]],fix:[]},
  {v:"0.9.19",d:"11/05 20:00",add:[["新增 GitHub 網頁版（elvis071114-coder.github.io/m01）：不用 Claude 帳號，用自己的免費 Gemini 金鑰就能聊，也能直接下載電腦版","New GitHub web version (elvis071114-coder.github.io/m01): no Claude account needed — chat with your own free Gemini key and download the desktop app directly"],["電腦版開始會自動檢查新版本","The desktop app now checks for new versions automatically"]],fix:[]},
  {v:"0.9.18",d:"11/05 19:30",add:[["她會主動關心你：你提過的事（考試、出遊、看醫生…），之後她會自己問你結果；「重點」頁可以看到、也可以刪掉","She follows up on her own: things you mention (a test, a trip, an appointment) — she asks how they went later; see or delete them in Memory"],["電腦版：Fish Audio 語氣會跟著表情變（開心、害羞、生氣…），設定裡可以關掉","Desktop app: the Fish Audio voice’s tone follows her expression (happy, shy, annoyed…); can be turned off in Settings"],["電腦版：會檢查有沒有新版本，有的話右上角 ⓘ 會出現紅點","Desktop app: checks for new versions and shows a red dot on ⓘ when one is out"]],fix:[]},
  {v:"0.9.17",d:"11/05 17:10",add:[["手機打字時（鍵盤打開），上方和角色區會自動收起來，聊天內容看得到","On phones, the top bar and character area fold away while the keyboard is open so you can see the chat"]],fix:[["手機上方「M-01」不會被擠成兩行，時間和電量不會疊在一起（手機上不顯示電量）","Phone top bar: “M-01” no longer wraps and the time no longer overlaps the battery (battery hidden on phones)"]]},
@@ -2405,8 +2741,8 @@ function aboutHelp(){
     "本地 AI 比較小，可能會答錯；上網查到的資料會附來源，重要的事請自己點進去確認。",
     "解除安裝：到「設定 → 解除安裝 App」，可以選要不要一起刪掉記憶資料夾和聊天模型。",
     "角色圖和聲音請使用你自己做的或有授權的，不要用模仿真實人物的聲音；要唸的文字會傳給 Fish Audio 處理。"]);
-  if(window.GH_MODE)notes=en?["Chats and memory are saved in this browser only. Clearing browser data, or opening it on another phone or browser, starts empty — download a backup now and then (Settings → Data).","Your Gemini key is kept only in this browser and is sent only to Google. On the free tier Google may use the chats to improve its products — don’t share anything private.","Her answers are AI-generated and can be wrong. Double-check anything important (health, money, legal).","No web search or voice here — the desktop app has those (Get App tab)."]
-    :["對話和記憶只存在這個瀏覽器裡。清除瀏覽器資料、或換手機／換瀏覽器打開，就會是空的；記得偶爾到「設定 → 資料」下載備份。","你的 Gemini 金鑰只存在這個瀏覽器，只會送到 Google。免費方案的對話內容 Google 可能拿去改進產品，私密的事不要講。","她的回答是 AI 產生的，可能會出錯；健康、金錢、法律這類重要的事請自己再確認。","這個網頁版不能上網查資料、沒有語音；電腦版 App 有（看「下載 App」分頁）。"];
+  if(window.GH_MODE)notes=en?["Chats and memory are saved in this browser. Sign in with Google (Settings → Account) to keep a copy in your own Google Drive and pick up on any phone or computer; otherwise clearing browser data starts empty.","Your Gemini key is kept in this browser (and in your own Google Drive if you sign in), and is sent only to Google. On the free tier Google may use the chats to improve its products — don’t share anything private.","Her answers are AI-generated and can be wrong. Double-check anything important (health, money, legal).","No web search or voice here — the desktop app has those (Get App tab)."]
+    :["對話和記憶存在這個瀏覽器裡。到「設定 → ACCOUNT」用 Google 登入，就會另外存一份到你自己的 Google 雲端硬碟，換手機、換電腦登入都能接著聊；沒登入的話，清除瀏覽器資料就會是空的。","你的 Gemini 金鑰存在這個瀏覽器（有登入的話也會存在你自己的雲端），只會送到 Google。免費方案的對話內容 Google 可能拿去改進產品，私密的事不要講。","她的回答是 AI 產生的，可能會出錯；健康、金錢、法律這類重要的事請自己再確認。","這個網頁版不能上網查資料、沒有語音；電腦版 App 有（看「下載 App」分頁）。"];
   const F=en?[
     ["Chat & memory",["Remembers every conversation and file for good, and you can search all of it","Saves key points about you by itself — add, edit or delete them in Memory","Multiple chats, incognito mode, edit or delete your own messages"]],
     ["Files",["Send images, PDF, Word, Excel and text files — she reads them and can look things up later"]],
@@ -2451,21 +2787,19 @@ $("folderBtn").onclick=e=>{e.stopPropagation();if(isDesk())revealFolder();else s
 $("infoBtn").onclick=e=>{e.stopPropagation();showHelp($("infoBtn"))};
 $("tourBtn").onclick=e=>{e.stopPropagation();try{hideHelp()}catch(err){}$("modelPop").hidden=true;$("volPop").hidden=true;startTour()};
 function showSetup(){
-  const en=isEN(),path=esc(deskPath()),win=/Windows/i.test(navigator.userAgent);
+  const en=isEN();
   const pop=$("setupPop");pop.hidden=false;$("stStep").textContent=en?"FIRST-TIME SETUP":"首次設定";
-  $("stTitle").textContent=en?"Your memory folder is ready":"記憶資料夾已經準備好了";
-  const where=win?(en?"the Google Drive icon at the bottom-right of the taskbar":"工作列右下角的 Google 雲端硬碟圖示"):(en?"the Google Drive icon in the menu bar":"螢幕上方選單列的 Google 雲端硬碟圖示");
-  $("stBody").innerHTML=(en?`<p>Everything you two say, her notes and your files are saved here:</p><p><code id="stPath">${path}</code> <a href="#" id="stMove">Change…</a></p><p><b style="display:inline">Back it up with Google Drive (recommended):</b></p><ol><li>Install <b style="display:inline">Google Drive for desktop</b> and sign in.</li><li>Click ${where} → gear → <b style="display:inline">Preferences</b>.</li><li><b style="display:inline">My Computer</b> → <b style="display:inline">Add folder</b> → choose the folder above → tick <b style="display:inline">Sync with Google Drive</b> → <b style="display:inline">Done</b>.</li></ol><p class="muted">You can find this again in Settings → MEMORY FOLDER.</p>`
-    :`<p>你們的對話、她記下的重點和你傳的檔案，都存在這裡：</p><p><code id="stPath">${path}</code> <a href="#" id="stMove">換位置…</a></p><p><b style="display:inline">建議用 Google 雲端硬碟備份：</b></p><ol><li>安裝「Google 雲端硬碟」電腦版並登入。</li><li>點${where} → 齒輪 →「偏好設定」。</li><li>「我的電腦」→「新增資料夾」→ 選上面這個資料夾 → 勾「與 Google 雲端硬碟同步處理」→「完成」。</li></ol><p class="muted">這份說明之後也可以在「設定 → MEMORY FOLDER」再打開。</p>`);
-  $("stMove").onclick=async e=>{e.preventDefault();const r=await moveFolder();if(r===true)$("stPath").textContent=deskPath()};
+  $("stTitle").textContent=en?"Sync with your Google account?":"要用 Google 帳號同步嗎？";
+  $("stBody").innerHTML=en?`<p>Sign in with Google and your chats, memories, character pictures and AI keys are saved to a hidden folder in <b style="display:inline">your own</b> Google Drive — sign in on another computer, or on the web version on your phone, and pick up where you left off.</p><p>Only M-01 can read that folder; the developer can’t see it. Not now? Everything is still saved on this computer, and you can sign in later in Settings.</p>`
+    :`<p>用 Google 帳號登入後，對話、記憶、角色圖和 AI 金鑰會自動存到<b style="display:inline">你自己</b> Google 雲端硬碟裡的隱藏資料夾。換電腦、或用手機打開網頁版登入同一個帳號，就能接著聊。</p><p>只有 M-01 能讀這個資料夾，開發者看不到。先不用的話，資料一樣會存在這台電腦裡，之後也可以到「設定」再登入。</p>`;
   const box=$("stBtns");box.innerHTML="";
-  const a=document.createElement("a");a.href="https://www.google.com/drive/download/";a.textContent=en?"Get Google Drive":"下載 Google 雲端硬碟";
-  const o=document.createElement("button");o.textContent=en?"Open folder":"打開資料夾";o.onclick=revealFolder;
-  const d=document.createElement("button");d.className="main";d.textContent=en?"Done":"完成";
-  d.onclick=async()=>{S.settings.setup=2;await saveSettingsQuiet();pop.hidden=true};
-  box.append(a,o,d);
+  const close=async()=>{S.settings.setup=3;await saveSettingsQuiet();pop.hidden=true};
+  const k=document.createElement("button");k.id="stSkip";k.textContent=en?"Not now":"先不用";k.onclick=close;
+  const d=document.createElement("button");d.className="main";d.id="stGoogle";d.textContent=en?"Sign in with Google":"用 Google 登入";
+  d.onclick=async()=>{await close();if(window.cloud){if(typeof openTab==="function")openTab("pSet");cloud.signIn()}};
+  box.append(k,d);
 }
-function maybeSetup(){if(isDesk()&&(S.settings.setup||0)<2)showSetup()}
+function maybeSetup(){if(isDesk()&&(S.settings.setup||0)<3&&!(window.cloud&&cloud.signedIn()))showSetup()}
 
 /* ---------- model + thinking picker next to the input ---------- */
 const TIERS=[["quick","低","簡短、最快","Low","Short and fastest"],["default","中","先想一下再回答","Medium","Thinks a little first"],["complex","高","仔細想、回答完整（比較慢）","High","Thinks it through, fuller answer (slower)"]];
@@ -2606,7 +2940,7 @@ addEventListener("keydown",e=>{if($("tour").hidden)return;if(e.key==="Escape"){e
 function maybeTour(){
   let done=!!S.settings.tourDone;try{done=done||localStorage.getItem("m01.tourDone")==="1"}catch(e){}
   if(done)return;
-  const wait=()=>{if(!$("setupPop").hidden||($("ghKey")&&!$("ghKey").hidden)){setTimeout(wait,600);return}startTour()};setTimeout(wait,700);
+  const wait=()=>{if(($("ghKey")&&!$("ghKey").hidden)||!$("setupPop").hidden||(typeof aiPickPending!=="undefined"&&aiPickPending)||($("aiPick")&&!$("aiPick").hidden)){setTimeout(wait,600);return}startTour()};setTimeout(wait,700);
 }
 
 /* ---------- hover: selection frame + soft tick ---------- */
@@ -2947,9 +3281,106 @@ function updateBlock(en){
 }
 setTimeout(()=>{try{checkUpdate(false)}catch(e){}},6000);
 
+
+/* ---------- local AI is optional: list / delete / download models, and pick an AI on first run ---------- */
+let lmPulling=null;
+async function renderLocalModels(){
+  const box=$("lmBox");if(!box||window.GH_MODE)return;if(lmPulling)return;const en=isEN();
+  let j=null;try{const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/tags");if(r.ok)j=await r.json()}catch(e){}
+  if(!j){box.innerHTML=`<p class="note">${en?'Ollama isn’t installed or isn’t running, so there’s no local AI yet. To use it: install Ollama from <a href="https://ollama.com/download">ollama.com/download</a>, open it, then come back here to download a model. You can also just use Gemini (free) or Claude instead.':'目前沒有本地 AI（沒安裝 Ollama，或 Ollama 沒打開）。想用的話：先到 <a href="https://ollama.com/download">ollama.com/download</a> 安裝 Ollama 並打開，再回到這裡下載模型。也可以直接改用 Gemini（免費）或 Claude。'}</p>`;return}
+  const ms=(j.models||[]).filter(m=>!/embed/i.test(m.name)),gb=b=>(b/1e9).toFixed(1)+" GB",have=n=>ms.some(m=>m.name===n);
+  let h=`<div class="lm-h">${en?"Local AI models on this computer":"這台電腦上的本地 AI 模型"}</div>`;
+  h+=ms.length?ms.map(m=>`<div class="row"><div class="t">${esc(m.name)}<div class="d">${gb(m.size||0)}${m.name===LOCAL_CFG.model?(en?" · in use":" · 使用中"):""}</div></div><button data-del="${esc(m.name)}">${en?"Delete":"刪除"}</button></div>`).join("")
+    :`<p class="note">${en?"None yet — download one below.":"還沒有下載任何模型，可以在下面下載。"}</p>`;
+  const btns=(have("qwen2.5:7b")?"":`<button class="sbtn" data-pull="qwen2.5:7b">${en?"Download standard (4.7GB)":"下載標準版（4.7GB）"}</button>`)+(have("qwen2.5:3b")?"":`<button class="sbtn" data-pull="qwen2.5:3b">${en?"Download light (1.9GB)":"下載輕量版（1.9GB）"}</button>`);
+  if(btns)h+=`<div class="inline">${btns}</div>`;
+  h+=`<p class="note" style="margin:0">${en?"Deleting a model frees its disk space; you can download it again any time.":"刪掉模型可以把空間省下來，之後隨時可以再下載。"}</p>`;
+  box.innerHTML=h;
+  box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    if(!b.classList.contains("sure")){b.classList.add("sure");b.textContent=en?"Sure? Delete":"確定刪除？";setTimeout(()=>{if(b.isConnected){b.classList.remove("sure");b.textContent=en?"Delete":"刪除"}},4000);return}
+    deleteLocalModel(b.dataset.del,ms.find(m=>m.name===b.dataset.del))});
+  box.querySelectorAll("[data-pull]").forEach(b=>b.onclick=()=>pullLocalModel(b.dataset.pull));
+}
+async function deleteLocalModel(name,info){
+  const en=isEN();let ok=false;
+  try{const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:name})});ok=r.ok}catch(e){}
+  if(!ok){toast(en?"Couldn’t delete it — is Ollama open?":"刪除失敗，Ollama 有打開嗎？",6000);return}
+  toast((en?"Deleted ":"已刪除 ")+name+(info&&info.size?(en?`, freed ${(info.size/1e9).toFixed(1)} GB`:`，省下 ${(info.size/1e9).toFixed(1)} GB`):""),6000);
+  if(name===LOCAL_CFG.model){
+    const r=await ollamaCheck();const left=(r.names||[]).filter(n=>!/embed/i.test(n));
+    if(left.length){LOCAL_CFG.model=left[0];$("lcModel").value=left[0];saveLocalCfg()}
+    else if((LOCAL_CFG.backend||"ollama")==="ollama"){let g={};try{g=await (await fetch("/secret?p=gemini",{headers:{"X-M01":"1"}})).json()}catch(e){}
+      if(g.has){LOCAL_CFG.backend="gemini";saveLocalCfg();toast(en?"No local model left — switched to Gemini.":"本地模型都刪掉了，已改用 Gemini。",6000)}}
+  }
+  await checkAI();paintModelChip();renderLocalModels();
+}
+async function pullLocalModel(name){
+  const box=$("lmBox"),en=isEN();if(lmPulling)return;
+  const ctl=new AbortController();lmPulling=ctl;
+  box.innerHTML=`<div class="lm-h">${en?"Downloading ":"下載中 "}${esc(name)}</div><div class="lm-bar"><i id="lmFill"></i></div><p class="note" id="lmTxt" style="margin:0">${en?"Starting…":"準備中…"}</p><div class="inline"><button class="sbtn" id="lmCancel">${en?"Cancel":"取消"}</button></div>`;
+  $("lmCancel").onclick=()=>ctl.abort();
+  let ok=false,err="";
+  try{
+    const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/pull",{method:"POST",signal:ctl.signal,headers:{"Content-Type":"application/json"},body:JSON.stringify({model:name,stream:true})});
+    if(!r.ok||!r.body)throw new Error("HTTP "+r.status);
+    const rd=r.body.getReader(),dec=new TextDecoder();let buf="";
+    for(;;){const {value,done}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
+      while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line)continue;let j;try{j=JSON.parse(line)}catch(e){continue}
+        if(j.error){err=j.error;break}
+        if(j.total&&j.completed!=null){const pct=Math.min(100,Math.round(j.completed/j.total*100));const f=$("lmFill");if(f)f.style.width=pct+"%";const t=$("lmTxt");if(t)t.textContent=`${pct}%（${(j.completed/1e9).toFixed(1)} / ${(j.total/1e9).toFixed(1)} GB）`}
+        else{const t=$("lmTxt");if(t&&j.status)t.textContent=j.status}
+        if(j.status==="success")ok=true}
+      if(err)break}
+  }catch(e){if(e&&e.name==="AbortError")err=en?"cancelled":"已取消";else err=String(e&&e.message||e)}
+  lmPulling=null;
+  if(ok){LOCAL_CFG.model=name;LOCAL_CFG.backend="ollama";$("lcModel").value=name;saveLocalCfg();toast((en?"Downloaded ":"下載好了：")+name,6000);await checkAI();paintModelChip()}
+  else toast((en?"Download didn’t finish: ":"下載沒有完成：")+err,7000);
+  renderLocalModels();
+}
+let aiPickPending=false;
+async function maybeAiPick(){
+  if(window.GH_MODE||typeof LOCAL_CFG==="undefined")return;
+  aiPickPending=true;try{await maybeAiPick0()}finally{aiPickPending=false}
+}
+async function maybeAiPick0(){
+  while(!$("setupPop").hidden||(window.cloud&&["waiting","signin","sync"].includes(cloud._st.state)))await new Promise(r=>setTimeout(r,800));
+  if((LOCAL_CFG.backend||"ollama")!=="ollama")return;
+  const r=await ollamaCheck();if(r.ok&&(r.names||[]).some(n=>!/embed/i.test(n)))return;
+  let g={},c={};try{g=await (await fetch("/secret?p=gemini",{headers:{"X-M01":"1"}})).json()}catch(e){}try{c=await (await fetch("/secret",{headers:{"X-M01":"1"}})).json()}catch(e){}
+  const en=isEN();
+  if(g.has||c.has){LOCAL_CFG.backend=g.has?"gemini":"claude";saveLocalCfg();await checkAI();paintModelChip();toast(en?`No local AI found — using ${g.has?"Gemini":"Claude"}.`:`沒有找到本地 AI，改用 ${g.has?"Gemini":"Claude"}。`,6000);return}
+  showAiPick();
+}
+function showAiPick(){
+  const en=isEN();let box=$("aiPick");if(!box){box=document.createElement("div");box.id="aiPick";box.dataset.i18n="none";document.body.appendChild(box)}
+  box.innerHTML=`<div class="g-card" role="dialog" aria-modal="true"><div class="g-tag">SETUP</div><h2>${en?"Choose her AI":"選一個 AI 開始"}</h2>
+   <p>${en?"There’s no local AI on this computer yet. Pick one — you can change it any time above the message box.":"這台電腦還沒有本地 AI。選一個開始，之後隨時可以在聊天框上方切換。"}</p>
+   <div class="opt"><b>${en?"Gemini — free, recommended":"Gemini：免費，建議"}</b>
+     <ol><li>${en?'Open <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> and sign in with Google.':'打開 <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a>，用 Google 帳號登入。'}</li><li>${en?"Press <b>Create API key</b>, copy it and paste it here:":"按 <b>Create API key</b>，複製後貼到這裡："}</li></ol>
+     <input id="apKey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…"><p class="msg" id="apMsg"></p>
+     <div class="acts"><button class="pbtn" id="apSave">${en?"Save and start":"儲存並開始"}</button></div></div>
+   <div class="opt"><b>${en?"Local AI — free, works offline, needs disk space":"本地 AI：免費、不用網路，但要佔硬碟空間"}</b>
+     <span style="font-size:13.5px;color:var(--muted)">${en?"Install Ollama, open it, then download a model in Settings → AI (standard 4.7GB or light 1.9GB).":"先安裝 Ollama 並打開，再到「設定 → AI」下載模型（標準版 4.7GB／輕量版 1.9GB）。"}</span>
+     <div class="acts"><a class="sbtn" href="https://ollama.com/download">${en?"Get Ollama":"下載 Ollama"}</a><button class="sbtn" id="apLocal">${en?"Go to Settings":"到設定"}</button></div></div>
+   <div class="opt"><b>${en?"Claude — smartest, paid per use":"Claude：最聰明，按用量付費"}</b><div class="acts"><button class="sbtn" id="apClaude">${en?"Set up Claude":"設定 Claude"}</button></div></div>
+   <button class="skip" id="apSkip">${en?"Later":"稍後再說"}</button></div>`;
+  box.hidden=false;
+  const close=()=>{box.hidden=true};
+  $("apSkip").onclick=()=>{close();if(typeof maybeTour==="function")maybeTour()};
+  $("apLocal").onclick=()=>{close();openTab("pSet");$("aiBackend").value="ollama";LOCAL_CFG.backend="ollama";saveLocalCfg();paintBackend();try{$("aiBackend").scrollIntoView({block:"start"})}catch(e){}};
+  $("apClaude").onclick=()=>{close();openTab("pSet");$("aiBackend").value="claude";LOCAL_CFG.backend="claude";saveLocalCfg();paintBackend();try{$("ckKey").focus()}catch(e){}};
+  $("apSave").onclick=async()=>{const inp=$("apKey"),msg=$("apMsg"),k=inp.value.trim();
+    if(!/^AIza[0-9A-Za-z_\-]{20,}$/.test(k)){msg.textContent=en?"That doesn’t look like a Gemini key (it starts with AIza).":"這看起來不像 Gemini 金鑰（應該是 AIza 開頭）。";return}
+    msg.textContent=en?"Checking your key…":"測試金鑰中…";$("apSave").disabled=true;
+    await saveKey("gemini",inp,"Gemini");$("apSave").disabled=false;
+    if(S.aiOK){close();toast(en?"Gemini is ready!":"Gemini 設定好了！");if(typeof maybeTour==="function")maybeTour()}
+    else msg.textContent=en?"That key didn’t work — copy it again from AI Studio.":"這把金鑰不能用，請到 AI Studio 重新複製一次。"};
+  $("apKey").addEventListener("keydown",e=>{if(e.key==="Enter")$("apSave").click()});
+}
+
 /* ---------- local AI settings ---------- */
 async function refreshLimits(){try{const lim=await S.sample.limits();S.imagesOK=!!lim.images;S.imgLimits=lim.images||null}catch(e){}}
-function paintBackend(){const b=LOCAL_CFG.backend||"ollama";$("aiBackend").value=b;$("claudeBox").hidden=b!=="claude";$("geminiBox").hidden=b!=="gemini";$("ollamaBox").hidden=b!=="ollama";$("ckModel").value=LOCAL_CFG.claudeModel||"claude-haiku-5-5";$("gmModel").value=LOCAL_CFG.geminiModel||"gemini-3.6-flash"}
+function paintBackend(){const b=LOCAL_CFG.backend||"ollama";if(b==="ollama"&&typeof renderLocalModels==="function")renderLocalModels();$("aiBackend").value=b;$("claudeBox").hidden=b!=="claude";$("geminiBox").hidden=b!=="gemini";$("ollamaBox").hidden=b!=="ollama";$("ckModel").value=LOCAL_CFG.claudeModel||"claude-haiku-5-5";$("gmModel").value=LOCAL_CFG.geminiModel||"gemini-3.6-flash"}
 async function checkAI(){
   if(LOCAL_CFG.backend==="gemini"){
     let st={};try{st=await (await fetch("/secret?p=gemini",{headers:{"X-M01":"1"}})).json()}catch(e){}
@@ -2973,7 +3404,7 @@ async function checkAI(){
     if(pick&&pick!==LOCAL_CFG.model){LOCAL_CFG.model=pick;saveLocalCfg();$("lcModel").value=pick;paintModelChip();return checkAI()}}
   S.aiOK=r.ok&&r.hasModel;
   $("aiState").textContent=!r.ok?"❌ 連不到 Ollama。請確認 Ollama 有開著。":r.hasModel?`✅ 已連線，使用模型 ${LOCAL_CFG.model}`:`⚠️ Ollama 已連線，但還沒下載 ${LOCAL_CFG.model}。請在終端機執行：ollama pull ${LOCAL_CFG.model}`;
-  if(!S.aiOK)showBanner(!r.ok?"連不到本地 AI（Ollama）。請先打開 Ollama，再重新整理這個頁面。":`還沒下載模型 ${LOCAL_CFG.model}，請在終端機執行：ollama pull ${LOCAL_CFG.model}`);else $("banner").hidden=true;
+  if(!S.aiOK)showBanner(!r.ok?"沒有找到本地 AI（Ollama）。可以到「設定 → AI」改用免費的 Gemini，或安裝 Ollama 後下載模型。":`還沒下載模型 ${LOCAL_CFG.model}，請在終端機執行：ollama pull ${LOCAL_CFG.model}`);else $("banner").hidden=true;
   updateStats();
 }
 $("lcModel").value=LOCAL_CFG.model;$("lcVision").value=LOCAL_CFG.vision;$("lcUrl").value=LOCAL_CFG.url;
@@ -3091,12 +3522,14 @@ async function migrateIDB(fdb){
 }
 async function boot(){
   if(booting||document.body.classList.contains("booted")||$("splash").classList.contains("lang"))return;booting=true;
-  if(!appStarted){const mode=await prepareStorage();appStarted=true;await init();if(mode==="folder"){await readFactsFile();fsShowPrimary()}}
+  if(!appStarted){const mode=await prepareStorage();
+    if(window.cloud){window.__ACTIVE_DB=cloud.wrap(window.__ACTIVE_DB||window.__idbDB);await cloud.ready();if(cloud.signedIn()){$("spLog").textContent="CLOUD SYNC";await cloud.bootSync()}}
+    appStarted=true;await init();if(window.cloud){cloud.paint();cloud.schedule(4000)}if(mode==="folder"){await readFactsFile();fsShowPrimary()}}
   await audioInit();
   const sp=$("splash");sp.classList.add("booting");bootChime();if(typeof FS!=="undefined"&&FS.dir&&!FS.dir.server&&!FS.ok)fsPerm(true);
   const lines=["SYSTEM CHECK","MEMORY LINK","CHARACTER SYNC","READY"];
   lines.forEach((l,i)=>setTimeout(()=>$("spLog").textContent=l,i*280));
-  setTimeout(()=>{sp.classList.add("gone");document.body.classList.remove("exiting");document.body.classList.add("booted");flashMood("wave",1600);booting=false;setTimeout(()=>{if(typeof maybeSetup==="function")maybeSetup();if(typeof maybeTour==="function")maybeTour();setTimeout(()=>{if(typeof maybeFollowUp==="function")maybeFollowUp()},4000)},900);
+  setTimeout(()=>{sp.classList.add("gone");document.body.classList.remove("exiting");document.body.classList.add("booted");flashMood("wave",1600);booting=false;setTimeout(()=>{if(typeof maybeSetup==="function")maybeSetup();if(typeof maybeAiPick==="function")maybeAiPick();if(typeof maybeTour==="function")maybeTour();setTimeout(()=>{if(typeof maybeFollowUp==="function")maybeFollowUp()},4000)},900);
     setTimeout(()=>{sp.classList.remove("booting")},600)},1250);
 }
 function shutdown(){
@@ -3104,6 +3537,7 @@ function shutdown(){
   setTimeout(()=>{document.body.classList.remove("booted");const sp=$("splash");sp.classList.remove("gone","booting");$("spLog").textContent="INITIALIZING";$("spPress").innerHTML="PRESS ANY KEY<small>已離開・點一下或按任意鍵重新開始</small>";sp.focus()},620);
 }
 $("splash").addEventListener("pointerdown",boot);
+try{if(sessionStorage.getItem("m01.autoboot")){sessionStorage.removeItem("m01.autoboot");setTimeout(boot,300)}}catch(e){}
 addEventListener("keydown",e=>{if($("splash").classList.contains("lang"))return;if(!document.body.classList.contains("booted")&&!booting){e.preventDefault();boot()}},true);
 /* first launch: choose the language on the start screen; then folder setup (app) and the guided tour */
 (function(){let first=false;try{first=!localStorage.getItem("m01.langChosen")&&!localStorage.getItem("m01.tourDone")}catch(e){}
@@ -3171,17 +3605,17 @@ paintSnd();
     <tr><th>${E?"Voice":"語音朗讀"}</th><td class="n">✗</td><td class="y">✓ Fish Audio</td></tr>
     <tr><th>${E?"Memory":"記憶存在哪"}</th><td>${E?"This browser":"這個瀏覽器"}</td><td>${E?"A folder on your computer":"電腦裡的資料夾"}</td></tr>
     <tr><th>${E?"Phone":"手機"}</th><td class="y">✓</td><td class="n">✗</td></tr></tbody></table>
-    <div class="dl-card"><div class="dl-head"><b>Mac</b><span>${E?"Local AI · needs Ollama · 16GB memory recommended":"本地 AI 版 · 需要 Ollama · 建議 16GB 記憶體"}</span></div>
+    <div class="dl-card"><div class="dl-head"><b>Mac</b><span>${E?"Optional local AI (needs Ollama, 16GB memory recommended) — or just Gemini / Claude":"可選本地 AI（要裝 Ollama、建議 16GB 記憶體）或只用 Gemini／Claude"}</span></div>
       <a class="pbtn dl-btn" href="${BASE}M-01-Companion-Mac.zip" download>${E?"Download for Mac":"下載 Mac 版"}</a>
-      <ol>${E?'<li>Install Ollama from <a href="https://ollama.com/download">ollama.com/download</a>.</li><li>Unzip the download.</li><li>Open Terminal, type <code>bash</code> and a space, drag in “安裝 M-01 Companion.command”, press Enter.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB).</li>':'<li>先到 <a href="https://ollama.com/download">ollama.com/download</a> 安裝 Ollama。</li><li>解壓縮下載的 zip。</li><li>打開「終端機」，輸入 <code>bash</code> 加一個空格，把「安裝 M-01 Companion.command」拖進去，按 Enter。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB）。</li>'}</ol>
+      <ol>${E?'<li>(Only for the local AI) install Ollama from <a href="https://ollama.com/download">ollama.com/download</a>.</li><li>Unzip the download.</li><li>Open Terminal, type <code>bash</code> and a space, drag in “安裝 M-01 Companion.command”, press Enter.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB), 3 = no local AI (Gemini / Claude only).</li>':'<li>（想用本地 AI 才需要）先到 <a href="https://ollama.com/download">ollama.com/download</a> 安裝 Ollama。</li><li>解壓縮下載的 zip。</li><li>打開「終端機」，輸入 <code>bash</code> 加一個空格，把「安裝 M-01 Companion.command」拖進去，按 Enter。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB），3 = 不要本地 AI（只用 Gemini／Claude）。</li>'}</ol>
       <details><summary>${E?"Troubleshooting":"遇到問題怎麼辦"}</summary><ul>${E?"<li>“Developer cannot be verified”: don’t double-click — use Terminal as in step 3.</li><li>“先看我.txt” in the zip has the full guide.</li>":"<li>出現「無法驗證開發者」：不要點兩下，照第 3 步用終端機執行。</li><li>zip 裡的「先看我.txt」有完整說明。</li>"}</ul></details></div>
-    <div class="dl-card"><div class="dl-head"><b>Windows</b><span>${E?"Local AI · needs Ollama · 16GB memory recommended":"本地 AI 版 · 需要 Ollama · 建議 16GB 記憶體"}</span></div>
+    <div class="dl-card"><div class="dl-head"><b>Windows</b><span>${E?"Optional local AI (needs Ollama, 16GB memory recommended) — or just Gemini / Claude":"可選本地 AI（要裝 Ollama、建議 16GB 記憶體）或只用 Gemini／Claude"}</span></div>
       <a class="pbtn dl-btn" href="${BASE}M-01-Companion-Windows.zip" download>${E?"Download for Windows":"下載 Windows 版"}</a>
-      <ol>${E?'<li>Install Ollama from <a href="https://ollama.com/download/windows">ollama.com/download/windows</a>.</li><li>Right-click the zip → “Extract All”.</li><li>Double-click “install.bat”. If “Windows protected your PC” appears, click “More info” → “Run anyway”.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB).</li>':'<li>先到 <a href="https://ollama.com/download/windows">ollama.com/download/windows</a> 安裝 Ollama。</li><li>在 zip 上按右鍵 →「全部解壓縮」。</li><li>按兩下「install.bat」。出現「Windows 已保護您的電腦」時，按「其他資訊」→「仍要執行」。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB）。</li>'}</ol>
+      <ol>${E?'<li>(Only for the local AI) install Ollama from <a href="https://ollama.com/download/windows">ollama.com/download/windows</a>.</li><li>Right-click the zip → “Extract All”.</li><li>Double-click “install.bat”. If “Windows protected your PC” appears, click “More info” → “Run anyway”.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB), 3 = no local AI (Gemini / Claude only).</li>':'<li>（想用本地 AI 才需要）先到 <a href="https://ollama.com/download/windows">ollama.com/download/windows</a> 安裝 Ollama。</li><li>在 zip 上按右鍵 →「全部解壓縮」。</li><li>按兩下「install.bat」。出現「Windows 已保護您的電腦」時，按「其他資訊」→「仍要執行」。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB），3 = 不要本地 AI（只用 Gemini／Claude）。</li>'}</ol>
       <details><summary>${E?"Troubleshooting":"遇到問題怎麼辦"}</summary><ul>${E?"<li>install.bat flashes and closes: Shift + right-click in the folder → “Open PowerShell here”, run <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>.</li><li>“先看我.txt” in the zip has the full guide.</li>":"<li>install.bat 一閃就消失：在資料夾按住 Shift 再按右鍵 →「在這裡開啟 PowerShell」，執行 <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>。</li><li>zip 裡的「先看我.txt」有完整說明。</li>"}</ul></details></div>
     <div class="dl-card"><div class="dl-head"><b>${E?"Sample character":"範例角色圖"}</b><span>${E?"12 expressions · transparent PNG · about 15MB":"12 種表情 · 去背 PNG · 約 15MB"}</span></div>
       <a class="pbtn dl-btn" href="${BASE}M-01-sample-character.zip" download>${E?"Download sample character":"下載範例角色圖"}</a>
-      <p class="note" style="margin:0">${E?"For the desktop app: unzip, then drag each picture onto the matching slot in Settings (file names match the slots). In this web version just press “Use the sample character” in Settings. Inspired by the community’s “Claude-chan” fan personification; made with AI.":"給電腦版用：解壓縮後，把圖片拖到「設定」裡對應的格子（檔名對照格子名稱）。網頁版直接在「設定」按「套用範例角色」就好。角色靈感來自社群的 Claude娘 二創形象，用 AI 製作。"}</p></div>
+      <p class="note" style="margin:0">${E?"For the desktop app: in Settings press “Use the sample character”, or pick this zip with “Add many pictures or a zip”. In this web version just press “Use the sample character” in Settings. Inspired by the community’s “Claude-chan” fan personification; made with AI.":"電腦版可以在「設定」按「套用範例角色」，或用「一次放多張圖片或 zip」直接選這個 zip。網頁版直接在「設定」按「套用範例角色」就好。角色靈感來自社群的 Claude娘 二創形象，用 AI 製作。"}</p></div>
     <p class="note">${E?"Phones: add this page to your Home Screen (Share → Add to Home Screen) to open it like an app.":"手機：把這個網頁「加到主畫面」，就能像 App 一樣打開。"}</p>`;
   };
   // first-run key screen
@@ -3197,6 +3631,9 @@ paintSnd();
       <p class="g-hint">${E?"The key stays only in this browser and is sent only to Google. On the free tier Google may use chats to improve its products — don’t share anything private.":"金鑰只存在這個瀏覽器，只會送到 Google。免費方案的對話內容 Google 可能拿去改進產品，私密的事不要講。"}</p></div>`;
     box.hidden=false;
     const inp=$("ghKeyIn"),msg=$("ghKeyMsg");
+    if(window.cloud&&!cloud.signedIn()){const gb=document.createElement("div");gb.className="g-acc";gb.innerHTML=`<p style="margin:0 0 8px">${E?"Used M-01 before (on another computer or phone)? Sign in with Google to bring your memories and key back.":"在別台電腦或手機用過 M-01？用 Google 登入，就能把記憶和金鑰帶回來。"}</p><button class="g-sub" id="ghGoogle" style="width:100%">${E?"Sign in with Google":"用 Google 登入"}</button>`;
+      box.querySelector(".g-card h2").insertAdjacentElement("afterend",gb);
+      $("ghGoogle").onclick=async()=>{box.hidden=true;await cloud.signIn();if(await needKey())showGhKey(true)}}
     $("ghKeySkip").onclick=()=>{skipped=true;box.hidden=true;if(typeof maybeTour==="function")maybeTour()};
     $("ghKeySave").onclick=async()=>{const k=inp.value.trim();if(!/^AIza[0-9A-Za-z_\-]{20,}$/.test(k)){msg.textContent=E?"That doesn’t look like a Gemini key (it starts with AIza).":"這看起來不像 Gemini 金鑰（應該是 AIza 開頭）。";return}
       msg.textContent=E?"Checking your key…":"測試金鑰中…";$("ghKeySave").disabled=true;
@@ -3210,19 +3647,9 @@ paintSnd();
   const needKey=async()=>{try{const j=await (await fetch("/secret?p=gemini")).json();return !j.has}catch(e){return true}};
   // weather works here too (Open-Meteo allows browsers)
   try{if(typeof TOOLS!=="undefined"&&typeof getWeather==="function"&&!TOOLS.some(t=>t.name==="get_weather"))TOOLS.push({name:"get_weather",description:"查某個地點現在的天氣和未來 3 天預報。對方問天氣、要不要帶傘、冷不冷時一定要先用這個工具，不要自己猜。台灣縣市直接用中文（例如：桃園、台北）；其他地方請用英文地名（例如 Tokyo）。",inputSchema:{type:"object",properties:{location:{type:"string"}},required:["location"]},execute:async({location})=>{showTool(`查天氣：${location}`);return await getWeather(String(location||""))}})}catch(e){}
-  // sample character: one button fills all 12 slots from this site
-  const SAMPLE={idle:"Eyes_open",blink:"Eyes_closed",talk:"Mouth_open",happy:"Happy",shy:"Shy",angry:"Angry",smug:"Smug",think:"Thinking",surprised:"Surprised",worried:"Worried",sad:"Sad",sleep:"Asleep"};
-  const sbox=document.createElement("div");sbox.className="subbox";sbox.id="ghSample";sbox.dataset.i18n="none";
-  const paintSample=()=>{const E=en();sbox.innerHTML=`<p class="note">${E?"No pictures yet? Use the sample character (12 expressions). The character concept comes from the community’s “Claude-chan” fan personification; these images were made with AI for this app.":"還沒有角色圖？可以先用範例角色（12 種表情）。角色靈感來自社群的 Claude娘 二創形象，圖是為這個 App 用 AI 製作的。"}</p><button class="pbtn" id="ghSampleBtn" style="align-self:flex-start">${E?"Use the sample character":"套用範例角色"}</button>`;
-    $("ghSampleBtn").onclick=async()=>{const b=$("ghSampleBtn"),E2=en();b.disabled=true;let done=0,fail=0;
-      for(const [k,n] of Object.entries(SAMPLE)){b.textContent=(E2?"Loading ":"載入中 ")+(done+1)+"/12…";
-        try{const r=await fetch("character/"+n+".png");if(!r.ok)throw 0;const bl=await r.blob();await handleSpriteFile(new File([bl],n+".png",{type:"image/png"}),k);done++}catch(e){fail++}}
-      b.disabled=false;b.textContent=E2?"Use the sample character":"套用範例角色";
-      toast(fail?(E2?`Loaded ${done} of 12 — some images couldn't be downloaded.`:`載入了 ${done}／12 張，有些圖片下載失敗。`):(E2?"Sample character added!":"範例角色套用好了！"),5000)}};
-  {const slots=$("slots");if(slots)slots.parentNode.insertBefore(sbox,slots)}
-  paintNotes();renderGhDl();paintSample();
+  paintNotes();renderGhDl();
   const ob=new MutationObserver(()=>{});ob.observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
-  new MutationObserver(()=>{paintNotes();renderGhDl();paintSample();if(!box.hidden)showGhKey(true)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+  new MutationObserver(()=>{paintNotes();renderGhDl();if(!box.hidden)showGhKey(true)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
   const wait=async()=>{if(!document.body.classList.contains("booted")){setTimeout(wait,500);return}if(await needKey())showGhKey(false)};
   setTimeout(wait,1200);
 })();
