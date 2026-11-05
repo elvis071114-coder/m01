@@ -25,6 +25,7 @@
   --font-hud:"Chakra Petch","Noto Sans TC",system-ui,sans-serif;
   --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   --cut:14px;
+  --card:#101013; --panel-rgb:19,19,22; --bg-rgb:9,9,11; --scrim:rgba(var(--scrim-rgb),.82); --code-bg:#0b0b0d; --focus-bg:#1e1e24; --stripe-a:#29292d; --stripe-b:#1b1b1e; --toast-bg:#000; --scrim-rgb:5,5,8;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -37,10 +38,10 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .hud-t{font-family:var(--font-hud);font-weight:600;letter-spacing:.12em;text-transform:uppercase}
 
 /* ---------- backdrop ---------- */
-.backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse 38% 55% at 26% 58%,rgba(var(--accent-rgb),.15),transparent 70%),#09090B}
+.backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse 38% 55% at 26% 58%,rgba(var(--accent-rgb),.15),transparent 70%),var(--bg)}
 .blocks{position:absolute;inset:-25% -30%;transform:rotate(-12deg);display:flex;flex-direction:column;justify-content:center;gap:3vh}
 .brow{display:flex;width:max-content;white-space:nowrap;will-change:transform}
-.brow span{font-family:"Rubik Mono One","Anton",sans-serif;font-size:min(30vh,280px);line-height:.95;padding-right:.25em;letter-spacing:-.02em;background:repeating-linear-gradient(135deg,#29292d 0 3px,#1b1b1e 3px 6px);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.5}
+.brow span{font-family:"Rubik Mono One","Anton",sans-serif;font-size:min(30vh,280px);line-height:.95;padding-right:.25em;letter-spacing:-.02em;background:repeating-linear-gradient(135deg,var(--stripe-a) 0 3px,var(--stripe-b) 3px 6px);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.5}
 .brow.dim span{opacity:.28}
 .brow.l{animation:slideL 46s linear infinite}.brow.r{animation:slideR 58s linear infinite}
 .brow:nth-child(3){animation-duration:52s}.brow:nth-child(4){animation-duration:64s}
@@ -50,7 +51,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 #motes{position:absolute;inset:0;width:100%;height:100%}
 
 /* ---------- HUD ---------- */
-.hud{position:relative;z-index:2;display:flex;align-items:center;gap:14px;padding:calc(12px + env(safe-area-inset-top)) calc(22px + env(safe-area-inset-right)) 12px calc(22px + env(safe-area-inset-left));border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(9,9,11,.92),rgba(9,9,11,.6))}
+.hud{position:relative;z-index:2;display:flex;align-items:center;gap:14px;padding:calc(12px + env(safe-area-inset-top)) calc(22px + env(safe-area-inset-right)) 12px calc(22px + env(safe-area-inset-left));border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(var(--bg-rgb),.92),rgba(var(--bg-rgb),.6))}
 .emblem{height:34px;padding:0 16px 0 12px;display:flex;align-items:center;background:var(--accent);color:var(--accent-ink);font-family:var(--font-display);font-size:18px;letter-spacing:.06em;clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%)}
 .hud .title{display:flex;flex-direction:column;line-height:1.15}
 .hud .title b{font-family:var(--font-hud);font-size:15px;letter-spacing:.2em}
@@ -70,7 +71,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .batt.low .bfill{background:#ff4d4d}.batt.charging .bfill{background:#4cd964}
 .bolt{display:none;width:10px;height:12px;fill:#4cd964}.batt.charging .bolt{display:block}
 /* volume popover */
-#volPop{position:fixed;z-index:61;width:74px;padding:12px 10px 10px;background:#101013;border:1px solid var(--line2);border-top:3px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;gap:8px}
+#volPop{position:fixed;z-index:61;width:74px;padding:12px 10px 10px;background:var(--card);border:1px solid var(--line2);border-top:3px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;gap:8px}
 #volPop[hidden]{display:none}
 .vtrack{position:relative;width:30px;height:150px;background:var(--panel3);border:1px solid var(--line2);cursor:pointer;touch-action:none;outline:none}
 .vtrack:focus-visible{box-shadow:0 0 0 2px var(--accent)}
@@ -100,10 +101,10 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 #heroWrap{position:relative;flex:1;min-height:0;display:grid;place-items:end center;padding:24px 40px 76px}
 .nameplate{position:absolute;left:22px;bottom:22px;z-index:3;display:flex;align-items:stretch;gap:0}
 .nameplate .bar{width:6px;background:var(--accent)}
-.nameplate .txt{padding:6px 22px 6px 14px;background:rgba(19,19,22,.9);border:1px solid var(--line);border-left:0;clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%)}
+.nameplate .txt{padding:6px 22px 6px 14px;background:rgba(var(--panel-rgb),.9);border:1px solid var(--line);border-left:0;clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%)}
 .nameplate b{display:block;font-family:var(--font-display);font-weight:400;font-size:30px;letter-spacing:.04em;line-height:1.05}
 .nameplate span{font-family:var(--font-hud);font-size:11px;letter-spacing:.2em;color:var(--muted)}
-.moodchip{position:absolute;right:18px;bottom:26px;z-index:3;display:flex;align-items:center;gap:8px;padding:6px 16px;font-size:12.5px;background:rgba(19,19,22,.9);border:1px solid var(--line);color:var(--muted);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.moodchip{position:absolute;right:18px;bottom:26px;z-index:3;display:flex;align-items:center;gap:8px;padding:6px 16px;font-size:12.5px;background:rgba(var(--panel-rgb),.9);border:1px solid var(--line);color:var(--muted);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 .moodchip i{width:7px;height:7px;background:var(--dim);transform:rotate(45deg)}
 .moodchip.talking{color:var(--ink)}.moodchip.talking i{display:none}
 .moodchip.thinking i{background:var(--mem)}.moodchip.happy i{background:var(--ok)}
@@ -142,7 +143,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .sparks svg{position:absolute;width:26px;height:26px;opacity:0;fill:var(--hi)}
 #heroWrap.happy .sparks svg{animation:spark .9s ease-out 2}
 @keyframes spark{0%{opacity:0;transform:scale(.3) rotate(0)}40%{opacity:1}100%{opacity:0;transform:scale(1.2) rotate(90deg)}}
-.empty{align-self:center;justify-self:center;width:min(360px,80%);padding:28px 24px;text-align:center;border:1.5px dashed var(--line2);background:rgba(19,19,22,.7);clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));display:flex;flex-direction:column;gap:12px;align-items:center}
+.empty{align-self:center;justify-self:center;width:min(360px,80%);padding:28px 24px;text-align:center;border:1.5px dashed var(--line2);background:rgba(var(--panel-rgb),.7);clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));display:flex;flex-direction:column;gap:12px;align-items:center}
 .empty svg{width:72px;height:72px;color:var(--line2)}
 .empty b{font-size:17px}
 .empty p{margin:0;font-size:13.5px;color:var(--muted)}
@@ -178,7 +179,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .assistant .bubble{background:var(--panel2);border-left:3px solid var(--accent);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
 .bubble p{margin:0 0 .55em}.bubble p:last-child{margin-bottom:0}
 .bubble ul,.bubble ol{margin:.2em 0 .55em;padding-left:1.3em}
-.bubble pre{background:#0b0b0d;border:1px solid var(--line);padding:10px;overflow-x:auto;font-size:13px}
+.bubble pre{background:var(--code-bg);border:1px solid var(--line);padding:10px;overflow-x:auto;font-size:13px}
 .bubble code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
 .assistant .bubble strong{color:var(--hi)}
 .bubble a{color:var(--accent-hi);word-break:break-all}
@@ -217,7 +218,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .mchip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 12px;font-size:12.5px;color:var(--muted);background:var(--panel2);border:1px solid var(--line2);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);cursor:pointer}
 .mchip:hover,.mchip[aria-expanded="true"]{color:var(--ink);border-color:var(--accent)}
 .mchip b{color:var(--accent);font-weight:700}
-#modelPop{position:fixed;z-index:62;width:min(340px,calc(100vw - 20px));max-height:min(70vh,560px);overflow:auto;background:#101013;border:1px solid var(--line2);border-top:3px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.6);padding:10px 0}
+#modelPop{position:fixed;z-index:62;width:min(340px,calc(100vw - 20px));max-height:min(70vh,560px);overflow:auto;background:var(--card);border:1px solid var(--line2);border-top:3px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.6);padding:10px 0}
 #modelPop[hidden]{display:none}
 .mp-h{font-family:var(--font-hud);font-size:10.5px;letter-spacing:.24em;color:var(--dim);padding:8px 14px 4px}
 .mp-g{font-size:12px;color:var(--accent);padding:8px 14px 2px;font-weight:700}
@@ -242,7 +243,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 #pending{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:8px}
 #pending:empty{display:none}
 .box{display:flex;align-items:flex-end;gap:6px;background:var(--panel2);border:1px solid var(--line2);padding:5px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
-.box:focus-within{border-color:var(--accent);background:#1e1e24}
+.box:focus-within{border-color:var(--accent);background:var(--focus-bg)}
 #input{flex:1;border:none;background:none;resize:none;outline:none;padding:8px 8px;max-height:160px;min-height:24px;line-height:1.45}
 #input::placeholder{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cbtn{width:38px;height:38px;border:none;background:none;display:grid;place-items:center;color:var(--muted);flex:none}
@@ -259,6 +260,19 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 #panel{position:absolute;inset:0;z-index:5;background:var(--panel);display:flex;flex-direction:column}
 #panel[hidden]{display:none}
 .pane{flex:1;overflow-y:auto;padding:18px 20px 22px;display:flex;flex-direction:column;gap:12px}
+#pSet{gap:8px}.sub-h{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--muted)}.sg-intro{margin:0 0 2px}
+.sgrp{border:1px solid var(--line);border-left:3px solid var(--line2);background:var(--panel);flex:none}
+.sgrp>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none}
+.sgrp>summary::-webkit-details-marker{display:none}
+.sgrp>summary:hover{background:var(--panel2)}
+.sg-t{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.sg-t b{font-size:15.5px;letter-spacing:.04em}.sg-t small{font-size:12.5px;color:var(--muted);line-height:1.45}
+.sg-chev{flex:none;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin:0 6px 4px 0}
+.sgrp[open]{border-left-color:var(--accent)}.sgrp[open]>summary .sg-chev{transform:rotate(225deg);margin-bottom:-4px}
+.sgrp[open]>summary .sg-t b{color:var(--accent)}
+.sgb{display:flex;flex-direction:column;gap:12px;padding:4px 14px 16px}
+.sgrp.flash{animation:sgflash 1.2s ease-out}@keyframes sgflash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+@media (max-width:899px){.deskonly{display:none!important}}
 .pane>*{flex-shrink:0}
 .pane label.sbtn{display:inline-flex;align-items:center;min-height:38px}
 .pane[hidden]{display:none}
@@ -310,7 +324,7 @@ input[type=range]{accent-color:var(--accent);width:100%}
 .convbar .cbtn2{border:1px solid var(--line2);background:var(--panel2);color:var(--ink);padding:6px 12px;font-size:13px;white-space:nowrap}
 .convbar .cbtn2:hover{border-color:var(--accent);color:var(--accent)}
 .convbar .cbtn2[aria-pressed="true"]{background:#2a1f3d;border-color:#9d7bff;color:#cbb8ff}
-#convList{position:absolute;left:10px;right:10px;top:48px;z-index:6;max-height:60%;overflow-y:auto;background:#101013;border:1px solid var(--line2);border-left:3px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.6);padding:6px}
+#convList{position:absolute;left:10px;right:10px;top:48px;z-index:6;max-height:60%;overflow-y:auto;background:var(--card);border:1px solid var(--line2);border-left:3px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.6);padding:6px}
 #convList[hidden]{display:none}
 .citem{display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;border-left:3px solid transparent}
 .citem:hover{background:var(--panel2)}
@@ -326,7 +340,7 @@ body.incog .frame{box-shadow:inset 0 0 0 2px #9d7bff}
 .help{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line2);background:var(--panel2);color:var(--muted);font:700 12px/1 var(--font-body);display:inline-grid;place-items:center;padding:0;cursor:pointer;flex:none;vertical-align:middle;margin-left:6px}
 .help:hover,.help[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
 .sec .help{margin-left:0}
-#helpPop{position:fixed;z-index:60;width:min(360px,calc(100vw - 24px));padding:14px 16px 14px;background:#101013;border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.6);font-size:13.5px;line-height:1.65;color:var(--ink)}
+#helpPop{position:fixed;z-index:60;width:min(360px,calc(100vw - 24px));padding:14px 16px 14px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.6);font-size:13.5px;line-height:1.65;color:var(--ink)}
 #helpPop[hidden]{display:none}
 #helpPop b{display:block;font-size:14.5px;margin-bottom:6px}
 #helpPop ol,#helpPop ul{margin:6px 0 0;padding-left:1.25em}
@@ -335,7 +349,7 @@ body.incog .frame{box-shadow:inset 0 0 0 2px #9d7bff}
 #helpPop code{color:var(--accent-hi)}
 #drop{position:fixed;inset:0;background:rgba(var(--accent-rgb),.1);border:3px dashed var(--accent);display:none;place-items:center;font-size:20px;font-weight:700;z-index:20;pointer-events:none}
 #drop.show{display:grid}
-#toast{position:fixed;left:75%;top:70px;transform:translateX(-50%);padding:9px 18px;font-size:14px;max-width:44%;z-index:30;display:none;text-align:center;background:#000;border-left:4px solid var(--accent);color:var(--ink)}
+#toast{position:fixed;left:75%;top:70px;transform:translateX(-50%);padding:9px 18px;font-size:14px;max-width:44%;z-index:30;display:none;text-align:center;background:var(--toast-bg);border-left:4px solid var(--accent);color:var(--ink)}
 
 
 /* ---------- console-style boot / exit ---------- */
@@ -410,13 +424,13 @@ body.exiting .stage{animation-delay:.06s}body.exiting .frame{animation-delay:.12
 
 .sstats{position:absolute;left:50px;top:30px;z-index:3;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
 .sstats small{font-family:var(--font-hud);font-size:10px;letter-spacing:.32em;color:var(--dim);padding-left:2px}
-.sstats .hchip{min-width:124px;justify-content:space-between;background:rgba(19,19,22,.78);backdrop-filter:blur(2px)}
+.sstats .hchip{min-width:124px;justify-content:space-between;background:rgba(var(--panel-rgb),.78);backdrop-filter:blur(2px)}
 .sstats .hchip b{font-size:17px}
 /* hover: game-style selection frame + brighten */
 #tour{position:fixed;inset:0;z-index:86}
 #tour[hidden]{display:none}
-.tour-spot{position:fixed;border:2px solid var(--accent);box-shadow:0 0 0 9999px rgba(5,5,8,.72),0 0 18px rgba(var(--accent-rgb),.6);transition:left .28s cubic-bezier(.2,.9,.25,1),top .28s cubic-bezier(.2,.9,.25,1),width .28s cubic-bezier(.2,.9,.25,1),height .28s cubic-bezier(.2,.9,.25,1);pointer-events:none}
-.tour-card{position:fixed;width:min(340px,calc(100vw - 24px));background:#101013;border:1px solid var(--line2);border-top:3px solid var(--accent);box-shadow:0 18px 50px rgba(0,0,0,.7);padding:14px 16px 12px;transition:left .28s,top .28s;animation:inL .3s cubic-bezier(.2,.9,.25,1) both}
+.tour-spot{position:fixed;border:2px solid var(--accent);box-shadow:0 0 0 9999px rgba(var(--scrim-rgb),.72),0 0 18px rgba(var(--accent-rgb),.6);transition:left .28s cubic-bezier(.2,.9,.25,1),top .28s cubic-bezier(.2,.9,.25,1),width .28s cubic-bezier(.2,.9,.25,1),height .28s cubic-bezier(.2,.9,.25,1);pointer-events:none}
+.tour-card{position:fixed;width:min(340px,calc(100vw - 24px));background:var(--card);border:1px solid var(--line2);border-top:3px solid var(--accent);box-shadow:0 18px 50px rgba(0,0,0,.7);padding:14px 16px 12px;transition:left .28s,top .28s;animation:inL .3s cubic-bezier(.2,.9,.25,1) both}
 .tour-step{font-family:var(--font-hud);font-size:10.5px;letter-spacing:.26em;color:var(--accent);margin-bottom:4px}
 .tour-card b{display:block;font-size:16px;margin-bottom:6px}
 .tour-card p{margin:0 0 12px;font-size:13.5px;line-height:1.65;color:var(--ink)}
@@ -439,7 +453,7 @@ body.exiting .stage{animation-delay:.06s}body.exiting .frame{animation-delay:.12
 @media (max-width:899px){.sstats{display:none}}
 #setupPop{position:fixed;inset:0;z-index:75;display:grid;place-items:center;background:rgba(5,5,7,.74);backdrop-filter:blur(3px);padding:16px}
 #setupPop[hidden]{display:none}
-.st-card{width:min(580px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#101013;border:1px solid var(--line2);border-top:4px solid var(--accent);padding:22px 24px;box-shadow:0 30px 80px rgba(0,0,0,.7);animation:inL .4s cubic-bezier(.2,.9,.25,1) both}
+.st-card{width:min(580px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--card);border:1px solid var(--line2);border-top:4px solid var(--accent);padding:22px 24px;box-shadow:0 30px 80px rgba(0,0,0,.7);animation:inL .4s cubic-bezier(.2,.9,.25,1) both}
 .st-step{font-family:var(--font-hud);font-size:11px;letter-spacing:.3em;color:var(--accent)}
 .st-card h3{margin:6px 0 12px;font-size:20px;font-weight:700}
 .st-card p,.st-card li{font-size:14px;line-height:1.7;color:var(--ink);margin:0 0 8px}
@@ -456,13 +470,14 @@ body.exiting .stage{animation-delay:.06s}body.exiting .frame{animation-delay:.12
 .slot.dropon{outline:2px dashed var(--accent);outline-offset:3px}
 .hbtn2.has-update{position:relative}.hbtn2.has-update::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ff4d4d;box-shadow:0 0 0 2px var(--bg)}
 .upd-box{display:flex;flex-direction:column;gap:4px;margin:8px 0 10px;padding:10px 12px;background:var(--panel2);border-left:3px solid #ff4d4d}.upd-box b{margin:0!important}.upd-box span{font-size:13px}.upd-box a{font-weight:700;color:var(--accent)}.upd-box small{color:var(--dim);font-size:12px}
-#lmBox{display:flex;flex-direction:column;gap:6px}#lmBox .lm-h{font-size:13px;font-weight:700;color:var(--muted)}#lmBox .row button.sure{color:#ff6b6b;border-color:#ff6b6b}
+#lmBox{display:flex;flex-direction:column;gap:6px}#lmBox .lm-cmp{display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:var(--panel2);border-left:3px solid var(--line2)}.lm-cmp div{display:flex;flex-direction:column}.lm-cmp b{font-size:13.5px}.lm-cmp span{font-size:13px;color:var(--muted);line-height:1.55}
+.lm-h{font-size:13px;font-weight:700;color:var(--muted)}#lmBox .row button.sure{color:#ff6b6b;border-color:#ff6b6b}
 #lmBox .lm-bar{height:6px;background:var(--panel3);overflow:hidden}#lmBox .lm-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
-#cloudMerge{position:fixed;inset:0;z-index:46;display:grid;place-items:center;padding:20px;background:rgba(5,5,8,.82);backdrop-filter:blur(4px)}#cloudMerge[hidden]{display:none}
-#cloudMerge .g-card{width:min(480px,100%);padding:22px;background:#101013;border:1px solid var(--line2);border-left:4px solid var(--accent)}#cloudMerge .g-tag{font-family:var(--font-hud);font-size:11.5px;letter-spacing:.24em;color:var(--accent)}
+#cloudMerge{position:fixed;inset:0;z-index:46;display:grid;place-items:center;padding:20px;background:var(--scrim);backdrop-filter:blur(4px)}#cloudMerge[hidden]{display:none}
+#cloudMerge .g-card{width:min(480px,100%);padding:22px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent)}#cloudMerge .g-tag{font-family:var(--font-hud);font-size:11.5px;letter-spacing:.24em;color:var(--accent)}
 #cloudMerge h2{margin:8px 0 6px;font-size:21px}#cloudMerge p{font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 10px}#cloudMerge .acts{display:flex;gap:8px;flex-wrap:wrap}
-#aiPick{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:20px;background:rgba(5,5,8,.82);backdrop-filter:blur(4px)}#aiPick[hidden]{display:none}
-#aiPick .g-card{width:min(520px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:22px 22px 18px;background:#101013;border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+#aiPick{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:20px;background:var(--scrim);backdrop-filter:blur(4px)}#aiPick[hidden]{display:none}
+#aiPick .g-card{width:min(520px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:22px 22px 18px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 20px 50px rgba(0,0,0,.6)}
 #aiPick .g-tag{font-family:var(--font-hud);font-size:11.5px;letter-spacing:.24em;color:var(--accent)}#aiPick h2{margin:8px 0 6px;font-size:21px}
 #aiPick p{margin:0 0 8px;font-size:14px;line-height:1.6;color:var(--muted)}#aiPick ol{margin:0 0 10px;padding-left:1.3em;font-size:14px;line-height:1.65}
 #aiPick .opt{border:1px solid var(--line2);background:var(--panel);padding:12px 14px;margin:10px 0;display:flex;flex-direction:column;gap:6px}#aiPick .opt b{font-size:15.5px}
@@ -540,6 +555,75 @@ body.kb .tabs{padding-top:4px}
   .mchip{min-height:34px;padding-left:12px;padding-right:12px}
 }
 
+/* ===== interface styles ===== */
+:root[data-theme=pink]{--scrim-rgb:120,60,90;--bg:#FFF2F7;--panel:#FFFFFF;--panel2:#FFE6F0;--panel3:#FFD5E6;--line:#F6CADB;--line2:#EEA9C6;--ink:#5B2E45;--muted:#A06A86;--dim:#C9A2B6;--hi:#FF8BC0;--ok:#4FC28A;--mem:#E39B1A;--mem-soft:rgba(227,155,26,.12);
+  --card:#FFFFFF;--panel-rgb:255,255,255;--bg-rgb:255,242,247;--scrim:rgba(255,226,238,.78);--code-bg:#FFF6FA;--focus-bg:#FFF0F6;--stripe-a:#FFDDEA;--stripe-b:#FFEFF5;--toast-bg:#FFFFFF;--cut:0px;color-scheme:light;
+  --font-display:"Noto Sans TC","PingFang TC",system-ui,sans-serif;--font-hud:"Noto Sans TC","PingFang TC",system-ui,sans-serif}
+:root[data-theme=light]{--scrim-rgb:60,70,90;--bg:#F4F5F7;--panel:#FFFFFF;--panel2:#F1F3F6;--panel3:#E7EAEF;--line:#E2E5EA;--line2:#CDD3DB;--ink:#1D2129;--muted:#69707C;--dim:#A0A7B2;--hi:#E8930C;--ok:#16A34A;--mem:#B7791F;--mem-soft:rgba(183,121,31,.1);
+  --card:#FFFFFF;--panel-rgb:255,255,255;--bg-rgb:244,245,247;--scrim:rgba(236,239,243,.82);--code-bg:#F6F8FA;--focus-bg:#FFFFFF;--stripe-a:#E8EBF0;--stripe-b:#F3F5F8;--toast-bg:#FFFFFF;--cut:0px;color-scheme:light;
+  --font-display:system-ui,"Noto Sans TC","PingFang TC",sans-serif;--font-hud:system-ui,"Noto Sans TC","PingFang TC",sans-serif}
+:root[data-theme=terminal]{--bg:#040804;--panel:#081008;--panel2:#0C180C;--panel3:#122412;--line:#1A361A;--line2:#2A5A2A;--ink:#A8FFA8;--muted:#5FB25F;--dim:#3B703B;--hi:#D6FF5C;--ok:#5CFF7A;--mem:#D6FF5C;--mem-soft:rgba(214,255,92,.1);
+  --card:#060D06;--panel-rgb:8,16,8;--bg-rgb:4,8,4;--scrim:rgba(2,6,2,.86);--code-bg:#020602;--focus-bg:#0E1C0E;--stripe-a:#0D1A0D;--stripe-b:#071007;--toast-bg:#020602;--cut:0px;color-scheme:dark;
+  --font-display:ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,"Noto Sans TC",monospace;--font-hud:ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,"Noto Sans TC",monospace;--font-body:ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,"Noto Sans TC","Microsoft JhengHei",monospace}
+:root[data-theme=neon]{--bg:#070618;--panel:#100E29;--panel2:#171437;--panel3:#211C49;--line:#2C2763;--line2:#40388C;--ink:#EEEAFF;--muted:#9E96D8;--dim:#655DA4;--hi:#3DF5FF;--ok:#3DF5FF;--mem:#FFD166;--mem-soft:rgba(255,209,102,.12);
+  --card:#0D0B24;--panel-rgb:16,14,41;--bg-rgb:7,6,24;--scrim:rgba(5,4,18,.84);--code-bg:#08071A;--focus-bg:#1B1740;--stripe-a:#1B1742;--stripe-b:#0F0C2A;--toast-bg:#0D0B24;color-scheme:dark}
+/* soft styles: round corners instead of cut ones */
+:root[data-theme=pink] *,:root[data-theme=light] *{clip-path:none!important}
+:root[data-theme=pink] :is(button,.tab,input,textarea,select,.bubble,.sgrp,.row,.box,.hchip,.moodchip,.nameplate .txt,.thought,.empty,.subbox,.lm-cmp,.tour-card,.st-card,#helpPop,#modelPop,#volPop,#convList,#toast,.g-card,.slot,.upd-box,#sharePop,.emblem),
+:root[data-theme=light] :is(button,.tab,input,textarea,select,.bubble,.sgrp,.row,.box,.hchip,.moodchip,.nameplate .txt,.thought,.empty,.subbox,.lm-cmp,.tour-card,.st-card,#helpPop,#modelPop,#volPop,#convList,#toast,.g-card,.slot,.upd-box,#sharePop,.emblem){border-radius:12px}
+:root[data-theme=pink] :is(button,.tab){border-radius:999px}
+:root[data-theme=pink] .bubble{border-radius:18px}
+:root[data-theme=pink] .brow span,:root[data-theme=light] .brow span{opacity:.55}
+:root[data-theme=pink] .vignette{background:radial-gradient(ellipse 80% 70% at 40% 50%,transparent 45%,rgba(255,200,222,.55))}
+:root[data-theme=light] .vignette{background:radial-gradient(ellipse 80% 70% at 40% 50%,transparent 45%,rgba(200,206,216,.45))}
+:root[data-theme=pink] :is(.tour-card,.st-card,#helpPop,.g-card,#sharePop,.sgrp,.bubble,#toast),:root[data-theme=light] :is(.tour-card,.st-card,#helpPop,.g-card,#sharePop,#toast){box-shadow:0 8px 28px rgba(120,60,90,.12)}
+:root[data-theme=pink] .sgrp,:root[data-theme=light] .sgrp{border-left-width:1px}
+:root[data-theme=pink] .sgrp[open],:root[data-theme=light] .sgrp[open]{box-shadow:inset 3px 0 0 var(--accent)}
+/* retro terminal: glow + scan lines */
+:root[data-theme=terminal] body{text-shadow:0 0 4px rgba(92,255,122,.35)}
+:root[data-theme=terminal] body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+:root[data-theme=terminal] .brow span{font-family:var(--font-display)}
+:root[data-theme=terminal] .bubble{border:1px solid var(--line2)}
+/* night neon: glowing edges */
+:root[data-theme=neon] .backdrop{background:radial-gradient(ellipse 40% 55% at 22% 60%,rgba(var(--accent-rgb),.22),transparent 70%),radial-gradient(ellipse 45% 50% at 80% 20%,rgba(61,245,255,.13),transparent 70%),var(--bg)}
+:root[data-theme=neon] :is(.tab[aria-selected="true"],.pbtn,#send,.emblem){box-shadow:0 0 14px rgba(var(--accent-rgb),.55),0 0 2px rgba(var(--accent-rgb),.9)}
+:root[data-theme=neon] .sgrp[open],:root[data-theme=neon] .box:focus-within{box-shadow:0 0 18px rgba(61,245,255,.18)}
+:root[data-theme=neon] .sec,:root[data-theme=neon] .sgrp[open]>summary .sg-t b{text-shadow:0 0 8px rgba(var(--accent-rgb),.7)}
+
+/* layout: drag the middle, swap sides */
+#splitter{display:none}
+@media (min-width:900px){
+  #splitter{display:block;position:absolute;top:0;bottom:0;width:18px;margin-left:-9px;z-index:6;cursor:col-resize;touch-action:none}
+  #splitter::before{content:"";position:absolute;left:8px;top:12%;bottom:12%;width:2px;background:var(--line2);opacity:0;transition:opacity .2s,background .2s,box-shadow .2s}
+  #splitter:hover::before,#splitter.drag::before{opacity:1}#splitter.drag::before{background:var(--accent)}
+  #splitter.snap::before{opacity:1;background:var(--hi);box-shadow:0 0 12px var(--hi)}
+  #splitter .sw{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;padding:0;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);font-size:15px;line-height:1;opacity:0;transition:opacity .2s}
+  #splitter:hover .sw,#splitter.drag .sw,#splitter .sw:focus-visible{opacity:1}#splitter .sw:hover{border-color:var(--accent);color:var(--accent)}
+  body.split .app{grid-template-columns:minmax(0,calc(var(--split)*1%)) minmax(0,1fr)}
+  body.split.swapped .app{grid-template-columns:minmax(0,1fr) minmax(0,calc(var(--split)*1%))}
+  body.swapped .app>.stage{order:2}body.swapped .app>.console{order:1;padding-left:22px;padding-right:6px}
+  body.dragging,body.dragging *{cursor:col-resize!important;user-select:none}
+  .tabs{overflow-x:auto;scrollbar-width:none}
+}
+@media (min-width:900px) and (max-width:1300px){body.swapped:not(.split) .app{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}}
+/* share */
+.tab-share{margin-left:auto;align-self:center;flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:none;border:1px solid var(--line2);color:var(--muted);font-size:13px}
+.tab-share svg{width:16px;height:16px}.tab-share:hover{color:var(--accent);border-color:var(--accent)}
+@media (max-width:899px){.tab-share span{display:none}.tab-share{padding:6px 8px}}
+#sharePop{position:fixed;z-index:40;width:min(380px,calc(100vw - 20px));padding:14px;background:var(--card);border:1px solid var(--line2);border-top:3px solid var(--accent);box-shadow:0 18px 40px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:10px}
+#sharePop[hidden]{display:none}
+.sh-h{font-weight:700;font-size:15px}.sh-row{display:flex;gap:10px;align-items:center;padding:10px;background:var(--panel2)}
+.sh-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.sh-t small{font-size:12.5px;color:var(--muted);line-height:1.45}.sh-t code{font-size:12px;color:var(--accent);overflow-wrap:anywhere}
+.sh-a{display:flex;flex-direction:column;gap:6px}.sh-a button{padding:6px 12px;font-size:13px;background:var(--panel3);border:1px solid var(--line2)}.sh-a button:hover{border-color:var(--accent)}
+.sh-msg{margin:0;min-height:1em;font-size:12.5px;color:var(--accent)}
+/* tap her */
+#sprite{cursor:pointer}
+#sprite.poked{animation:poke .4s cubic-bezier(.3,1.6,.5,1)}@keyframes poke{35%{transform:scale(.97,1.03) translateY(-8px)}}
+#heroWrap .thought.say{opacity:1;transform:none;animation:none;font-family:var(--font-body);font-size:15px;letter-spacing:.02em;color:var(--ink);max-width:min(64%,340px);line-height:1.5;padding:10px 16px;white-space:normal;z-index:3}
+#updBar{position:fixed;z-index:35;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(560px,calc(100vw - 20px));display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 14px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+#updBar[hidden]{display:none}#updBar b{font-size:14.5px}#updBar span{flex:1 1 200px;font-size:13px;color:var(--muted)}#updBar .pbtn,#updBar .sbtn{padding:7px 14px}
+.upd-box .pbtn{align-self:flex-start;margin:4px 0}
+
 /* GitHub edition */
 #folderBtn,#unSec{display:none!important}
 .dl-card{display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:var(--panel2);border-left:3px solid var(--accent)}
@@ -548,9 +632,9 @@ body.kb .tabs{padding-top:4px}
 .dl-btn{align-self:flex-start;text-decoration:none;display:inline-block}
 .gh-cmp{width:100%;border-collapse:collapse;font-size:13px;line-height:1.45}.gh-cmp th,.gh-cmp td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 .gh-cmp thead th{color:var(--accent);font-size:12.5px}.gh-cmp tbody th{color:var(--muted);white-space:nowrap;width:1%}.gh-cmp .y{color:#8fd694}.gh-cmp .n{color:var(--dim)}
-#ghKey{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:20px;background:rgba(5,5,8,.82);backdrop-filter:blur(4px)}
+#ghKey{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:20px;background:var(--scrim);backdrop-filter:blur(4px)}
 #ghKey[hidden]{display:none}
-#ghKey .g-card{width:min(470px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:22px 22px 18px;background:#101013;border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+#ghKey .g-card{width:min(470px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:22px 22px 18px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 20px 50px rgba(0,0,0,.6)}
 #ghKey .g-tag{font-family:var(--font-hud);font-size:11.5px;letter-spacing:.24em;color:var(--accent)}
 #ghKey h2{margin:8px 0 8px;font-size:21px}#ghKey p{margin:0 0 10px;font-size:14px;line-height:1.6;color:var(--muted)}
 #ghKey ol{margin:0 0 12px;padding-left:1.3em;font-size:14px;line-height:1.7}
@@ -662,8 +746,13 @@ body.kb .tabs{padding-top:4px}
           </div>
           <div class="pane" id="pDl" hidden data-i18n="none"></div>
           <div class="pane" id="pSet" hidden>
+            <p class="note sg-intro">點一下分類就會展開；設定會自動儲存。</p>
+            <details class="sgrp" id="g_acc"><summary><span class="sg-t"><b>帳號與同步</b><small>用 Google 登入，換電腦、換手機都能接著聊</small></span><i class="sg-chev" aria-hidden="true"></i></summary>
+            <div class="sgb">
             <div id="cloudSec" data-i18n="none"></div>
-            <div class="sec">AI<button class="help" data-help="localai" aria-label="說明">?</button></div>
+            </div></details>
+            <details class="sgrp" id="g_ai"><summary><span class="sg-t"><b>AI 模型</b><small>選 Gemini、本地 AI 或 Claude，設定金鑰</small></span><button class="help" data-help="localai" aria-label="說明">?</button><i class="sg-chev" aria-hidden="true"></i></summary>
+            <div class="sgb">
             <p class="note" id="aiState">檢查中…</p>
             <p class="note">平常切換模型和思考程度，用聊天輸入框上方的按鈕就好；這裡是設定金鑰的地方。</p>
             <label class="field" for="aiBackend">AI 來源<select id="aiBackend"><option value="ollama">本地 AI（Ollama：免費、資料不出電腦）</option><option value="gemini">Gemini（Google：有免費額度，比本地聰明）</option><option value="claude">Claude（最聰明：需要 API 金鑰，按用量付費）</option></select></label>
@@ -682,11 +771,13 @@ body.kb .tabs{padding-top:4px}
             <div id="ollamaBox" class="subbox">
               <div id="lmBox" data-i18n="none"></div>
               <label class="field" for="lcModel">聊天模型（Ollama 模型名稱）<input id="lcModel" placeholder="qwen2.5:7b"></label>
-              <label class="field" for="lcVision">看圖模型（選填，留空就不看圖）<input id="lcVision" placeholder="例如 gemma3:4b"></label>
+              <label class="field" for="lcVision">看圖模型（下載後會自動填好，通常不用改）<input id="lcVision" placeholder="例如 gemma3:4b"></label>
               <label class="field" for="lcUrl">Ollama 位址<input id="lcUrl" placeholder="http://localhost:11434"></label>
               <div class="inline" hidden><button class="pbtn" id="lcSave">儲存並測試連線</button></div><span class="autosave">改完會自動儲存並測試連線</span>
             </div>
-            <div class="sec">VOICE<button class="help" data-help="voice" aria-label="說明">?</button></div>
+            </div></details>
+            <details class="sgrp" id="g_voice"><summary><span class="sg-t"><b>語音</b><small>用 Fish Audio 讓她把回覆唸出來</small></span><button class="help" data-help="voice" aria-label="說明">?</button><i class="sg-chev" aria-hidden="true"></i></summary>
+            <div class="sgb">
             <p class="note" id="fishState">語音還沒設定。</p>
             <div class="subbox" id="fishBox">
               <p class="note" data-i18n="fishnote">用 <a href="https://fish.audio">Fish Audio</a> 讓她把回覆唸出來，說話時角色會跟著對嘴。到 <a href="https://fish.audio/app/api-keys/">fish.audio 的 API Keys 頁面</a>建立金鑰，貼到下面就會自動儲存。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。要唸的文字會傳給 Fish Audio 處理。</p>
@@ -701,14 +792,29 @@ body.kb .tabs{padding-top:4px}
               <label class="toggle" for="fishEmo">語氣跟著表情變（開心、害羞、生氣…）<input type="checkbox" id="fishEmo" checked></label>
               <div class="inline"><button class="pbtn" id="fishTest">試聽</button><button class="sbtn" id="fishClear">刪除金鑰</button></div>
             </div>
-            <div class="sec">CHARACTER SPRITES<button class="help" data-help="sprites" aria-label="說明">?</button></div>
+            </div></details>
+            <details class="sgrp" id="g_char"><summary><span class="sg-t"><b>角色圖</b><small>放角色的表情圖片（最少兩張）</small></span><button class="help" data-help="sprites" aria-label="說明">?</button><i class="sg-chev" aria-hidden="true"></i></summary>
+            <div class="sgb">
             <p class="note">最少放兩張：「嘴巴閉上」和「嘴巴張開」。說話時兩張會快速交替，角色也會跟著晃動；只放一張的話，說話時會用晃動來表示。閉眼和開心是選填。建議用去背 PNG，每張的尺寸和角色位置要一樣；也可以直接把圖片拖到格子上。圖片只存在你自己的帳號裡，別人看不到；太大的圖會自動壓縮。</p>
             <div class="inline sp-bulk"><label class="pbtn pick">一次放多張圖片或 zip<input type="file" id="spriteMulti" multiple accept="image/png,image/jpeg,image/webp,image/gif,.zip,application/zip" class="fileover"></label><button class="sbtn" id="sampleBtn" hidden>套用範例角色</button></div>
             <p class="note">可以一次選好幾張，或直接選整個 zip：檔名有表情名稱就會自動放到對的格子（例如 Eyes_open、Mouth_open、Happy，或 張眼、張嘴、開心）。也可以把一整批圖片拖到下面的格子區。</p>
             <p class="note" id="sampleNote" hidden>範例角色：角色靈感來自社群的 Claude娘 二創形象，圖片是用 AI 製作的。</p>
             <div class="slots" id="slots"></div>
             <input type="file" id="spriteFile" accept="image/png,image/webp,image/gif,image/jpeg" hidden>
-            <div class="sec">PROFILE<button class="help" data-help="profile" aria-label="說明">?</button></div>
+            </div></details>
+            <details class="sgrp" id="g_look"><summary><span class="sg-t"><b>外觀與音效</b><small>介面風格、主題顏色、音效、左右版面</small></span><i class="sg-chev" aria-hidden="true"></i></summary>
+            <div class="sgb">
+            <label class="field" for="themeSel">介面風格<select id="themeSel"><option value="mecha">機甲（預設：深色、橘色）</option><option value="pink">可愛粉嫩</option><option value="terminal">復古終端機</option><option value="light">淺色簡約</option><option value="neon">夜空霓虹</option></select></label>
+            <label class="field" for="accentPick">主題顏色
+              <div class="swatches" id="swatches"><input type="color" id="accentPick" value="#ff7a3d" aria-label="自訂顏色"></div></label>
+            <label class="field" for="sndSet">音效風格<select id="sndSet"><option value="mecha">機甲（預設）</option><option value="bubble">柔和泡泡</option><option value="retro">復古 8-bit</option><option value="wood">清脆木琴</option><option value="scifi">科幻電子</option></select></label>
+            <div class="inline"><button class="sbtn" id="sndTry">試聽音效</button></div>
+            <label class="toggle" for="uiSound">介面音效（按鈕、開啟、離開）<input type="checkbox" id="uiSound" checked></label>
+            <div class="deskonly" id="layoutBox"><p class="note" style="margin:0">版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。</p>
+            <div class="inline"><button class="sbtn" id="swapBtn">左右換邊</button><button class="sbtn" id="layoutReset">恢復預設版面</button></div></div>
+            </div></details>
+            <details class="sgrp" id="g_prof"><summary><span class="sg-t"><b>個人化</b><small>語言、你的稱呼、她的名字和個性</small></span><button class="help" data-help="profile" aria-label="說明">?</button><i class="sg-chev" aria-hidden="true"></i></summary>
+            <div class="sgb">
             <label class="field" for="langSel">語言 Language<select id="langSel"><option value="zh">中文（繁體）</option><option value="en">English</option></select></label>
             <label class="field" for="userName">你希望被怎麼稱呼<input id="userName" placeholder="例如：Elvis"></label>
             <label class="field" for="botName">夥伴的名字<input id="botName" placeholder="Claude"></label>
@@ -716,14 +822,15 @@ body.kb .tabs{padding-top:4px}
             <button class="sbtn" id="presetBtn" style="align-self:flex-start">套用「傲嬌 Claude」說話風格</button>
             <label class="field" for="tier" hidden>回覆方式<select id="tier"><option value="quick">簡短：一兩句，回得快</option><option value="default">一般（建議）</option><option value="complex">詳細：想清楚再回答，比較長</option></select></label>
             <span class="autosave" id="autoSaved">設定會自動儲存</span>
-            <label class="field" for="accentPick">主題顏色
-              <div class="swatches" id="swatches"><input type="color" id="accentPick" value="#ff7a3d" aria-label="自訂顏色"></div></label>
-            <label class="toggle" for="uiSound">介面音效（按鈕、開啟、離開）<input type="checkbox" id="uiSound" checked></label>
-            <div class="sec">MEMORY FOLDER<button class="help" data-help="folder" aria-label="說明">?</button></div>
+            </div></details>
+            <details class="sgrp" id="g_data"><summary><span class="sg-t"><b>記憶與資料</b><small>記憶資料夾、備份、還原、解除安裝</small></span><button class="help" data-help="data" aria-label="說明">?</button><i class="sg-chev" aria-hidden="true"></i></summary>
+            <div class="sgb">
+            <div id="folderSub">
+            <div class="sub-h">記憶資料夾<button class="help" data-help="folder" aria-label="說明">?</button></div>
             <p class="note" id="fsState">記憶目前存在 App 裡。選「文件」裡的 Companion 資料夾，所有記憶就會存進去，再由 Google 雲端硬碟同步。</p>
             <div class="inline"><button class="pbtn" id="fsPick">選擇備份資料夾</button><button class="sbtn" id="fsAll">立即全部匯出</button></div>
             <div class="inline" id="fsDeskBtns" hidden><button class="sbtn" id="fsOpen">打開資料夾</button><button class="sbtn" id="fsMove">更換位置…</button><button class="sbtn" id="fsDrive">Google 雲端硬碟備份教學</button></div>
-            <div class="sec">DATA<button class="help" data-help="data" aria-label="說明">?</button></div>
+            </div>
             <label class="sbtn pick" style="align-self:flex-start">從備份還原（JSON）<input type="file" accept=".json,application/json" class="fileover" id="importFile"></label>
             <button class="sbtn" id="exportBtn" style="align-self:flex-start">下載全部記憶備份（JSON）</button>
             <p class="note">對話、記憶和角色圖都存在上面的記憶資料夾裡，再由 Google 雲端硬碟同步。備份檔可以用來搬到別台電腦。</p>
@@ -732,6 +839,7 @@ body.kb .tabs{padding-top:4px}
               <p class="note">把 M-01 App 從這台電腦移除。Ollama 本身不會被移除。</p>
               <button class="sbtn danger-btn" id="unBtn" style="align-self:flex-start">解除安裝 App…</button>
             </div>
+            </div></details>
           </div>
         </div>
       </div>
@@ -1095,7 +1203,6 @@ window.GH_MODE=true;
 (function(){
   const G_WEB_ID="993727503948-jejnfo3n3d83fnpl3puuugg6qd1reirp.apps.googleusercontent.com";
   const G_APP_ID="993727503948-3gbtkjv217715hsi7g0o5e759fked4c9.apps.googleusercontent.com";
-  const G_APP_SECRET=""; // desktop-app client: Google treats this one as public
   const SCOPE="openid email profile https://www.googleapis.com/auth/drive.appdata";
   const API=()=>window.__M01_GAPI||"https://www.googleapis.com";
   const AUTH=()=>window.__M01_GAUTH||"https://accounts.google.com/o/oauth2/v2/auth";
@@ -1140,7 +1247,7 @@ window.GH_MODE=true;
   /* ---------- tokens ---------- */
   async function deskToken(){
     if(st.token&&Date.now()<st.exp-60e3)return st.token;
-    let j=null;try{j=await (await fetch("/gtoken?op=refresh",{method:"POST",headers:H,body:new URLSearchParams({client_id:G_APP_ID,client_secret:G_APP_SECRET,grant_type:"refresh_token"}).toString()})).json()}catch(e){}
+    let j=null;try{j=await (await fetch("/gtoken?op=refresh",{method:"POST",headers:H,body:new URLSearchParams({client_id:G_APP_ID,grant_type:"refresh_token"}).toString()})).json()}catch(e){}
     if(j&&j.status===200&&j.body&&j.body.access_token){st.token=j.body.access_token;st.exp=Date.now()+(+j.body.expires_in||3600)*1000;st.needAuth=false;return st.token}
     if(j&&j.body&&/invalid_grant|not_signed_in|unauthorized_client/.test(JSON.stringify(j.body))){st.needAuth=true;st.err="expired"}
     return null}
@@ -1282,7 +1389,7 @@ window.GH_MODE=true;
       if(!k)continue;const sp=k.indexOf(" "),s0=k.slice(0,sp),c0=k.slice(sp+1);if(s0!==state)continue;
       await fetch("/secret?p=gcode",{method:"DELETE",headers:H}).catch(()=>{});
       if(c0.startsWith("!"))throw{code:"cancel"};
-      const j=await (await fetch("/gtoken?op=exchange",{method:"POST",headers:H,body:new URLSearchParams({client_id:G_APP_ID,client_secret:G_APP_SECRET,code:c0,code_verifier:ver,redirect_uri:redirect,grant_type:"authorization_code"}).toString()})).json();
+      const j=await (await fetch("/gtoken?op=exchange",{method:"POST",headers:H,body:new URLSearchParams({client_id:G_APP_ID,code:c0,code_verifier:ver,redirect_uri:redirect,grant_type:"authorization_code"}).toString()})).json();
       if(!(j&&j.status===200&&j.body&&j.body.access_token))throw{code:"error"};
       if(j.body.scope&&!/drive\.appdata/.test(j.body.scope)){await fetch("/secret?p=google",{method:"DELETE",headers:H}).catch(()=>{});throw{code:"scope"}}
       st.token=j.body.access_token;st.exp=Date.now()+(+j.body.expires_in||3600)*1000;return}
@@ -1322,7 +1429,7 @@ window.GH_MODE=true;
   /* ---------- settings section ---------- */
   function ago(t){if(!t)return"";const E=en(),m=Math.round((Date.now()-t)/60e3);return m<1?(E?"just now":"剛剛"):m<60?(E?`${m} min ago`:`${m} 分鐘前`):new Date(t).toLocaleString(E?"en":"zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}
   function paint(){const box=document.getElementById("cloudSec");if(!box)return;const E=en(),u=user(),e=s=>typeof esc==="function"?esc(s):String(s);
-    let h=`<div class="sec">ACCOUNT · CLOUD SYNC</div>`;
+    let h="";
     if(st.state==="waiting")h+=`<p class="note">${E?"Google’s sign-in page is open in your browser. Sign in there and you’ll be brought back here automatically.":"已經在瀏覽器打開 Google 登入頁。在那邊登入完，會自動回到這裡。"}</p><div class="inline"><button class="sbtn" id="gCancel">${E?"Cancel":"取消"}</button></div>`;
     else if(!u)h+=`<p class="note">${E?"Sign in with Google and your chats, memories, character pictures and AI keys are saved to a hidden folder in <b>your own</b> Google Drive. Sign in with the same account on another computer or phone and pick up where you left off. Only M-01 can read that folder — the developer can’t see it.":"用 Google 帳號登入後，對話、記憶、角色圖和 AI 金鑰會自動存到<b>你自己</b> Google 雲端硬碟裡的隱藏資料夾。換電腦、換手機登入同一個帳號，就能接著聊。只有 M-01 能讀這個資料夾，開發者看不到。"}</p>
         <div class="inline"><button class="pbtn" id="gIn"${st.state==="signin"||st.state==="sync"?" disabled":""}>${st.state==="sync"?(E?"Syncing…":"同步中…"):(E?"Sign in with Google":"用 Google 登入")}</button></div>${st.err==="scope"?`<p class="note warnnote">${E?"Last time the <b>Google Drive</b> box on Google’s permission screen wasn’t ticked, so M-01 couldn’t save to your Drive. Press the button again and tick that box (“See, create, and delete its own configuration data in your Google Drive”).":"上次登入時，Google 權限畫面上「<b>Google 雲端硬碟</b>」那一格沒有打勾，所以 M-01 沒辦法存到你的雲端。請再按一次上面的按鈕，記得把那一格（「查看、建立及刪除這個應用程式在 Google 雲端硬碟中的設定資料」）打勾。"}</p>`:st.err==="signin"?`<p class="note warnnote">${E?"Sign-in didn’t finish. Try again.":"登入沒有完成，請再試一次。"}</p>`:st.err==="offline"?`<p class="note warnnote">${E?"Can’t reach Google — check your connection.":"連不到 Google，請確認網路。"}</p>`:""}`;
@@ -2204,7 +2311,7 @@ function renderStage(){
   const w=$("heroWrap");w.innerHTML="";const sp=sprites();
   if(!sp.idle){
     w.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="7" r="4"/><path d="M4 22c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><b>角色圖尚未設定</b><p>放一張嘴巴閉上、一張嘴巴張開的圖，她說話時就會在這裡對嘴、晃動。</p><button class="pbtn" id="goSprites">前往設定</button></div>`;
-    $("goSprites").onclick=()=>openTab("pSet");
+    $("goSprites").onclick=()=>openSec("g_char");
   }else{
     w.insertAdjacentHTML("beforeend",`<div class="glow"></div><div class="rings"><i></i><i></i><i></i></div>`);
     const box=document.createElement("div");box.className="sprite";box.id="sprite";box.dataset.frame="idle";
@@ -2389,6 +2496,19 @@ async function loadSprites(){
 }
 $("presetBtn").onclick=()=>{$("persona").value=CLAUDE_PERSONA;if(["","小憶","瞬光"].includes($("botName").value.trim()))$("botName").value="Claude";autoSaveProfile();toast("已套用「傲嬌 Claude」說話風格")};
 function saveSettingsQuiet(){if(S.db){const s=JSON.parse(JSON.stringify(S.settings));queueWrite(()=>S.base.set(s))}}
+/* scroll only inside the settings pane (scrollIntoView would also shift the whole page) */
+function paneScrollTo(el,smooth=true){const pane=el&&el.closest(".pane");if(!pane)return;const d=el.getBoundingClientRect().top-pane.getBoundingClientRect().top-8;try{pane.scrollBy({top:d,behavior:smooth?"smooth":"auto"})}catch(e){pane.scrollTop+=d}}
+addEventListener("scroll",()=>{if(scrollX||scrollY)scrollTo(0,0)});
+/* settings groups: remember which are open, and jump straight to one */
+function openSec(gid,focusSel){
+  openTab("pSet");const g=$(gid);if(!g)return;g.open=true;
+  requestAnimationFrame(()=>{paneScrollTo(focusSel&&g.querySelector(focusSel)||g);g.classList.remove("flash");void g.offsetWidth;g.classList.add("flash")});
+}
+(function(){let open=[];try{open=JSON.parse(localStorage.getItem("m01.sgOpen")||"[]")}catch(e){}
+  document.querySelectorAll("#pSet details.sgrp").forEach(d=>{if(open.includes(d.id))d.open=true;
+    d.querySelector("summary").addEventListener("click",e=>{if(e.target.closest(".help"))e.preventDefault()});
+    d.addEventListener("toggle",()=>{try{const o=[...document.querySelectorAll("#pSet details.sgrp")].filter(x=>x.open).map(x=>x.id);localStorage.setItem("m01.sgOpen",JSON.stringify(o))}catch(e){}
+      if(d.open&&d.id==="g_ai"&&typeof paintBackend==="function")try{paintBackend()}catch(e){}})})})();
 function openTab(id){
   document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab===id));
   const p=$("panel");p.hidden=id==="chat";
@@ -2514,6 +2634,7 @@ const I18N={
 "❌ 連不到 Ollama。請確認 Ollama 有開著。":"❌ Can't reach Ollama. Make sure it's running.","連不到 Ollama":"Can't reach Ollama",
 "那天沒有對話紀錄":"No chats that day","正在想":"Thinking",
 };
+Object.assign(I18N,{"記憶資料夾":"Memory folder","看圖模型（下載後會自動填好，通常不用改）":"Picture model (filled in automatically after download)","點一下分類就會展開；設定會自動儲存。": "Tap a group to open it. Settings save automatically.", "帳號與同步": "Account & sync", "用 Google 登入，換電腦、換手機都能接著聊": "Sign in with Google to continue on any computer or phone", "AI 模型": "AI model", "選 Gemini、本地 AI 或 Claude，設定金鑰": "Choose Gemini, local AI or Claude, and set keys", "語音": "Voice", "用 Fish Audio 讓她把回覆唸出來": "Have her read replies aloud with Fish Audio", "角色圖": "Character", "放角色的表情圖片（最少兩張）": "Her expression pictures (at least two)", "外觀與音效": "Look & sound", "介面風格、主題顏色、音效、左右版面": "Interface style, colour, sounds and layout", "個人化": "Personal", "語言、你的稱呼、她的名字和個性": "Language, your name, her name and personality", "記憶與資料": "Memory & data", "記憶資料夾、備份、還原、解除安裝": "Memory folder, backup, restore, uninstall", "備份、還原": "Backup and restore", "介面風格": "Interface style", "機甲（預設：深色、橘色）": "Mecha (default: dark, orange)", "可愛粉嫩": "Cute pink", "復古終端機": "Retro terminal", "淺色簡約": "Light & simple", "夜空霓虹": "Night neon", "音效風格": "Sound set", "機甲（預設）": "Mecha (default)", "柔和泡泡": "Soft bubbles", "復古 8-bit": "Retro 8-bit", "清脆木琴": "Wooden marimba", "科幻電子": "Sci-fi electronic", "試聽音效": "Play sounds", "版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。": "Layout: swap her and the chat left/right, or drag the divider in the middle to resize — it snaps at the middle and at a quarter.", "左右換邊": "Swap sides", "恢復預設版面": "Reset layout"});
 const I18N_RE=[
  [/^顯示更早的 (\d+) 則$/,"Show $1 earlier"],
  [/^已記下：(.+)$/s,"Noted: $1"],[/^你的方案不能用 (\S+)，已改用 (\S+)$/,"Your plan can't use $1 — switched to $2"],[/^(\S+) 現在不能用（免費額度用完或需要付費方案），已自動改用 (\S+)$/,"$1 isn't available right now (free quota used up or paid plan needed) — switched to $2"],[/^上網查：「(.*)」$/,"Searching the web: \"$1\""],[/^✅ 使用 Gemini（(.+)），金鑰 (.*)$/,"✅ Using Gemini ($1), key $2"],[/^(Gemini|Claude) 連線成功$/,"Connected to $1"],[/^❌ (?:金鑰無效或沒有額度|免費額度暫時用完|連不到（電腦有網路嗎？）|測試失敗)：(.*)$/s,"❌ Test failed: $1"],[/^✅ 使用 Claude（(.+)），金鑰 (.*)$/,"✅ Using Claude ($1), key $2"],[/^已儲存（(.+)），要換再貼新的$/,"Saved ($1) — paste a new one to replace"],[/^查天氣：(.*)$/,"Checking weather: $1"],[/^❌ (?:金鑰無效或餘額不足|連不到 Claude（電腦有網路嗎？）|測試失敗)：(.*)$/s,"❌ Test failed: $1"],[/^出錯了：(.*)$/s,"Something went wrong: $1"],
@@ -2654,7 +2775,7 @@ function toggleVolPop(){
 }
 document.addEventListener("pointerdown",e=>{const pop=$("volPop");if(!pop.hidden&&!e.target.closest("#volPop")&&!e.target.closest("#sndBtn"))pop.hidden=true},true);
 addEventListener("keydown",e=>{if(e.key==="Escape")$("volPop").hidden=true});
-function paintPrefs(){applyAccent(S.settings.accent||"#FF7A3D");paintVol();applyLang();try{paintModelChip()}catch(e){}}
+function paintPrefs(){if(typeof applyTheme==="function")applyTheme(S.settings.theme||(()=>{try{return localStorage.getItem("m01.theme")}catch(e){return""}})()||"mecha");if($("sndSet"))$("sndSet").value=S.settings.sndSet||"mecha";applyAccent(S.settings.accent||"#FF7A3D");paintVol();applyLang();try{paintModelChip()}catch(e){}}
 $("langSel").onchange=e=>{S.settings.lang=e.target.value==="en"?"en":"zh";applyLang();if(typeof checkFish==="function")checkFish();if(typeof renderThread==="function")renderThread();saveSettingsQuiet();playSfx("press",.55)};
 paintPrefs();
 $("convBtn").onclick=e=>{e.stopPropagation();const l=$("convList");if(l.hidden){renderConvList();l.hidden=false}else l.hidden=true};
@@ -2681,7 +2802,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="0.9.22",APP_STAGE="Alpha",APP_BUILD="2026-11-05 21:30";
+const APP_VER="0.9.23",APP_STAGE="Beta",APP_BUILD="2026-11-05 23:30";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -2692,6 +2813,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"0.9.23",d:"11/05 23:30",add:[["版本改成 Beta","Now labelled Beta"],["點一下她會有反應，說的話常常跟你們最近聊的內容有關","Tap her and she reacts — often about what you have been talking about"],["設定分成幾個分類、可以折疊；沒放角色圖時按「前往設定」會直接打開角色圖","Settings are grouped and collapsible; “Go to settings” with no character opens the character section"],["五種介面風格（機甲、可愛粉嫩、復古終端機、淺色簡約、夜空霓虹）和五種音效","Five interface styles (Mecha, Cute pink, Retro terminal, Light, Night neon) and five sound sets"],["電腦螢幕上可以把角色和聊天左右換邊，也可以拖中間調整大小（正中間和四分之一會吸附）","On computer screens, swap her and the chat left/right, or drag the middle to resize (snaps at the middle and a quarter)"],["分享按鈕：一鍵複製網頁版和 GitHub 連結","Share button: copy the web version and GitHub links"],["本地 AI 寫清楚標準版和輕量版差在哪；可以下載或刪除看圖模型，下載後自動使用","Local AI explains standard vs light; download or delete a picture model, used automatically"],["新手教學更詳細，會自動切到要介紹的分頁","A more detailed guided tour that opens the right tab for each step"],["有新版本時馬上提醒，按一下就更新（電腦版之後的更新不用重新安裝）","New versions are announced right away and install in one click (future desktop updates need no reinstall)"]],fix:[["在設定頁打開教學時，框框會指錯地方","The guided tour pointed at the wrong place when started from Settings"],["Google 登入用的資料改放在背景程式裡，不再出現在網頁程式中","Google sign-in details now live in the background helper, not in the page"]]},
  {v:"0.9.22",d:"11/05 21:30",add:[["電腦版和 GitHub 網頁版可以用 Google 帳號登入：對話、記憶、角色圖和 AI 金鑰會自動同步到你自己 Google 雲端硬碟的隱藏資料夾，換電腦、換手機都能接著聊","Desktop app and GitHub web version: sign in with Google — chats, memories, character pictures and AI keys sync to a hidden folder in your own Google Drive, so you can pick up on any computer or phone"],["兩台裝置同一天都有聊天的話，兩邊的對話會合併，不會蓋掉","If two devices both chatted, the chats are combined instead of one overwriting the other"],["電腦版第一次打開不用再設定資料夾，改成問要不要用 Google 登入","Desktop app: first launch no longer walks you through the folder — it offers Google sign-in instead"]],fix:[["登入時沒勾「Google 雲端硬碟」權限的話，會提醒你再登入一次並打勾","If the Google Drive box wasn’t ticked at sign-in, M-01 now tells you to sign in again and tick it"]]},
  {v:"0.9.21",d:"11/05 21:00",add:[["電腦版的本地 AI 變成可選：安裝時可以選不要，只用 Gemini 或 Claude，省下 2～5GB","Desktop app: local AI is now optional — skip it at install and use Gemini or Claude, saving 2–5GB"],["「設定 → AI」可以看本地模型佔多少空間、刪掉，或之後再下載（有進度條）","Settings → AI: see how much space each local model uses, delete it, or download one later (with progress)"],["第一次打開、沒有本地 AI 時，會請你選一個 AI（貼上免費的 Gemini 金鑰就能開始）","First run without local AI asks you to pick one (paste a free Gemini key to start)"]],fix:[["沒裝 Ollama 時，打開 App 不會再等 30 秒","Opening the app no longer waits 30 seconds when Ollama isn’t installed"]]},
  {v:"0.9.20",d:"11/05 20:30",add:[["角色圖可以一次放好幾張或直接選 zip，會依檔名自動放到對的格子","Add many character pictures at once (or a zip) — they go into the right slots by file name"],["電腦版和 GitHub 網頁版：一鍵「套用範例角色」","Desktop app and GitHub web version: one-click “Use the sample character”"]],fix:[]},
@@ -2767,7 +2889,7 @@ function aboutHelp(){
   ];
   const feats=F.map(([h,l])=>`<span class="about-h">${h}</span><ul>${l.map(x=>`<li>${x}</li>`).join("")}</ul>`).join("");
   const log=CHANGELOG.map((c,i)=>{const body=`${c.add.length?`<b class="cl-t">${en?"Added":"新增"}</b><ul>${c.add.map(x=>`<li>${en?x[1]:x[0]}</li>`).join("")}</ul>`:""}${c.fix.length?`<b class="cl-t">${en?"Fixes":"修正"}</b><ul>${c.fix.map(x=>`<li>${en?x[1]:x[0]}</li>`).join("")}</ul>`:""}`;
-    return `<details class="cl"${i===0?" open":""}><summary>${APP_STAGE} ${c.v}<span>${c.d}</span></summary>${body}</details>`}).join("");
+    return `<details class="cl"${i===0?" open":""}><summary>${cmpVer(c.v,"0.9.23")>=0?"Beta":"Alpha"} ${c.v}<span>${c.d}</span></summary>${body}</details>`}).join("");
   return ["M-01 Companion",ver+`<p style="margin:4px 0 6px"><a href="#" id="tourAgain" style="color:var(--accent)">${en?"Replay the guided tour →":"重新看使用教學 →"}</a></p><span class="about-h">${en?"WHAT'S NEW":"更新紀錄"}</span>`+log+feats+`<span class="about-h">${en?"NOTES":"注意事項"}</span><ul>${notes.map(n=>`<li>${n}</li>`).join("")}</ul>`];
 }
 function storageHelp(){
@@ -2801,7 +2923,7 @@ function showSetup(){
   const close=async()=>{S.settings.setup=3;await saveSettingsQuiet();pop.hidden=true};
   const k=document.createElement("button");k.id="stSkip";k.textContent=en?"Not now":"先不用";k.onclick=close;
   const d=document.createElement("button");d.className="main";d.id="stGoogle";d.textContent=en?"Sign in with Google":"用 Google 登入";
-  d.onclick=async()=>{await close();if(window.cloud){if(typeof openTab==="function")openTab("pSet");cloud.signIn()}};
+  d.onclick=async()=>{await close();if(window.cloud){openSec("g_acc");cloud.signIn()}};
   box.append(k,d);
 }
 function maybeSetup(){if(isDesk()&&(S.settings.setup||0)<3&&!(window.cloud&&cloud.signedIn()))showSetup()}
@@ -2888,7 +3010,7 @@ async function openModelPop(){
   });
   const rc=$("mpRecheck");if(rc)rc.onclick=async e=>{e.preventDefault();e.stopPropagation();rc.textContent=isEN()?"Checking…":"檢查中…";await probeGemini(true);pop.hidden=true;openModelPop()};
   if(typeof LOCAL_CFG!=="undefined"&&!((LOCAL_CFG.gemAvail||{})._t)){probeGemini(false).then(r=>{if(r&&r._t&&!pop.hidden){pop.hidden=true;openModelPop()}})}
-  const k=$("mpKeys");if(k)k.onclick=()=>{pop.hidden=true;openTab("pSet");setTimeout(()=>{try{$("aiBackend").scrollIntoView({block:"center"})}catch(e){}},200)};
+  const k=$("mpKeys");if(k)k.onclick=()=>{pop.hidden=true;openSec("g_ai","#aiBackend")};
 }
 $("modelChip").onclick=e=>{e.stopPropagation();openModelPop()};
 document.addEventListener("pointerdown",e=>{const pop=$("modelPop");if(!pop.hidden&&!e.target.closest("#modelPop")&&!e.target.closest("#modelChip")){pop.hidden=true;$("modelChip").setAttribute("aria-expanded","false")}},true);
@@ -2898,19 +3020,33 @@ try{paintModelChip()}catch(e){}
 /* ---------- one-time guided tour ---------- */
 function tourSteps(){
   const en=isEN(),app=typeof LOCAL_CFG!=="undefined"&&!window.GH_MODE;
-  const S1=[
-    [".composer .box",en?"Chat":"聊天",en?"Type here to talk to her. Enter sends, Shift+Enter adds a line. The paperclip sends images and files (PDF, Word, Excel…) — she reads them.":"在這裡打字跟她聊天，按 Enter 送出、Shift+Enter 換行。左邊的迴紋針可以傳圖片和檔案（PDF、Word、Excel…），她會讀內容。"],
-    ["#modelChip",app?(en?"Model & thinking":"模型・思考程度"):(en?"Thinking":"思考程度"),app?(en?"Switch the AI (local, Gemini, Claude) and how hard she thinks. Low is fastest; medium and high think first and answer more fully.":"點這裡切換 AI（本地、Gemini、Claude）和思考程度。低最快；中、高會先想一下再回答，比較完整。"):(en?"Low is fastest; medium and high think more and answer more fully.":"低最快；中、高會想得比較多、回答比較完整。")],
-    [".convbar",en?"Chats":"對話",en?"Click the chat name to switch, rename or delete chats. “＋ New chat” starts a new one, “Incognito” isn't saved. She remembers you in every chat.":"點對話名稱可以切換、改名、刪除以前的對話；「＋ 新對話」開新的；「無痕」聊的內容不會被保存。不管在哪段對話，她都記得你。"],
-    ['.tab[data-tab="pMem"]',en?"Memory":"重點",en?"Key points she saves about you — likes, plans, important people. Add your own or delete wrong ones.":"她會自己記下關於你的重點（喜好、計畫、重要的人）。你也可以自己加，或刪掉記錯的。"],
-    ['.tab[data-tab="pSet"]',en?"Settings":"設定",en?"Add character images (12 expressions), change her name and personality, theme colour and language."+(app?" API keys for Gemini and Claude, and the Fish Audio voice, are here too.":""):"放角色圖（12 種表情）、改她的名字和個性、主題顏色、語言。"+(app?"Gemini、Claude 的 API 金鑰和 Fish Audio 語音也在這裡設定。":"")],
-    ["#sndBtn",en?"Volume":"音量",en?"Click for a vertical volume slider, with Mute below.":"點一下會出現直立的音量滑桿，下面有靜音。"],
+  // [where, title, text, tab to open first, settings group to open]
+  const T=[
+    [".composer .box",en?"Chat":"聊天",en?"Type here to talk to her. Enter sends, Shift+Enter starts a new line. The paperclip on the left sends pictures and files (PDF, Word, Excel, code…) and she reads them — you can also drag files in. To ask about something from before, just ask; she looks through her memory.":"在這裡打字跟她聊天：Enter 送出、Shift+Enter 換行。左邊的迴紋針可以傳圖片和檔案（PDF、Word、Excel、程式碼…），她會讀內容；也可以直接把檔案拖進來。想問以前聊過的事，直接問就好，她會去翻記憶。","chat"],
+    ["#modelChip",app?(en?"AI & thinking":"AI・思考程度"):(en?"Thinking":"思考程度"),app?(en?"Switch the AI here. Local AI is free and works offline; Gemini has a free quota and is smarter; Claude is the smartest but paid. Thinking: Low is fastest, Medium thinks a little first, High thinks it through (slower).":"點這裡切換 AI：本地 AI 免費、不用網路；Gemini 有免費額度、比較聰明；Claude 最聰明但要付費。思考程度：低最快、中會先想一下、高想得最完整但比較慢。"):(en?"Low is fastest, Medium thinks a little first, High thinks it through but is slower.":"思考程度：低最快、中會先想一下、高想得最完整但比較慢。"),"chat"],
+    [".convbar",en?"Chats":"對話",en?"Click the chat name to switch, rename or delete chats. “＋ New chat” starts a fresh one. “Incognito” isn’t saved and isn’t remembered. In every chat she still remembers the key points about you.":"點對話名稱可以切換、改名、刪除以前的對話；「＋ 新對話」開一段新的；「無痕」聊的內容不會被保存、也不會被記住。不管在哪段對話，她都記得關於你的重點。","chat"],
+    ["#heroWrap",en?"Her":"她",en?"Her mouth moves when she talks and her face follows her mood. Tap her and she’ll say something — often about what you’ve been talking about. Leave her alone long enough and she falls asleep.":"這是她：說話時會對嘴、表情會跟著心情變。點她一下會有反應，常常會跟你們最近聊的事有關。太久沒理她，她會睡著。","chat"],
+    ["#splitter",en?"Layout":"版面",en?"Drag this line to make her or the chat bigger — it snaps at the middle and at a quarter. The ⇄ button in the middle swaps the two sides. Double-click the line to reset.":"拖這條線可以把她或聊天區調大，拖到正中間或四分之一的地方會自動吸附；中間的 ⇄ 可以把兩邊換位置，點兩下這條線就恢復預設。","chat"],
+    ['.tab[data-tab="pMem"]',en?"Memory":"重點",en?"She writes down key points about you (likes, plans, important people) and uses them later. Add your own, or delete anything she got wrong.":"她會自己記下關於你的事（喜好、計畫、重要的人），之後聊天會用到。你可以自己新增，記錯的也可以刪掉。","pMem"],
+    ['.tab[data-tab="pFiles"]',en?"Files":"檔案",en?"Every file you’ve sent is listed here — open or delete them. She remembers what’s inside, so you can ask about them later.":"你傳過的檔案都在這裡，可以重新打開或刪掉。她會記得檔案內容，之後問也找得到。","pFiles"],
+    ['.tab[data-tab="pSearch"]',en?"Search":"搜尋",en?"Search old chats and file contents by keyword.":"用關鍵字找以前的對話和檔案內容。","pSearch"],
+    ['.tab[data-tab="pDl"]',en?"Get the app":"下載 App",en?"The desktop app adds local AI, web search, weather and voice. Download it here.":"電腦版多了本地 AI、上網查資料、查天氣和語音，可以在這裡下載。","pDl"],
+    ["#g_acc>summary",en?"Settings · Account":"設定・帳號與同步",en?"Settings are grouped — tap a group to open it. Sign in with Google here and your chats and memories are saved to your own Google Drive, so you can continue on another computer or phone.":"設定分成幾個分類，點一下就會展開。在「帳號與同步」用 Google 登入，對話和記憶會存到你自己的雲端，換電腦、換手機都能接著聊。","pSet"],
+    ["#g_ai>summary",en?"Settings · AI":"設定・AI 模型",app?(en?"Choose the AI and paste keys. The desktop app can also download or delete local AI models here, with a note on which one to pick.":"選要用哪個 AI、貼金鑰。電腦版也可以在這裡下載或刪除本地 AI 模型，裡面有寫該選哪個。"):(en?"Paste your free Gemini key and pick the model.":"貼上免費的 Gemini 金鑰、選模型。"),"pSet"],
+    ["#g_char>summary",en?"Settings · Character":"設定・角色圖",en?"Add her expression pictures — at least “mouth closed” and “mouth open” — or use the sample character in one click.":"放她的表情圖片（最少「嘴巴閉上」和「嘴巴張開」兩張），也可以一鍵套用範例角色。","pSet"],
+    ["#g_look>summary",en?"Settings · Look & sound":"設定・外觀與音效",en?"Five interface styles (Mecha, Cute pink, Retro terminal, Light, Night neon), the theme colour, five sound sets, and the layout.":"五種介面風格（機甲、可愛粉嫩、復古終端機、淺色簡約、夜空霓虹）、主題顏色、五種音效，還有左右版面。","pSet"],
+    ["#g_prof>summary",en?"Settings · Personal":"設定・個人化",en?"Language, what she calls you, her name and her personality.":"語言、你希望被怎麼稱呼、她的名字和個性。","pSet"],
+    ["#shareBtn",en?"Share":"分享",en?"Send the web version or the GitHub page to friends.":"把網頁版或 GitHub 連結傳給朋友。","chat"],
+    ["#sndBtn",en?"Volume":"音量",en?"A vertical volume slider, with Mute below.":"點一下會出現直立的音量滑桿，下面有靜音。","chat"],
   ];
-  if(app)S1.push(["#folderBtn",en?"Memory folder":"記憶資料夾",en?"Opens the folder where everything she remembers is saved.":"一鍵打開存放記憶的資料夾。"]);
-  S1.push(["#infoBtn",en?"Version & help":"版本資訊",en?"Features, update log and notes are here.":"功能介紹、更新紀錄和注意事項都在這裡。"]);
-  S1.push(["#tourBtn",en?"Guided tour":"新手教學",en?"Forgot something? Click this button to see this tour again anytime. Now say hi to her!":"忘記怎麼用的話，隨時點這個按鈕就能再看一次這份教學。現在跟她打聲招呼吧！"]);
-  return S1.filter(x=>{const el=document.querySelector(x[0]);return el&&el.getClientRects().length});
+  if(app)T.push(["#folderBtn",en?"Memory folder":"記憶資料夾",en?"Opens the folder on this computer where everything is saved.":"一鍵打開這台電腦上存放記憶的資料夾。","chat"]);
+  T.push(["#infoBtn",en?"Version & updates":"版本與更新",en?"Features, the update log and notes. When a new version is out a red dot appears here and you can update in one click.":"功能介紹、更新紀錄和注意事項。有新版本時這裡會出現紅點，可以一鍵更新。","chat"]);
+  T.push(["#tourBtn",en?"Guided tour":"新手教學",en?"Forgot something? Press this anytime to see this tour again. Now say hi to her!":"忘記怎麼用的話，隨時按這個按鈕再看一次。現在跟她打聲招呼吧！","chat"]);
+  return T.filter(x=>document.querySelector(x[0]));
 }
+const tourVisible=step=>{const el=document.querySelector(step[0]);return !!(el&&el.getClientRects().length&&el.offsetParent!==null||el&&getComputedStyle(el).position==="fixed")};
+function tourPrep(step){if(step[3])openTab(step[3]);const g=/^#(g_[a-z]+)/.exec(step[0]);if(g){const d=$(g[1]);if(d&&d.hidden)return;}
+  const el=document.querySelector(step[0]);if(el&&el.closest(".pane"))paneScrollTo(el,false);}
 let tourI=0,tourList=[];
 function placeTour(){
   const step=tourList[tourI];if(!step)return;const el=document.querySelector(step[0]);if(!el)return;
@@ -2920,25 +3056,29 @@ function placeTour(){
   if(y+ch>innerHeight-12)y=r.top-ch-14;if(y<12)y=Math.min(innerHeight-ch-12,Math.max(12,r.top+r.height/2-ch/2));
   card.style.left=x+"px";card.style.top=y+"px";
 }
-function showTourStep(){
-  const en=isEN(),step=tourList[tourI];if(!step){endTour();return}
+function showTourStep(dir){
+  const en=isEN();dir=dir||1;
+  // open the right tab first; skip steps whose target isn't shown in this edition / screen size
+  while(tourList[tourI]){tourPrep(tourList[tourI]);if(tourVisible(tourList[tourI]))break;tourI+=dir;if(tourI<0){tourI=0;dir=1}}
+  const step=tourList[tourI];if(!step){endTour();return}
   $("tourStep").textContent=`${en?"GUIDE":"使用教學"} ${tourI+1} / ${tourList.length}`;$("tourTitle").textContent=step[1];$("tourText").textContent=step[2];
   $("tourSkip").textContent=en?"Skip":"略過";$("tourPrev").textContent=en?"Back":"上一步";$("tourPrev").hidden=tourI===0;
   $("tourNext").textContent=tourI===tourList.length-1?(en?"Done":"完成"):(en?"Next":"下一步");
-  try{document.querySelector(step[0]).scrollIntoView({block:"nearest"})}catch(e){}
-  placeTour();requestAnimationFrame(placeTour);
+  placeTour();requestAnimationFrame(placeTour);setTimeout(placeTour,350);
 }
 function startTour(){
-  tourList=tourSteps();if(!tourList.length)return;tourI=0;
+  const cur=document.querySelector('.tab[aria-selected="true"]');
+  tourList=tourSteps().filter(st=>{try{tourPrep(st)}catch(e){}return tourVisible(st)});try{openTab("chat")}catch(e){}
+  if(!tourList.length)return;tourI=0;
   try{hideHelp()}catch(e){}try{$("modelPop").hidden=true;$("volPop").hidden=true}catch(e){}
   $("tour").hidden=false;showTourStep();$("tourNext").focus();
 }
 function endTour(){
-  $("tour").hidden=true;S.settings.tourDone=true;try{localStorage.setItem("m01.tourDone","1")}catch(e){}
+  $("tour").hidden=true;try{openTab("chat")}catch(e){}S.settings.tourDone=true;try{localStorage.setItem("m01.tourDone","1")}catch(e){}
   if(S.db){const st=JSON.parse(JSON.stringify(S.settings));queueWrite(()=>S.base.set(st))}
 }
 $("tourNext").onclick=()=>{if(tourI>=tourList.length-1){endTour();return}tourI++;showTourStep()};
-$("tourPrev").onclick=()=>{if(tourI>0){tourI--;showTourStep()}};
+$("tourPrev").onclick=()=>{if(tourI>0){tourI--;showTourStep(-1)}};
 $("tourSkip").onclick=endTour;
 addEventListener("resize",()=>{if(!$("tour").hidden)placeTour()});
 addEventListener("keydown",e=>{if($("tour").hidden)return;if(e.key==="Escape"){e.preventDefault();endTour()}else if(e.key==="ArrowRight"||e.key==="Enter"&&document.activeElement===document.body){$("tourNext").click()}else if(e.key==="ArrowLeft"){$("tourPrev").click()}});
@@ -3264,41 +3404,80 @@ document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest
 
 
 /* ---------- new-version check (desktop app) ---------- */
-const UPDATE_URL=window.GH_MODE?"":"https://elvis071114-coder.github.io/m01/version.json";  // set to the published version.json (GitHub) to turn this on
+const UPDATE_URL="https://elvis071114-coder.github.io/m01/version.json";  // set to the published version.json (GitHub) to turn this on
 function cmpVer(a,b){const p=x=>String(x).split(".").map(n=>parseInt(n,10)||0);const A=p(a),B=p(b);for(let i=0;i<Math.max(A.length,B.length);i++){const d=(A[i]||0)-(B[i]||0);if(d)return d>0?1:-1}return 0}
 async function checkUpdate(force){
-  const url=(LOCAL_CFG&&LOCAL_CFG.updateUrl)||UPDATE_URL;if(!url)return null;
+  const gh=!!window.GH_MODE,url=gh?"version.json?t="+Date.now():((LOCAL_CFG&&LOCAL_CFG.updateUrl)||UPDATE_URL);if(!url)return null;
   let last=0;try{last=+localStorage.getItem("m01.updChecked")||0}catch(e){}
-  if(!force&&Date.now()-last<6*36e5){try{const c=JSON.parse(localStorage.getItem("m01.update")||"null");if(c&&cmpVer(c.version,APP_VER)>0){S.update=c;markUpdate()}}catch(e){}return S.update||null}
-  let j=null;try{const r=await fetch("/getjson?url="+encodeURIComponent(url),{headers:{"X-M01":"1"}});j=await r.json()}catch(e){j=null}
+  if(!force&&Date.now()-last<20*60e3){try{const c=JSON.parse(localStorage.getItem("m01.update")||"null");if(c&&cmpVer(c.version,APP_VER)>0){S.update=c;markUpdate()}}catch(e){}return S.update||null}
+  let j=null;try{const r=gh?await fetch(url,{cache:"no-store"}):await fetch("/getjson?url="+encodeURIComponent(url),{headers:{"X-M01":"1"}});j=await r.json()}catch(e){j=null}
   try{localStorage.setItem("m01.updChecked",String(Date.now()))}catch(e){}
   if(!j||!j.version)return null;
   try{localStorage.setItem("m01.update",JSON.stringify(j))}catch(e){}
-  if(cmpVer(j.version,APP_VER)>0){S.update=j;markUpdate();
-    const en=isEN();toast((en?`New version ${j.version} is available`:`有新版本 Alpha ${j.version} 可以下載`)+(en?(j.notes_en?`: ${j.notes_en}`:""):(j.notes?`：${j.notes}`:""))+(en?" — open ⓘ at the top right.":"（點右上角 ⓘ 下載）"),9000)}
-  else{S.update=null;markUpdate()}
+  if(cmpVer(j.version,APP_VER)>0){const fresh=!S.update||S.update.version!==j.version;S.update=j;markUpdate();if(fresh)showUpdBar()}
+  else{S.update=null;markUpdate();hideUpdBar()}
   return S.update||null;
 }
 function markUpdate(){const b=$("infoBtn");if(b)b.classList.toggle("has-update",!!S.update)}
-function updateBlock(en){
-  const u=S.update;if(!u)return"";const os=/Windows/i.test(navigator.userAgent)?u.windows:/Mac/i.test(navigator.userAgent)?u.mac:"";const pick=os||u.url||"";const link=/^https:\/\//.test(pick)?pick:"";
-  return `<div class="upd-box"><b>${en?`New version ${esc(u.version)} available`:`有新版本 Alpha ${esc(u.version)}`}</b><span>${esc(en?(u.notes_en||u.notes||""):(u.notes||""))}</span>${link?`<a href="${esc(link)}">${en?"Download the new version →":"下載新版 →"}</a>`:""}<small>${en?`You have ${APP_VER}. Download, then run the installer again — your memory folder is kept.`:`你現在是 ${APP_VER}。下載後重新執行安裝檔就好，記憶資料夾會保留。`}</small></div>`;
+async function updMode(){
+  // "page": one click swaps in the new version; "web": just reload; "install": the background helper changed too, so download it
+  const u=S.update;if(!u)return"none";if(window.GH_MODE)return"web";
+  if(!u.page)return"install";let hv=1;try{const pg=await serverFS.ping();hv=pg&&pg.hv||1}catch(e){}
+  return (u.helper||1)<=hv?"page":"install";
 }
-setTimeout(()=>{try{checkUpdate(false)}catch(e){}},6000);
+function updLink(u){const os=/Windows/i.test(navigator.userAgent)?u.windows:/Mac/i.test(navigator.userAgent)?u.mac:"";const pick=os||u.url||"";return /^https:\/\//.test(pick)?pick:""}
+async function applyUpdateNow(){
+  const u=S.update;if(!u)return;const en=isEN(),mode=await updMode();
+  if(mode==="web"){try{sessionStorage.setItem("m01.autoboot","1")}catch(e){}location.replace(location.pathname+"?v="+encodeURIComponent(u.version));return}
+  if(mode==="page"){toast(en?"Updating…":"更新中…",30000);let j=null;
+    try{j=await (await fetch("/selfupdate?url="+encodeURIComponent(u.page),{method:"POST",headers:{"X-M01":"1"}})).json()}catch(e){}
+    if(j&&j.ok){toast(en?"Updated! Restarting…":"更新好了，重新開啟中…",4000);try{sessionStorage.setItem("m01.autoboot","1")}catch(e){}setTimeout(()=>location.reload(),700);return}
+    toast(en?"Couldn’t update automatically — download the new version instead.":"沒辦法自動更新，請改用下載安裝。",7000)}
+  const link=updLink(u);if(!link)return;
+  if(typeof APP_MODE!=="undefined"&&APP_MODE)fetch("/open?url="+encodeURIComponent(link),{headers:{"X-M01":"1"}}).catch(()=>{});else window.open(link,"_blank");
+  toast(en?"Downloading — run the installer again when it’s done. Your memories are kept.":"下載中，下載完重新執行安裝檔就好，記憶會保留。",8000);
+}
+async function showUpdBar(){
+  const u=S.update;if(!u)return;const en=isEN(),mode=await updMode();let bar=$("updBar");
+  if(!bar){bar=document.createElement("div");bar.id="updBar";bar.dataset.i18n="none";document.body.appendChild(bar)}
+  bar.innerHTML=`<b>${en?`New version ${esc(u.version)}`:`有新版本 ${esc(u.version)}`}</b><span>${esc(en?(u.notes_en||u.notes||""):(u.notes||""))}</span>
+    <button class="pbtn" id="updNow">${mode==="install"?(en?"Download":"下載新版"):(en?"Update now":"立即更新")}</button><button class="sbtn" id="updLater">${en?"Later":"稍後"}</button>`;
+  bar.hidden=false;$("updNow").onclick=()=>{bar.hidden=true;applyUpdateNow()};$("updLater").onclick=()=>{bar.hidden=true};
+}
+function hideUpdBar(){const b=$("updBar");if(b)b.hidden=true}
+function updateBlock(en){
+  const u=S.update;if(!u)return"";
+  setTimeout(async()=>{const b=$("updInfoBtn");if(!b)return;const m=await updMode();b.textContent=m==="install"?(en?"Download the new version":"下載新版"):(en?"Update now":"立即更新");b.onclick=()=>{try{hideHelp()}catch(e){}applyUpdateNow()}},0);
+  return `<div class="upd-box"><b>${en?`New version ${esc(u.version)} available`:`有新版本 ${APP_STAGE} ${esc(u.version)}`}</b><span>${esc(en?(u.notes_en||u.notes||""):(u.notes||""))}</span><button class="pbtn" id="updInfoBtn">${en?"Update now":"立即更新"}</button><small>${en?`You have ${APP_VER}. Updating keeps all your memories.`:`你現在是 ${APP_VER}。更新不會影響記憶。`}</small></div>`;
+}
+setTimeout(()=>{try{checkUpdate(true)}catch(e){}},3500);
+setInterval(()=>{try{checkUpdate(true)}catch(e){}},30*60e3);
 
 
 /* ---------- local AI is optional: list / delete / download models, and pick an AI on first run ---------- */
+function isVisionModel(n){return /(^|[^a-z])(qwen[0-9.]*-?vl|llava|bakllava|minicpm-v|moondream|gemma3|llama3\.2-vision|granite3\.2-vision)/i.test(String(n||""))}
+async function refreshImageLimits(){try{const lim=await S.sample.limits();S.imagesOK=!!lim.images;S.imgLimits=lim.images||null}catch(e){}}
 let lmPulling=null;
 async function renderLocalModels(){
   const box=$("lmBox");if(!box||window.GH_MODE)return;if(lmPulling)return;const en=isEN();
   let j=null;try{const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/tags");if(r.ok)j=await r.json()}catch(e){}
   if(!j){box.innerHTML=`<p class="note">${en?'Ollama isn’t installed or isn’t running, so there’s no local AI yet. To use it: install Ollama from <a href="https://ollama.com/download">ollama.com/download</a>, open it, then come back here to download a model. You can also just use Gemini (free) or Claude instead.':'目前沒有本地 AI（沒安裝 Ollama，或 Ollama 沒打開）。想用的話：先到 <a href="https://ollama.com/download">ollama.com/download</a> 安裝 Ollama 並打開，再回到這裡下載模型。也可以直接改用 Gemini（免費）或 Claude。'}</p>`;return}
   const ms=(j.models||[]).filter(m=>!/embed/i.test(m.name)),gb=b=>(b/1e9).toFixed(1)+" GB",have=n=>ms.some(m=>m.name===n);
-  let h=`<div class="lm-h">${en?"Local AI models on this computer":"這台電腦上的本地 AI 模型"}</div>`;
-  h+=ms.length?ms.map(m=>`<div class="row"><div class="t">${esc(m.name)}<div class="d">${gb(m.size||0)}${m.name===LOCAL_CFG.model?(en?" · in use":" · 使用中"):""}</div></div><button data-del="${esc(m.name)}">${en?"Delete":"刪除"}</button></div>`).join("")
-    :`<p class="note">${en?"None yet — download one below.":"還沒有下載任何模型，可以在下面下載。"}</p>`;
+  const chatMs=ms.filter(m=>!isVisionModel(m.name)),visMs=ms.filter(m=>isVisionModel(m.name));
+  // the picture model is used automatically: no need to pick it
+  if(visMs.length&&!visMs.some(m=>m.name===LOCAL_CFG.vision)){LOCAL_CFG.vision=visMs[0].name;$("lcVision").value=LOCAL_CFG.vision;saveLocalCfg();refreshImageLimits()}
+  else if(!visMs.length&&LOCAL_CFG.vision&&isVisionModel(LOCAL_CFG.vision)){LOCAL_CFG.vision="";$("lcVision").value="";saveLocalCfg();refreshImageLimits()}
+  const row=(m,tag)=>`<div class="row"><div class="t">${esc(m.name)}<div class="d">${gb(m.size||0)}${tag||""}</div></div><button data-del="${esc(m.name)}">${en?"Delete":"刪除"}</button></div>`;
+  let h=`<div class="lm-h">${en?"Chat models on this computer":"這台電腦上的聊天模型"}</div>`;
+  h+=chatMs.length?chatMs.map(m=>row(m,m.name===LOCAL_CFG.model?(en?" · in use":" · 使用中"):"")).join(""):`<p class="note">${en?"None yet — download one below.":"還沒有下載聊天模型，可以在下面下載。"}</p>`;
   const btns=(have("qwen2.5:7b")?"":`<button class="sbtn" data-pull="qwen2.5:7b">${en?"Download standard (4.7GB)":"下載標準版（4.7GB）"}</button>`)+(have("qwen2.5:3b")?"":`<button class="sbtn" data-pull="qwen2.5:3b">${en?"Download light (1.9GB)":"下載輕量版（1.9GB）"}</button>`);
   if(btns)h+=`<div class="inline">${btns}</div>`;
+  h+=`<div class="lm-cmp"><div><b>${en?"Standard · qwen2.5:7b · 4.7GB":"標準版 · qwen2.5:7b · 4.7GB"}</b><span>${en?"Smarter, more natural Chinese, stays in character better. Use it if the computer has 16GB of memory or more.":"比較聰明、中文比較自然，也比較能維持她的個性。電腦記憶體 16GB 以上就選這個。"}</span></div>
+    <div><b>${en?"Light · qwen2.5:3b · 1.9GB":"輕量版 · qwen2.5:3b · 1.9GB"}</b><span>${en?"Faster and smaller, for 8GB computers or older laptops. Makes more mistakes and forgets her personality more often.":"比較快、比較省空間，適合 8GB 記憶體或比較舊的電腦。缺點是比較容易答錯、忘記她的個性。"}</span></div>
+    <div><b>${en?"Not sure?":"不知道選哪個？"}</b><span>${en?"Start with standard. If replies take more than about 10 seconds, switch to light — or use Gemini (free, smarter, needs internet).":"先用標準版；如果每次回覆都要等超過 10 秒左右，就改用輕量版，或直接改用 Gemini（免費、更聰明，但要網路）。"}</span></div></div>`;
+  h+=`<div class="lm-h">${en?"Picture model (lets her see images)":"看圖模型（讓她看得懂圖片）"}</div>`;
+  h+=visMs.length?visMs.map(m=>row(m,en?" · used automatically when you send a picture":" · 傳圖片時會自動使用")).join("")
+    :`<p class="note" style="margin:0">${en?"Without it, local AI can’t look at pictures you send (Gemini and Claude can). It’s only used when you send an image — no need to switch to it.":"沒有它的話，本地 AI 看不到你傳的圖片（Gemini 和 Claude 本來就看得懂）。下載後會自動在你傳圖片時使用，不用另外切換。"}</p><div class="inline"><button class="sbtn" data-pull="qwen2.5vl:3b">${en?"Download picture model (3.2GB)":"下載看圖模型（3.2GB）"}</button></div>`;
   h+=`<p class="note" style="margin:0">${en?"Deleting a model frees its disk space; you can download it again any time.":"刪掉模型可以把空間省下來，之後隨時可以再下載。"}</p>`;
   box.innerHTML=h;
   box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
@@ -3311,8 +3490,9 @@ async function deleteLocalModel(name,info){
   try{const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:name})});ok=r.ok}catch(e){}
   if(!ok){toast(en?"Couldn’t delete it — is Ollama open?":"刪除失敗，Ollama 有打開嗎？",6000);return}
   toast((en?"Deleted ":"已刪除 ")+name+(info&&info.size?(en?`, freed ${(info.size/1e9).toFixed(1)} GB`:`，省下 ${(info.size/1e9).toFixed(1)} GB`):""),6000);
+  if(name===LOCAL_CFG.vision){LOCAL_CFG.vision="";$("lcVision").value="";saveLocalCfg();refreshImageLimits()}
   if(name===LOCAL_CFG.model){
-    const r=await ollamaCheck();const left=(r.names||[]).filter(n=>!/embed/i.test(n));
+    const r=await ollamaCheck();const left=(r.names||[]).filter(n=>!/embed/i.test(n)&&!isVisionModel(n));
     if(left.length){LOCAL_CFG.model=left[0];$("lcModel").value=left[0];saveLocalCfg()}
     else if((LOCAL_CFG.backend||"ollama")==="ollama"){let g={};try{g=await (await fetch("/secret?p=gemini",{headers:{"X-M01":"1"}})).json()}catch(e){}
       if(g.has){LOCAL_CFG.backend="gemini";saveLocalCfg();toast(en?"No local model left — switched to Gemini.":"本地模型都刪掉了，已改用 Gemini。",6000)}}
@@ -3338,7 +3518,8 @@ async function pullLocalModel(name){
       if(err)break}
   }catch(e){if(e&&e.name==="AbortError")err=en?"cancelled":"已取消";else err=String(e&&e.message||e)}
   lmPulling=null;
-  if(ok){LOCAL_CFG.model=name;LOCAL_CFG.backend="ollama";$("lcModel").value=name;saveLocalCfg();toast((en?"Downloaded ":"下載好了：")+name,6000);await checkAI();paintModelChip()}
+  if(ok&&isVisionModel(name)){LOCAL_CFG.vision=name;$("lcVision").value=name;saveLocalCfg();refreshImageLimits();toast(en?"Picture model ready — she can look at images now.":"看圖模型下載好了，現在她看得懂圖片了。",6000)}
+  else if(ok){LOCAL_CFG.model=name;LOCAL_CFG.backend="ollama";$("lcModel").value=name;saveLocalCfg();toast((en?"Downloaded ":"下載好了：")+name,6000);await checkAI();paintModelChip()}
   else toast((en?"Download didn’t finish: ":"下載沒有完成：")+err,7000);
   renderLocalModels();
 }
@@ -3350,7 +3531,7 @@ async function maybeAiPick(){
 async function maybeAiPick0(){
   while(!$("setupPop").hidden||(window.cloud&&["waiting","signin","sync"].includes(cloud._st.state)))await new Promise(r=>setTimeout(r,800));
   if((LOCAL_CFG.backend||"ollama")!=="ollama")return;
-  const r=await ollamaCheck();if(r.ok&&(r.names||[]).some(n=>!/embed/i.test(n)))return;
+  const r=await ollamaCheck();if(r.ok&&(r.names||[]).some(n=>!/embed/i.test(n)&&!isVisionModel(n)))return;
   let g={},c={};try{g=await (await fetch("/secret?p=gemini",{headers:{"X-M01":"1"}})).json()}catch(e){}try{c=await (await fetch("/secret",{headers:{"X-M01":"1"}})).json()}catch(e){}
   const en=isEN();
   if(g.has||c.has){LOCAL_CFG.backend=g.has?"gemini":"claude";saveLocalCfg();await checkAI();paintModelChip();toast(en?`No local AI found — using ${g.has?"Gemini":"Claude"}.`:`沒有找到本地 AI，改用 ${g.has?"Gemini":"Claude"}。`,6000);return}
@@ -3372,8 +3553,8 @@ function showAiPick(){
   box.hidden=false;
   const close=()=>{box.hidden=true};
   $("apSkip").onclick=()=>{close();if(typeof maybeTour==="function")maybeTour()};
-  $("apLocal").onclick=()=>{close();openTab("pSet");$("aiBackend").value="ollama";LOCAL_CFG.backend="ollama";saveLocalCfg();paintBackend();try{$("aiBackend").scrollIntoView({block:"start"})}catch(e){}};
-  $("apClaude").onclick=()=>{close();openTab("pSet");$("aiBackend").value="claude";LOCAL_CFG.backend="claude";saveLocalCfg();paintBackend();try{$("ckKey").focus()}catch(e){}};
+  $("apLocal").onclick=()=>{close();$("aiBackend").value="ollama";LOCAL_CFG.backend="ollama";saveLocalCfg();paintBackend();openSec("g_ai","#lmBox")};
+  $("apClaude").onclick=()=>{close();openSec("g_ai","#claudeBox");$("aiBackend").value="claude";LOCAL_CFG.backend="claude";saveLocalCfg();paintBackend();try{$("ckKey").focus()}catch(e){}};
   $("apSave").onclick=async()=>{const inp=$("apKey"),msg=$("apMsg"),k=inp.value.trim();
     if(!/^AIza[0-9A-Za-z_\-]{20,}$/.test(k)){msg.textContent=en?"That doesn’t look like a Gemini key (it starts with AIza).":"這看起來不像 Gemini 金鑰（應該是 AIza 開頭）。";return}
     msg.textContent=en?"Checking your key…":"測試金鑰中…";$("apSave").disabled=true;
@@ -3577,6 +3758,127 @@ $("sndBtn").onclick=e=>{e.stopPropagation();toggleVolPop()};
 $("uiSound").onchange=()=>{S.settings.uiSound=$("uiSound").checked;paintSnd();saveSettingsQuiet()};
 paintSnd();
 </script>
+<script>/* ===== Beta extras: interface styles, sound sets, layout, share, pokes ===== */
+(function(){
+  /* ---------- interface styles ---------- */
+  const THEME_ACCENT={mecha:"#FF7A3D",pink:"#FF5FA2",terminal:"#33FF66",light:"#2F6FED",neon:"#FF3DF2"};
+  window.applyTheme=function(t){t=THEME_ACCENT[t]?t:"mecha";const r=document.documentElement;
+    if(t==="mecha")r.removeAttribute("data-theme");else r.setAttribute("data-theme",t);
+    try{localStorage.setItem("m01.theme",t)}catch(e){}const sel=$("themeSel");if(sel)sel.value=t;
+    const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=(getComputedStyle(r).getPropertyValue("--bg")||"").trim()||"#09090B"};
+  try{applyTheme(localStorage.getItem("m01.theme")||"mecha")}catch(e){}
+  $("themeSel").onchange=e=>{const t=e.target.value;S.settings.theme=t;applyTheme(t);S.settings.accent=THEME_ACCENT[t];applyAccent(THEME_ACCENT[t]);saveSettingsQuiet();playSfx("press",.5)};
+
+  /* ---------- sound sets (the default "mecha" set uses the recorded sounds) ---------- */
+  const N=(type,f0,f1,st,dur,g,lp)=>({type,f0,f1,st,dur,g,lp});
+  const SETS={
+    bubble:{press:[N("sine",420,900,0,.1,.55)],exit:[N("sine",760,240,0,.3,.5)],hover:[N("sine",1300,1650,0,.045,.16)],
+      boot:[N("sine",392,640,0,.14,.45),N("sine",523,860,.12,.14,.45),N("sine",659,1100,.24,.22,.45)]},
+    retro:{press:[N("square",880,880,0,.05,.2),N("square",1320,1320,.05,.06,.2)],exit:[N("square",660,660,0,.08,.18),N("square",440,440,.08,.08,.18),N("square",220,220,.16,.16,.18)],hover:[N("square",1760,1760,0,.025,.07)],
+      boot:[523,659,784,1047].map((f,i)=>N("square",f,f,i*.08,.09,.18)).concat([N("square",1568,1568,.34,.26,.16)])},
+    wood:{press:[N("sine",784,784,0,.22,.6),N("sine",3136,3136,0,.06,.1)],exit:[N("sine",659,659,0,.2,.55),N("sine",440,440,.12,.34,.55)],hover:[N("sine",1568,1568,0,.07,.18)],
+      boot:[523,587,659,784,880,1047].map((f,i)=>N("sine",f,f,i*.07,.32,.5))},
+    scifi:{press:[N("sawtooth",180,900,0,.09,.22,1),N("sine",1760,2400,0,.05,.1)],exit:[N("sawtooth",900,90,0,.4,.26,1)],hover:[N("sine",2900,3400,0,.03,.07)],
+      boot:[N("sawtooth",90,1400,0,.7,.28,1),N("sine",1047,1047,.55,.5,.28),N("sine",1568,1568,.66,.6,.2)]}};
+  function synth(set,kind,vol){const def=SETS[set];if(!def||typeof actx==="undefined"||!actx||!soundOn())return;const notes=def[kind];if(!notes)return;
+    try{actx.resume();const t=actx.currentTime,out=actx.createGain();out.gain.value=(vol==null?.6:vol)*(volume()/.7);out.connect(actx.destination);
+      for(const n of notes){const o=actx.createOscillator(),g=actx.createGain(),st=t+n.st;o.type=n.type;o.frequency.setValueAtTime(n.f0,st);if(n.f1!==n.f0)o.frequency.exponentialRampToValueAtTime(n.f1,st+n.dur);
+        g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(n.g,st+.006);g.gain.exponentialRampToValueAtTime(.0001,st+n.dur);
+        let node=o;if(n.lp){const fl=actx.createBiquadFilter();fl.type="lowpass";fl.frequency.setValueAtTime(400,st);fl.frequency.exponentialRampToValueAtTime(5000,st+n.dur);o.connect(fl);node=fl}
+        node.connect(g).connect(out);o.start(st);o.stop(st+n.dur+.05)}}catch(e){}}
+  const sndSet=()=>(S.settings&&S.settings.sndSet)||"mecha";
+  window.__synth=synth;
+  const _p=playSfx,_h=hoverTick,_b=bootChime;
+  playSfx=function(k,vol){if(sndSet()!=="mecha"){synth(sndSet(),k,vol);return}return _p(k,vol)};
+  hoverTick=function(){if(sndSet()!=="mecha"){if(!document.body.classList.contains("booted"))return;synth(sndSet(),"hover",.5);return}return _h()};
+  bootChime=function(){if(sndSet()!=="mecha"){synth(sndSet(),"boot",.7);return}return _b()};
+  const demo=()=>{if(typeof audioInit==="function")audioInit().then(()=>{playSfx("press",.6);setTimeout(()=>hoverTick(),350);setTimeout(()=>bootChime(),700)})};
+  $("sndSet").onchange=e=>{S.settings.sndSet=e.target.value;saveSettingsQuiet();demo()};
+  $("sndTry").onclick=e=>{e.stopPropagation();demo()};
+
+  /* ---------- layout: swap sides, drag the middle, snap at 1/4, 1/2, 3/4 ---------- */
+  const L=(()=>{try{return Object.assign({split:0,swap:false},JSON.parse(localStorage.getItem("m01.layout")||"{}"))}catch(e){return{split:0,swap:false}}})();
+  const app=document.querySelector(".app"),stage=document.querySelector(".app>.stage");
+  const sp=document.createElement("div");sp.id="splitter";sp.dataset.i18n="none";sp.title=isEN()?"Drag to resize · double-click to reset":"拖曳調整大小・點兩下恢復";
+  sp.innerHTML=`<button class="sw" id="swapMini" aria-label="左右換邊" title="左右換邊">⇄</button>`;app.appendChild(sp);
+  const saveL=()=>{try{localStorage.setItem("m01.layout",JSON.stringify(L))}catch(e){}};
+  function placeSplit(){const ar=app.getBoundingClientRect(),r=stage.getBoundingClientRect();if(!ar.width||!r.width)return;sp.style.left=((L.swap?r.left:r.right)-ar.left)+"px"}
+  window.applyLayout=function(){document.body.classList.toggle("swapped",!!L.swap);document.body.classList.toggle("split",!!L.split);if(L.split)app.style.setProperty("--split",L.split);requestAnimationFrame(placeSplit)};
+  let drag=false;
+  sp.addEventListener("pointerdown",e=>{if(e.target.closest(".sw"))return;e.preventDefault();drag=true;try{sp.setPointerCapture(e.pointerId)}catch(x){}sp.classList.add("drag");document.body.classList.add("dragging")});
+  sp.addEventListener("pointermove",e=>{if(!drag)return;const ar=app.getBoundingClientRect();let pct=(e.clientX-ar.left)/ar.width*100,st=L.swap?100-pct:pct;
+    st=Math.max(20,Math.min(80,st));let snap=null;for(const p of [25,50,75])if(Math.abs(st-p)<3){st=p;snap=p}
+    if(snap!==null&&L.split!==snap){sp.classList.remove("snap");void sp.offsetWidth;sp.classList.add("snap");try{hoverTick()}catch(x){}}
+    L.split=Math.round(st*10)/10;applyLayout()});
+  const endDrag=()=>{if(!drag)return;drag=false;sp.classList.remove("drag");document.body.classList.remove("dragging");saveL()};
+  sp.addEventListener("pointerup",endDrag);sp.addEventListener("pointercancel",endDrag);
+  sp.addEventListener("dblclick",e=>{if(e.target.closest(".sw"))return;L.split=0;applyLayout();saveL()});
+  const swap=()=>{L.swap=!L.swap;applyLayout();saveL();playSfx("press",.5)};
+  $("swapMini").onclick=e=>{e.stopPropagation();swap()};$("swapBtn").onclick=swap;
+  $("layoutReset").onclick=()=>{L.split=0;L.swap=false;applyLayout();saveL();toast(isEN()?"Layout reset":"版面已恢復預設")};
+  addEventListener("resize",placeSplit);try{new ResizeObserver(placeSplit).observe(app)}catch(e){}
+  applyLayout();
+
+  /* ---------- share: the web version and the GitHub page ---------- */
+  const WEB="https://elvis071114-coder.github.io/m01/",REPO="https://github.com/elvis071114-coder/m01";
+  const shareBtn=document.createElement("button");shareBtn.id="shareBtn";shareBtn.className="tab-share";shareBtn.type="button";shareBtn.dataset.i18n="none";
+  shareBtn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg><span></span>`;
+  document.querySelector(".tabs").appendChild(shareBtn);
+  const pop=document.createElement("div");pop.id="sharePop";pop.hidden=true;pop.dataset.i18n="none";document.body.appendChild(pop);
+  async function copy(t){try{await navigator.clipboard.writeText(t);return true}catch(e){}try{const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();const ok=document.execCommand("copy");a.remove();return ok}catch(e){return false}}
+  function openLink(u){if(typeof APP_MODE!=="undefined"&&APP_MODE)fetch("/open?url="+encodeURIComponent(u),{headers:{"X-M01":"1"}}).catch(()=>{});else window.open(u,"_blank")}
+  function paintShare(){const E=isEN();shareBtn.title=E?"Share":"分享";shareBtn.setAttribute("aria-label",E?"Share M-01":"分享 M-01");shareBtn.querySelector("span").textContent=E?"Share":"分享";
+    const row=(k,t,d,u)=>`<div class="sh-row"><div class="sh-t"><b>${t}</b><small>${d}</small><code>${u.replace(/^https:\/\//,"")}</code></div><div class="sh-a"><button data-copy="${k}">${E?"Copy":"複製"}</button><button data-open="${k}">${E?"Open":"打開"}</button></div></div>`;
+    pop.innerHTML=`<div class="sh-h">${E?"Share M-01 with friends":"把 M-01 分享給朋友"}</div>`+row("web",E?"Web version":"網頁版",E?"Opens in any browser, phone included — just needs a free Gemini key.":"任何瀏覽器（手機也可以）直接打開，只要一把免費的 Gemini 金鑰。",WEB)
+      +row("repo","GitHub",E?"The project page: desktop app downloads, README and updates.":"專案頁面：電腦版下載、說明和更新。",REPO)
+      +(navigator.share?`<button class="pbtn sh-native" id="shNative">${E?"Share…":"用其他 App 分享…"}</button>`:"")+`<p class="sh-msg" id="shMsg"></p>`;
+    const U={web:WEB,repo:REPO};
+    pop.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const ok=await copy(U[b.dataset.copy]);$("shMsg").textContent=ok?(E?"Copied!":"已複製！"):(E?"Couldn’t copy — select the link and copy it.":"沒辦法自動複製，請手動選取連結。")});
+    pop.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openLink(U[b.dataset.open]));
+    const n=$("shNative");if(n)n.onclick=()=>navigator.share({title:"M-01 Companion",text:E?"An AI companion that remembers you":"會記得你的 AI 聊天夥伴",url:WEB}).catch(()=>{});
+  }
+  paintShare();new MutationObserver(paintShare).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+  shareBtn.onclick=e=>{e.stopPropagation();if(!pop.hidden){pop.hidden=true;return}paintShare();pop.hidden=false;const r=shareBtn.getBoundingClientRect();
+    pop.style.top=(r.bottom+8)+"px";pop.style.left=Math.max(10,Math.min(innerWidth-pop.offsetWidth-10,r.right-pop.offsetWidth))+"px";playSfx("press",.45)};
+  document.addEventListener("pointerdown",e=>{if(!pop.hidden&&!pop.contains(e.target)&&!shareBtn.contains(e.target))pop.hidden=true});
+  addEventListener("keydown",e=>{if(e.key==="Escape")pop.hidden=true});
+
+  /* ---------- tap her: a quick line in the thought bubble, about what you've been talking about ---------- */
+  const FALL_ZH=["幹、幹嘛突然戳我啦！","再戳我就要生氣了喔…","嗯？有事要跟我說嗎？","哼，想我了就直說嘛。","不要一直戳啦，很癢耶！","我在聽啦，你說。","你今天過得怎麼樣？","戳我也不會給你獎勵喔。","……好啦，陪你一下。","別鬧了，要不要聊點什麼？","你是不是很無聊？","我、我才沒有在等你戳我。"];
+  const FALL_EN=["H-hey! Why'd you poke me?!","Poke me again and I'll get mad…","Hm? Something you want to say?","Missed me? Just say so.","Stop it, that tickles!","I'm listening, go on.","How's your day going?","Poking me won't get you a prize.","…Fine, I'll keep you company.","Want to talk about something?","Are you bored or something?","I-it's not like I was waiting for that."];
+  const TIME_ZH={night:["這麼晚了還不睡？","我也有點想睡了……"],morning:["早安……才不是特地等你的。","早餐吃了沒？"],noon:["午餐吃什麼？","下午也要加油喔。"],evening:["今天辛苦了。","晚餐吃了嗎？"]};
+  const TIME_EN={night:["Still up this late?","I'm getting sleepy too…"],morning:["Morning… not that I was waiting.","Had breakfast yet?"],noon:["What's for lunch?","Hang in there this afternoon."],evening:["Good work today.","Had dinner yet?"]};
+  const BUSY_ZH=["等一下啦，我在想！","別吵，快好了……"],BUSY_EN=["Wait, I'm thinking!","Shh, almost done…"];
+  let pool=[],poolAt=-99,refilling=false,recent=[],sayT=null;
+  const msgsNow=()=>{try{return S.logs.reduce((n,l)=>n+l.items.length,0)}catch(e){return 0}};
+  function pick(arr){const opts=arr.filter(x=>!recent.includes(x));const x=(opts.length?opts:arr)[Math.floor(Math.random()*(opts.length?opts:arr).length)];recent.push(x);if(recent.length>6)recent.shift();return x}
+  function fallback(){const E=isEN(),h=new Date().getHours(),slot=h<5?"night":h<11?"morning":h<14?"noon":h>=18&&h<23?"evening":h>=23?"night":null;
+    const base=E?FALL_EN:FALL_ZH;const extra=slot?(E?TIME_EN:TIME_ZH)[slot]:[];return pick(Math.random()<.3&&extra.length?extra:base)}
+  async function refill(){
+    if(refilling||!S.sample||S.busy||S.incog)return;refilling=true;const at=msgsNow();
+    try{const E=isEN(),name=S.settings.botName||"Claude";
+      const items=S.logs.flatMap(l=>l.items).slice(-8).map(m=>(m.role==="user"?(E?"Them":"對方"):(E?"You":"你"))+"："+String(m.text||"").replace(/\s+/g," ").slice(0,160)).join("\n");
+      const prompt=`${E?`You are ${name}.`:`你是${name}。`}${E?"Your personality":"你的個性"}：${String(S.settings.persona||"").slice(0,500)}\n\n${E?"Recent chat":"最近的對話"}：\n${items||(E?"(nothing yet)":"（還沒聊什麼）")}\n\n${E?`They just poked you with a finger. Write 6 different short things you'd say when poked — tied to what you've been talking about, in character, each under 12 words, in English.`:`對方剛剛用手指戳了你一下。寫 6 句你被戳時會說的話：要跟最近聊的內容有關、符合你的個性、每句不超過 20 個字、每句都不一樣，用繁體中文。`} ${E?'Output only a JSON array of strings, like ["…","…"].':'只輸出 JSON 字串陣列，例如 ["…","…"]。'}`;
+      const r=await Promise.race([S.sample.json(prompt,{modelTier:"quick"}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),25000))]);
+      const arr=(Array.isArray(r)?r:[]).map(x=>(window.__toTrad?window.__toTrad(String(x)):String(x)).trim()).filter(x=>x&&x.length<=70&&!/^\[|^\{/.test(x));
+      if(arr.length>=2){pool=arr.sort(()=>Math.random()-.5);poolAt=at}
+    }catch(e){}finally{refilling=false}}
+  window.__pokeRefill=refill;
+  function say(t){const th=document.querySelector("#heroWrap .thought");if(!th)return;clearTimeout(sayT);th.textContent=t;th.classList.add("say");
+    sayT=setTimeout(()=>{th.classList.remove("say");setTimeout(()=>{if(!th.classList.contains("say"))th.textContent="···"},300)},Math.min(6500,2600+t.length*90))}
+  function react(){const el=$("sprite");if(!el)return;el.classList.remove("poked");void el.offsetWidth;el.classList.add("poked");
+    const sp=sprites(),opts=["shy","surprised","happy","angry","smug"].filter(k=>sp[k]);if(opts.length&&!S.streaming)setExpr(opts[Math.floor(Math.random()*opts.length)],2400)}
+  window.pokeHer=function(){
+    const E=isEN();let line;
+    if(S.busy||S.streaming)line=pick(E?BUSY_EN:BUSY_ZH);
+    else if(pool.length&&msgsNow()-poolAt<6)line=pool.shift();
+    else line=fallback();
+    if(!S.busy&&(pool.length<2||msgsNow()-poolAt>=6))setTimeout(refill,200);
+    say(line);react();try{playSfx("press",.3)}catch(e){}
+    return line};
+  $("heroWrap").addEventListener("click",e=>{if(e.target.closest("#sprite"))pokeHer()});
+})();
+</script>
 <script>
 /* ===== GitHub edition: page pieces ===== */
 (function(){
@@ -3586,10 +3888,11 @@ paintSnd();
   const secs=[...document.querySelectorAll("#pSet .sec")];
   const hideFrom=(label,stops)=>{const s=secs.find(x=>x.textContent.trim().startsWith(label));if(!s)return;let n=s;
     while(n){if(n!==s&&n.classList&&n.classList.contains("sec")&&stops.some(u=>n.textContent.trim().startsWith(u)))break;const nx=n.nextElementSibling;n.hidden=true;n.style.display="none";n=nx}};
-  hideFrom("VOICE",["CHARACTER"]);hideFrom("MEMORY FOLDER",["DATA"]);
+  ["g_voice","folderSub"].forEach(id=>{const e=document.getElementById(id);if(e){e.hidden=true;e.style.display="none"}});
+  {const d=document.querySelector("#g_data .sg-t small");if(d)d.textContent="備份、還原";}
   try{[...$("aiBackend").options].forEach(o=>{if(o.value!=="gemini")o.remove()})}catch(e){}
   {const lab=document.querySelector('label[for="aiBackend"]');if(lab){lab.hidden=true;lab.style.display="none"}}
-  const aiHelp=document.querySelector('#pSet .sec .help[data-help="localai"]');if(aiHelp)aiHelp.dataset.help="ghai";
+  const aiHelp=document.querySelector('#pSet .help[data-help="localai"]');if(aiHelp)aiHelp.dataset.help="ghai";
   HELP.ghai=["Gemini 金鑰","<ol><li>用 Google 帳號打開 <a href=\"https://aistudio.google.com/apikey\">aistudio.google.com/apikey</a>，按 Create API key。</li><li>複製金鑰，貼到下面的欄位，會自動儲存並測試。</li><li>免費額度每分鐘、每天有上限，用完等一下就會恢復。</li><li>金鑰只存在這個瀏覽器，只會送到 Google。</li></ol>"];
   HELP_EN.ghai=["Gemini key","<ol><li>Open <a href=\"https://aistudio.google.com/apikey\">aistudio.google.com/apikey</a> with a Google account and press Create API key.</li><li>Copy it and paste it below — it saves and tests automatically.</li><li>The free tier has per-minute and per-day limits; wait a bit and it recovers.</li><li>The key stays in this browser and is only sent to Google.</li></ol>"];
   const paintNotes=()=>{
