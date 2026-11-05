@@ -1999,7 +1999,7 @@ function renderSlots(){
 function fileToDataURL(f){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>no(new Error("讀不到這個檔案"));r.readAsDataURL(f)})}
 async function shrinkImage(f){
   // desktop app: saved as a file on this computer, so keep it sharp; web: each saved doc must stay under 256 KB
-  const desk=typeof isDesk==="function"&&isDesk();
+  const desk=(typeof isDesk==="function"&&isDesk())||!!window.GH_MODE;  // the GitHub edition keeps images in this browser, no size cap
   const LIMIT=desk?12000000:230000,MAXD=desk?2048:1200;
   if(f.type==="image/gif"&&f.size<LIMIT*0.7)return await fileToDataURL(f);
   const url=URL.createObjectURL(f);
@@ -3179,6 +3179,9 @@ paintSnd();
       <a class="pbtn dl-btn" href="${BASE}M-01-Companion-Windows.zip" download>${E?"Download for Windows":"下載 Windows 版"}</a>
       <ol>${E?'<li>Install Ollama from <a href="https://ollama.com/download/windows">ollama.com/download/windows</a>.</li><li>Right-click the zip → “Extract All”.</li><li>Double-click “install.bat”. If “Windows protected your PC” appears, click “More info” → “Run anyway”.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB).</li>':'<li>先到 <a href="https://ollama.com/download/windows">ollama.com/download/windows</a> 安裝 Ollama。</li><li>在 zip 上按右鍵 →「全部解壓縮」。</li><li>按兩下「install.bat」。出現「Windows 已保護您的電腦」時，按「其他資訊」→「仍要執行」。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB）。</li>'}</ol>
       <details><summary>${E?"Troubleshooting":"遇到問題怎麼辦"}</summary><ul>${E?"<li>install.bat flashes and closes: Shift + right-click in the folder → “Open PowerShell here”, run <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>.</li><li>“先看我.txt” in the zip has the full guide.</li>":"<li>install.bat 一閃就消失：在資料夾按住 Shift 再按右鍵 →「在這裡開啟 PowerShell」，執行 <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>。</li><li>zip 裡的「先看我.txt」有完整說明。</li>"}</ul></details></div>
+    <div class="dl-card"><div class="dl-head"><b>${E?"Sample character":"範例角色圖"}</b><span>${E?"12 expressions · transparent PNG · about 15MB":"12 種表情 · 去背 PNG · 約 15MB"}</span></div>
+      <a class="pbtn dl-btn" href="${BASE}M-01-sample-character.zip" download>${E?"Download sample character":"下載範例角色圖"}</a>
+      <p class="note" style="margin:0">${E?"For the desktop app: unzip, then drag each picture onto the matching slot in Settings (file names match the slots). In this web version just press “Use the sample character” in Settings. Inspired by the community’s “Claude-chan” fan personification; made with AI.":"給電腦版用：解壓縮後，把圖片拖到「設定」裡對應的格子（檔名對照格子名稱）。網頁版直接在「設定」按「套用範例角色」就好。角色靈感來自社群的 Claude娘 二創形象，用 AI 製作。"}</p></div>
     <p class="note">${E?"Phones: add this page to your Home Screen (Share → Add to Home Screen) to open it like an app.":"手機：把這個網頁「加到主畫面」，就能像 App 一樣打開。"}</p>`;
   };
   // first-run key screen
@@ -3207,9 +3210,19 @@ paintSnd();
   const needKey=async()=>{try{const j=await (await fetch("/secret?p=gemini")).json();return !j.has}catch(e){return true}};
   // weather works here too (Open-Meteo allows browsers)
   try{if(typeof TOOLS!=="undefined"&&typeof getWeather==="function"&&!TOOLS.some(t=>t.name==="get_weather"))TOOLS.push({name:"get_weather",description:"查某個地點現在的天氣和未來 3 天預報。對方問天氣、要不要帶傘、冷不冷時一定要先用這個工具，不要自己猜。台灣縣市直接用中文（例如：桃園、台北）；其他地方請用英文地名（例如 Tokyo）。",inputSchema:{type:"object",properties:{location:{type:"string"}},required:["location"]},execute:async({location})=>{showTool(`查天氣：${location}`);return await getWeather(String(location||""))}})}catch(e){}
-  paintNotes();renderGhDl();
+  // sample character: one button fills all 12 slots from this site
+  const SAMPLE={idle:"Eyes_open",blink:"Eyes_closed",talk:"Mouth_open",happy:"Happy",shy:"Shy",angry:"Angry",smug:"Smug",think:"Thinking",surprised:"Surprised",worried:"Worried",sad:"Sad",sleep:"Asleep"};
+  const sbox=document.createElement("div");sbox.className="subbox";sbox.id="ghSample";sbox.dataset.i18n="none";
+  const paintSample=()=>{const E=en();sbox.innerHTML=`<p class="note">${E?"No pictures yet? Use the sample character (12 expressions). The character concept comes from the community’s “Claude-chan” fan personification; these images were made with AI for this app.":"還沒有角色圖？可以先用範例角色（12 種表情）。角色靈感來自社群的 Claude娘 二創形象，圖是為這個 App 用 AI 製作的。"}</p><button class="pbtn" id="ghSampleBtn" style="align-self:flex-start">${E?"Use the sample character":"套用範例角色"}</button>`;
+    $("ghSampleBtn").onclick=async()=>{const b=$("ghSampleBtn"),E2=en();b.disabled=true;let done=0,fail=0;
+      for(const [k,n] of Object.entries(SAMPLE)){b.textContent=(E2?"Loading ":"載入中 ")+(done+1)+"/12…";
+        try{const r=await fetch("character/"+n+".png");if(!r.ok)throw 0;const bl=await r.blob();await handleSpriteFile(new File([bl],n+".png",{type:"image/png"}),k);done++}catch(e){fail++}}
+      b.disabled=false;b.textContent=E2?"Use the sample character":"套用範例角色";
+      toast(fail?(E2?`Loaded ${done} of 12 — some images couldn't be downloaded.`:`載入了 ${done}／12 張，有些圖片下載失敗。`):(E2?"Sample character added!":"範例角色套用好了！"),5000)}};
+  {const slots=$("slots");if(slots)slots.parentNode.insertBefore(sbox,slots)}
+  paintNotes();renderGhDl();paintSample();
   const ob=new MutationObserver(()=>{});ob.observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
-  new MutationObserver(()=>{paintNotes();renderGhDl();if(!box.hidden)showGhKey(true)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+  new MutationObserver(()=>{paintNotes();renderGhDl();paintSample();if(!box.hidden)showGhKey(true)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
   const wait=async()=>{if(!document.body.classList.contains("booted")){setTimeout(wait,500);return}if(await needKey())showGhKey(false)};
   setTimeout(wait,1200);
 })();
