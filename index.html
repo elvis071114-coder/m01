@@ -1157,7 +1157,8 @@ window.GH_MODE=true;
   function webAuth(prompt){return new Promise((ok,no)=>{
     const go=()=>{try{
       if(!tc)tc=google.accounts.oauth2.initTokenClient({client_id:G_WEB_ID,scope:SCOPE,callback:()=>{}});
-      tc.callback=r=>{if(r&&r.access_token){st.token=r.access_token;st.exp=Date.now()+(+r.expires_in||3600)*1000;LS("m01.g.tok",JSON.stringify({t:st.token,exp:st.exp}));st.needAuth=false;ok(st.token)}else no(new Error(r&&(r.error||r.type)||"denied"))};
+      tc.callback=r=>{if(r&&r.access_token&&r.scope&&!/drive\.appdata/.test(r.scope)){no({code:"scope"});return}
+        if(r&&r.access_token){st.token=r.access_token;st.exp=Date.now()+(+r.expires_in||3600)*1000;LS("m01.g.tok",JSON.stringify({t:st.token,exp:st.exp}));st.needAuth=false;ok(st.token)}else no(new Error(r&&(r.error||r.type)||"denied"))};
       tc.error_callback=e=>no(new Error(e&&e.type||"popup"));
       const u=user();tc.requestAccessToken(Object.assign({prompt},u&&u.email?{login_hint:u.email}:{}));
     }catch(e){no(e)}};
@@ -1168,6 +1169,7 @@ window.GH_MODE=true;
     const t=await token();if(!t)throw{code:"auth"};
     let r;try{r=await fetch(API()+path,Object.assign({},opt,{headers:Object.assign({},opt.headers||{},{Authorization:"Bearer "+t})}))}catch(e){throw{code:"offline"}}
     if(r.status===401){st.token=null;st.exp=0;if(web()){LS("m01.g.tok",null);st.needAuth=true;throw{code:"auth"}}if(!retry)return g(path,opt,true);throw{code:"auth"}}
+    if(r.status===403){let t="";try{t=await r.text()}catch(e){}if(/insufficient|scope|PERMISSION/i.test(t))throw{code:"scope"}}
     if(!r.ok)throw{code:"http",status:r.status};
     return r}
   async function listFiles(){const out={};let pt="";
@@ -1243,7 +1245,7 @@ window.GH_MODE=true;
     catch(e){todo.forEach(x=>st.dirty.add(x));saveMeta();throw e}
     st.meta.owner=(user()||{}).email||"";saveMeta(true)}
   function done(){st.last=Date.now();LS("m01.g.last",String(st.last));st.err="";st.state="idle";paint()}
-  function fail(e){st.state="idle";st.err=e&&e.code==="auth"?"auth":e&&e.code==="offline"?"offline":"error";if(st.err==="auth")st.needAuth=true;paint()}
+  function fail(e){st.state="idle";st.err=e&&e.code==="auth"?"auth":e&&e.code==="scope"?"scope":e&&e.code==="offline"?"offline":"error";if(st.err==="auth")st.needAuth=true;paint()}
   /* before the app reads its memory: bring everything up to date */
   async function bootSync(){
     if(!signedIn()||!st.base)return false;await loadMeta();
@@ -1282,6 +1284,7 @@ window.GH_MODE=true;
       if(c0.startsWith("!"))throw{code:"cancel"};
       const j=await (await fetch("/gtoken?op=exchange",{method:"POST",headers:H,body:new URLSearchParams({client_id:G_APP_ID,client_secret:G_APP_SECRET,code:c0,code_verifier:ver,redirect_uri:redirect,grant_type:"authorization_code"}).toString()})).json();
       if(!(j&&j.status===200&&j.body&&j.body.access_token))throw{code:"error"};
+      if(j.body.scope&&!/drive\.appdata/.test(j.body.scope)){await fetch("/secret?p=google",{method:"DELETE",headers:H}).catch(()=>{});throw{code:"scope"}}
       st.token=j.body.access_token;st.exp=Date.now()+(+j.body.expires_in||3600)*1000;return}
     throw{code:"cancel"}}
   async function signIn(){
@@ -1294,6 +1297,8 @@ window.GH_MODE=true;
       if(st.changed){toast(E?"Loaded your memories from the cloud.":"已從雲端載入你的記憶。",3000);await sleep(900);reload()}
       else toast(E?"Sync is on. Your memories are backed up to your Google Drive.":"同步開好了！記憶會自動存到你的 Google 雲端硬碟。",5000);
     }catch(e){st.state="idle";if(e&&e.code==="cancel"){st.err="";paint();return}
+      if(e&&e.code==="scope"){LS("m01.g.user",null);LS("m01.g.tok",null);st.token=null;st.exp=0;st.err="scope";paint();
+        if(typeof toast==="function")toast(E?"The Google Drive box wasn’t ticked, so sync can’t work. Sign in again and tick it.":"登入時沒有勾選「Google 雲端硬碟」那一格，沒辦法同步。請再登入一次，記得打勾。",8000);return}
       if(!user()){LS("m01.g.tok",null)}st.err=e&&e.code==="offline"?"offline":"signin";paint();
       if(typeof toast==="function")toast(E?"Google sign-in didn’t finish. Try again.":"Google 登入沒有完成，請再試一次。",5000)}}
   async function signOut(){
@@ -1301,7 +1306,7 @@ window.GH_MODE=true;
     LS("m01.g.user",null);LS("m01.g.tok",null);st.token=null;st.exp=0;st.needAuth=false;st.err="";
     if(st.meta){st.meta.prevOwner=st.meta.owner||st.meta.prevOwner||"";st.meta.seen={};st.meta.owner="";saveMeta(true)}
     paint();if(typeof toast==="function")toast(E?"Signed out. Everything stays on this device.":"已登出。資料還是留在這台裝置上。",4000)}
-  async function reconnect(){if(!web()){return signIn()}
+  async function reconnect(){if(!web()||st.err==="scope"){if(st.err==="scope"){LS("m01.g.user",null);st.err=""}return signIn()}
     try{await webAuth("");st.err="";st.needAuth=false;paint();live()}catch(e){try{await webAuth("consent");st.err="";paint();live()}catch(e2){}}}
 
   /* ---------- first sign-in when both sides already have memories ---------- */
@@ -1320,10 +1325,10 @@ window.GH_MODE=true;
     let h=`<div class="sec">ACCOUNT · CLOUD SYNC</div>`;
     if(st.state==="waiting")h+=`<p class="note">${E?"Google’s sign-in page is open in your browser. Sign in there and you’ll be brought back here automatically.":"已經在瀏覽器打開 Google 登入頁。在那邊登入完，會自動回到這裡。"}</p><div class="inline"><button class="sbtn" id="gCancel">${E?"Cancel":"取消"}</button></div>`;
     else if(!u)h+=`<p class="note">${E?"Sign in with Google and your chats, memories, character pictures and AI keys are saved to a hidden folder in <b>your own</b> Google Drive. Sign in with the same account on another computer or phone and pick up where you left off. Only M-01 can read that folder — the developer can’t see it.":"用 Google 帳號登入後，對話、記憶、角色圖和 AI 金鑰會自動存到<b>你自己</b> Google 雲端硬碟裡的隱藏資料夾。換電腦、換手機登入同一個帳號，就能接著聊。只有 M-01 能讀這個資料夾，開發者看不到。"}</p>
-        <div class="inline"><button class="pbtn" id="gIn"${st.state==="signin"||st.state==="sync"?" disabled":""}>${st.state==="sync"?(E?"Syncing…":"同步中…"):(E?"Sign in with Google":"用 Google 登入")}</button></div>${st.err==="signin"?`<p class="note warnnote">${E?"Sign-in didn’t finish. Try again.":"登入沒有完成，請再試一次。"}</p>`:st.err==="offline"?`<p class="note warnnote">${E?"Can’t reach Google — check your connection.":"連不到 Google，請確認網路。"}</p>`:""}`;
-    else{const s=st.state==="sync"?(E?"Syncing…":"同步中…"):st.needAuth||st.err==="auth"?(E?"Connection expired — press Reconnect to keep syncing.":"連線過期了，按「重新連線」繼續同步。"):st.err==="offline"?(E?"Offline — will sync when you’re back online.":"目前離線，連上網路後會自動同步。"):st.err?(E?"The last sync didn’t finish; it will retry.":"上次同步沒有完成，等一下會自動再試。"):st.last?(E?`Synced ${ago(st.last)}`:`上次同步：${ago(st.last)}`):"";
+        <div class="inline"><button class="pbtn" id="gIn"${st.state==="signin"||st.state==="sync"?" disabled":""}>${st.state==="sync"?(E?"Syncing…":"同步中…"):(E?"Sign in with Google":"用 Google 登入")}</button></div>${st.err==="scope"?`<p class="note warnnote">${E?"Last time the <b>Google Drive</b> box on Google’s permission screen wasn’t ticked, so M-01 couldn’t save to your Drive. Press the button again and tick that box (“See, create, and delete its own configuration data in your Google Drive”).":"上次登入時，Google 權限畫面上「<b>Google 雲端硬碟</b>」那一格沒有打勾，所以 M-01 沒辦法存到你的雲端。請再按一次上面的按鈕，記得把那一格（「查看、建立及刪除這個應用程式在 Google 雲端硬碟中的設定資料」）打勾。"}</p>`:st.err==="signin"?`<p class="note warnnote">${E?"Sign-in didn’t finish. Try again.":"登入沒有完成，請再試一次。"}</p>`:st.err==="offline"?`<p class="note warnnote">${E?"Can’t reach Google — check your connection.":"連不到 Google，請確認網路。"}</p>`:""}`;
+    else{const s=st.state==="sync"?(E?"Syncing…":"同步中…"):st.err==="scope"?(E?"Google Drive permission is missing — press Reconnect and tick the Google Drive box.":"缺少 Google 雲端硬碟的權限：按「重新連線」，記得把雲端硬碟那一格打勾。"):st.needAuth||st.err==="auth"?(E?"Connection expired — press Reconnect to keep syncing.":"連線過期了，按「重新連線」繼續同步。"):st.err==="offline"?(E?"Offline — will sync when you’re back online.":"目前離線，連上網路後會自動同步。"):st.err?(E?"The last sync didn’t finish; it will retry.":"上次同步沒有完成，等一下會自動再試。"):st.last?(E?`Synced ${ago(st.last)}`:`上次同步：${ago(st.last)}`):"";
       h+=`<p class="note">${E?"Signed in as":"已登入"} <b>${e(u.email)}</b>${s?`<br>${s}`:""}</p>
-        <div class="inline">${st.needAuth||st.err==="auth"?`<button class="pbtn" id="gRe">${E?"Reconnect":"重新連線"}</button>`:`<button class="sbtn" id="gNow"${st.state==="sync"?" disabled":""}>${E?"Sync now":"立即同步"}</button>`}<button class="sbtn" id="gOut">${E?"Sign out":"登出"}</button></div>
+        <div class="inline">${st.needAuth||st.err==="auth"||st.err==="scope"?`<button class="pbtn" id="gRe">${E?"Reconnect":"重新連線"}</button>`:`<button class="sbtn" id="gNow"${st.state==="sync"?" disabled":""}>${E?"Sync now":"立即同步"}</button>`}<button class="sbtn" id="gOut">${E?"Sign out":"登出"}</button></div>
         <p class="note" style="margin:0">${E?"Changes are saved to your Google Drive automatically. Signing out keeps everything on this device, and nothing in the cloud is deleted.":"有變動會自動存到你的 Google 雲端硬碟。登出後資料還是留在這台裝置上，雲端的也不會被刪掉。"}</p>`}
     box.innerHTML=h;
     const b=id=>box.querySelector("#"+id);
@@ -2687,7 +2692,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
- {v:"0.9.22",d:"11/05 21:30",add:[["電腦版和 GitHub 網頁版可以用 Google 帳號登入：對話、記憶、角色圖和 AI 金鑰會自動同步到你自己 Google 雲端硬碟的隱藏資料夾，換電腦、換手機都能接著聊","Desktop app and GitHub web version: sign in with Google — chats, memories, character pictures and AI keys sync to a hidden folder in your own Google Drive, so you can pick up on any computer or phone"],["兩台裝置同一天都有聊天的話，兩邊的對話會合併，不會蓋掉","If two devices both chatted, the chats are combined instead of one overwriting the other"],["電腦版第一次打開不用再設定資料夾，改成問要不要用 Google 登入","Desktop app: first launch no longer walks you through the folder — it offers Google sign-in instead"]],fix:[]},
+ {v:"0.9.22",d:"11/05 21:30",add:[["電腦版和 GitHub 網頁版可以用 Google 帳號登入：對話、記憶、角色圖和 AI 金鑰會自動同步到你自己 Google 雲端硬碟的隱藏資料夾，換電腦、換手機都能接著聊","Desktop app and GitHub web version: sign in with Google — chats, memories, character pictures and AI keys sync to a hidden folder in your own Google Drive, so you can pick up on any computer or phone"],["兩台裝置同一天都有聊天的話，兩邊的對話會合併，不會蓋掉","If two devices both chatted, the chats are combined instead of one overwriting the other"],["電腦版第一次打開不用再設定資料夾，改成問要不要用 Google 登入","Desktop app: first launch no longer walks you through the folder — it offers Google sign-in instead"]],fix:[["登入時沒勾「Google 雲端硬碟」權限的話，會提醒你再登入一次並打勾","If the Google Drive box wasn’t ticked at sign-in, M-01 now tells you to sign in again and tick it"]]},
  {v:"0.9.21",d:"11/05 21:00",add:[["電腦版的本地 AI 變成可選：安裝時可以選不要，只用 Gemini 或 Claude，省下 2～5GB","Desktop app: local AI is now optional — skip it at install and use Gemini or Claude, saving 2–5GB"],["「設定 → AI」可以看本地模型佔多少空間、刪掉，或之後再下載（有進度條）","Settings → AI: see how much space each local model uses, delete it, or download one later (with progress)"],["第一次打開、沒有本地 AI 時，會請你選一個 AI（貼上免費的 Gemini 金鑰就能開始）","First run without local AI asks you to pick one (paste a free Gemini key to start)"]],fix:[["沒裝 Ollama 時，打開 App 不會再等 30 秒","Opening the app no longer waits 30 seconds when Ollama isn’t installed"]]},
  {v:"0.9.20",d:"11/05 20:30",add:[["角色圖可以一次放好幾張或直接選 zip，會依檔名自動放到對的格子","Add many character pictures at once (or a zip) — they go into the right slots by file name"],["電腦版和 GitHub 網頁版：一鍵「套用範例角色」","Desktop app and GitHub web version: one-click “Use the sample character”"]],fix:[]},
  {v:"0.9.19",d:"11/05 20:00",add:[["新增 GitHub 網頁版（elvis071114-coder.github.io/m01）：不用 Claude 帳號，用自己的免費 Gemini 金鑰就能聊，也能直接下載電腦版","New GitHub web version (elvis071114-coder.github.io/m01): no Claude account needed — chat with your own free Gemini key and download the desktop app directly"],["電腦版開始會自動檢查新版本","The desktop app now checks for new versions automatically"]],fix:[]},
