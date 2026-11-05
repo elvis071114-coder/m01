@@ -1,0 +1,8 @@
+{
+ "version": "0.9.19",
+ "notes": "新增 GitHub 網頁版；電腦版會自動檢查新版本",
+ "notes_en": "New GitHub web version; the desktop app now checks for updates",
+ "url": "https://elvis071114-coder.github.io/m01/",
+ "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
+ "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip"
+}
