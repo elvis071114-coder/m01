@@ -229,6 +229,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .mp-seg{display:flex;gap:6px;padding:4px 14px 6px}
 .mp-seg button{flex:1;padding:7px 0;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);font-size:13.5px;font-weight:700;cursor:pointer}
 .mp-seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.mp-why{color:var(--dim)!important;margin-top:4px}
 .mp-note{font-size:12px;color:var(--muted);padding:2px 14px 6px;line-height:1.5}
 .mp-link{display:block;font-size:12.5px;color:var(--accent);padding:6px 14px;background:none;border:0;text-align:left;cursor:pointer}
 .memnote{font-size:12px;color:var(--mem);background:var(--mem-soft);border-left:3px solid var(--mem);padding:3px 10px;align-self:flex-start}
@@ -471,7 +472,7 @@ body.exiting .stage{animation-delay:.06s}body.exiting .frame{animation-delay:.12
 .hbtn2.has-update{position:relative}.hbtn2.has-update::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ff4d4d;box-shadow:0 0 0 2px var(--bg)}
 .upd-box{display:flex;flex-direction:column;gap:4px;margin:8px 0 10px;padding:10px 12px;background:var(--panel2);border-left:3px solid #ff4d4d}.upd-box b{margin:0!important}.upd-box span{font-size:13px}.upd-box a{font-weight:700;color:var(--accent)}.upd-box small{color:var(--dim);font-size:12px}
 #lmBox{display:flex;flex-direction:column;gap:6px}#lmBox .lm-cmp{display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:var(--panel2);border-left:3px solid var(--line2)}.lm-cmp div{display:flex;flex-direction:column}.lm-cmp b{font-size:13.5px}.lm-cmp span{font-size:13px;color:var(--muted);line-height:1.55}
-.lm-h{font-size:13px;font-weight:700;color:var(--muted)}#lmBox .row button.sure{color:#ff6b6b;border-color:#ff6b6b}
+.lm-h{font-size:13px;font-weight:700;color:var(--muted)}#lmBox .lm-card button.sure,#lmBox .row button.sure{color:#ff6b6b;border-color:#ff6b6b}
 #lmBox .lm-bar{height:6px;background:var(--panel3);overflow:hidden}#lmBox .lm-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
 #cloudMerge{position:fixed;inset:0;z-index:46;display:grid;place-items:center;padding:20px;background:var(--scrim);backdrop-filter:blur(4px)}#cloudMerge[hidden]{display:none}
 #cloudMerge .g-card{width:min(480px,100%);padding:22px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent)}#cloudMerge .g-tag{font-family:var(--font-hud);font-size:11.5px;letter-spacing:.24em;color:var(--accent)}
@@ -489,7 +490,7 @@ body.exiting .stage{animation-delay:.06s}body.exiting .frame{animation-delay:.12
 #helpPop .cl summary{cursor:pointer;font-weight:700;font-size:13.5px;list-style:none}#helpPop .cl summary::-webkit-details-marker{display:none}#helpPop .cl summary::before{content:"▸ ";color:var(--accent)}#helpPop .cl[open] summary::before{content:"▾ "}
 #helpPop .cl summary span{font-weight:400;color:var(--dim);font-size:12px;margin-left:8px}#helpPop .cl-t{display:block;font-size:12px;color:var(--muted);margin:6px 0 0}
 #helpPop .about-h{display:block;font-size:13px;color:var(--accent);margin:8px 0 2px;letter-spacing:.1em}
-@media (max-width:599px){#folderBtn{display:none}}
+#folderBtn,#folderSub{display:none!important}
 @media (max-width:1100px){.slots{grid-template-columns:repeat(2,minmax(0,1fr))}.hchip.opt{display:none}}
 @media (max-width:899px){
   .hud{padding:8px 12px;gap:10px}.hud .hchip{display:none}
@@ -594,9 +595,10 @@ body.kb .tabs{padding-top:4px}
 #splitter{display:none}
 @media (min-width:900px){
   #splitter{display:block;position:absolute;top:0;bottom:0;width:18px;margin-left:-9px;z-index:6;cursor:col-resize;touch-action:none}
-  #splitter::before{content:"";position:absolute;left:8px;top:12%;bottom:12%;width:2px;background:var(--line2);opacity:0;transition:opacity .2s,background .2s,box-shadow .2s}
-  #splitter:hover::before,#splitter.drag::before{opacity:1}#splitter.drag::before{background:var(--accent)}
-  #splitter.snap::before{opacity:1;background:var(--hi);box-shadow:0 0 12px var(--hi)}
+  #splitter::before{content:"";position:absolute;left:8px;top:12%;bottom:12%;width:2px;background:var(--accent);opacity:.2;box-shadow:0 0 6px rgba(var(--accent-rgb),.3);transition:opacity .2s,box-shadow .2s}
+  #splitter:hover::before{opacity:.45}
+  #splitter.drag::before{opacity:1;box-shadow:0 0 12px rgba(var(--accent-rgb),.85)}
+  #splitter.snap::before{opacity:1;box-shadow:0 0 22px rgba(var(--accent-rgb),1),0 0 4px #fff}
   #splitter .sw{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;padding:0;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);font-size:15px;line-height:1;opacity:0;transition:opacity .2s}
   #splitter:hover .sw,#splitter.drag .sw,#splitter .sw:focus-visible{opacity:1}#splitter .sw:hover{border-color:var(--accent);color:var(--accent)}
   body.split .app{grid-template-columns:minmax(0,calc(var(--split)*1%)) minmax(0,1fr)}
@@ -623,6 +625,13 @@ body.kb .tabs{padding-top:4px}
 #updBar{position:fixed;z-index:35;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(560px,calc(100vw - 20px));display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 14px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 14px 34px rgba(0,0,0,.45)}
 #updBar[hidden]{display:none}#updBar b{font-size:14.5px}#updBar span{flex:1 1 200px;font-size:13px;color:var(--muted)}#updBar .pbtn,#updBar .sbtn{padding:7px 14px}
 .upd-box .pbtn{align-self:flex-start;margin:4px 0}
+.lm-card{display:flex;gap:10px;align-items:center;padding:11px 12px;background:var(--panel2);border-left:3px solid var(--line2)}.lm-card.on{border-left-color:var(--accent)}
+.lm-ct{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.lm-ct b{font-size:14.5px}.lm-ct b small{font-weight:400;font-size:12px;color:var(--muted);margin-left:4px}
+.lm-ct span{font-size:13px;color:var(--muted);line-height:1.55}.lm-ct em{font-style:normal;font-size:12.5px;color:var(--ok)}.lm-ca{flex:none}.lm-tool{border-left-style:dashed}
+.lm-dev{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:10px 12px;background:var(--panel2);font-size:13.5px}.lm-dev small{flex-basis:100%;color:var(--muted);font-size:12px}
+.lm-ram{display:inline-flex;gap:6px}.lm-ram .sbtn{padding:4px 10px;font-size:12.5px}.lm-ram .sbtn.on{border-color:var(--accent);color:var(--accent)}
+.lm-card.rec{box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),.55)}.lm-rec{font-style:normal;font-size:11.5px;font-weight:700;margin-left:8px;padding:1px 8px;background:var(--accent);color:var(--accent-ink)}
+.lm-ca{display:flex;flex-direction:column;gap:6px}.lm-adv summary{cursor:pointer;font-size:13px;color:var(--muted)}.lm-adv .inline{margin:8px 0 6px}.lm-adv input{flex:1;min-width:0;padding:8px 10px;background:var(--panel2);border:1px solid var(--line2);color:var(--ink)}
 
 /* GitHub edition */
 #folderBtn,#unSec{display:none!important}
@@ -770,8 +779,8 @@ body.kb .tabs{padding-top:4px}
             </div>
             <div id="ollamaBox" class="subbox">
               <div id="lmBox" data-i18n="none"></div>
-              <label class="field" for="lcModel">聊天模型（Ollama 模型名稱）<input id="lcModel" placeholder="qwen2.5:7b"></label>
-              <label class="field" for="lcVision">看圖模型（下載後會自動填好，通常不用改）<input id="lcVision" placeholder="例如 gemma3:4b"></label>
+              <label class="field" for="lcModel">聊天模型（Ollama 模型名稱）<input id="lcModel" placeholder="qwen3.5:9b"></label>
+              <label class="field" for="lcVision" hidden style="display:none!important">看圖片工具（裝好後會自動填，通常不用改）<input id="lcVision" placeholder="例如 gemma3:4b"></label>
               <label class="field" for="lcUrl">Ollama 位址<input id="lcUrl" placeholder="http://localhost:11434"></label>
               <div class="inline" hidden><button class="pbtn" id="lcSave">儲存並測試連線</button></div><span class="autosave">改完會自動儲存並測試連線</span>
             </div>
@@ -807,7 +816,7 @@ body.kb .tabs{padding-top:4px}
             <label class="field" for="themeSel">介面風格<select id="themeSel"><option value="mecha">機甲（預設：深色、橘色）</option><option value="pink">可愛粉嫩</option><option value="terminal">復古終端機</option><option value="light">淺色簡約</option><option value="neon">夜空霓虹</option></select></label>
             <label class="field" for="accentPick">主題顏色
               <div class="swatches" id="swatches"><input type="color" id="accentPick" value="#ff7a3d" aria-label="自訂顏色"></div></label>
-            <label class="field" for="sndSet">音效風格<select id="sndSet"><option value="mecha">機甲（預設）</option><option value="bubble">柔和泡泡</option><option value="retro">復古 8-bit</option><option value="wood">清脆木琴</option><option value="scifi">科幻電子</option></select></label>
+            <label class="field" for="sndSet">音效風格<select id="sndSet"><option value="clean">清亮（預設）</option><option value="mecha">機甲（舊版）</option><option value="bubble">柔和泡泡</option><option value="retro">復古 8-bit</option><option value="wood">清脆木琴</option><option value="scifi">科幻電子</option></select></label>
             <div class="inline"><button class="sbtn" id="sndTry">試聽音效</button></div>
             <label class="toggle" for="uiSound">介面音效（按鈕、開啟、離開）<input type="checkbox" id="uiSound" checked></label>
             <div class="deskonly" id="layoutBox"><p class="note" style="margin:0">版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。</p>
@@ -820,10 +829,10 @@ body.kb .tabs{padding-top:4px}
             <label class="field" for="botName">夥伴的名字<input id="botName" placeholder="Claude"></label>
             <label class="field" for="persona">夥伴的個性與說話方式<textarea id="persona" rows="5"></textarea></label>
             <button class="sbtn" id="presetBtn" style="align-self:flex-start">套用「傲嬌 Claude」說話風格</button>
-            <label class="field" for="tier" hidden>回覆方式<select id="tier"><option value="quick">簡短：一兩句，回得快</option><option value="default">一般（建議）</option><option value="complex">詳細：想清楚再回答，比較長</option></select></label>
+            <label class="field" for="tier" hidden style="display:none!important">回覆方式<select id="tier"><option value="quick">簡短：一兩句，回得快</option><option value="default">一般（建議）</option><option value="deep">詳細</option><option value="complex">詳細：想清楚再回答，比較長</option></select></label>
             <span class="autosave" id="autoSaved">設定會自動儲存</span>
             </div></details>
-            <details class="sgrp" id="g_data"><summary><span class="sg-t"><b>記憶與資料</b><small>記憶資料夾、備份、還原、解除安裝</small></span><button class="help" data-help="data" aria-label="說明">?</button><i class="sg-chev" aria-hidden="true"></i></summary>
+            <details class="sgrp" id="g_data"><summary><span class="sg-t"><b>記憶與資料</b><small>備份、還原、解除安裝</small></span><button class="help" data-help="data" aria-label="說明">?</button><i class="sg-chev" aria-hidden="true"></i></summary>
             <div class="sgb">
             <div id="folderSub">
             <div class="sub-h">記憶資料夾<button class="help" data-help="folder" aria-label="說明">?</button></div>
@@ -833,7 +842,7 @@ body.kb .tabs{padding-top:4px}
             </div>
             <label class="sbtn pick" style="align-self:flex-start">從備份還原（JSON）<input type="file" accept=".json,application/json" class="fileover" id="importFile"></label>
             <button class="sbtn" id="exportBtn" style="align-self:flex-start">下載全部記憶備份（JSON）</button>
-            <p class="note">對話、記憶和角色圖都存在上面的記憶資料夾裡，再由 Google 雲端硬碟同步。備份檔可以用來搬到別台電腦。</p>
+            <p class="note">對話、記憶和角色圖存在這台裝置裡；用 Google 登入的話，也會自動同步到你自己的雲端。備份檔可以拿來保險，或搬到沒有登入的電腦。</p>
             <div id="unSec" class="subbox" hidden>
               <div class="sec">UNINSTALL</div>
               <p class="note">把 M-01 App 從這台電腦移除。Ollama 本身不會被移除。</p>
@@ -889,9 +898,9 @@ window.GH_MODE=true;
       catch(e){if(e&&e.name==="AbortError")throw e;return J({status:0,body:null})}
     }
     if(path==="/getjson"){const t=q.get("url")||"";
-      if(/^https:\/\/(geocoding-api|api)\.open-meteo\.com\//.test(t)){try{const r=await of(t);return J(await r.json())}catch(e){return J({error:true,reason:"unreachable"})}}
+      if(/^https:\/\/(geocoding-api|api)\.open-meteo\.com\//.test(t)||/^https:\/\/get\.geojs\.io\/v1\/ip\/geo\.json$/.test(t)||/^https:\/\/api\.bigdatacloud\.net\/data\/reverse-geocode-client\?[\w=&.%-]*$/.test(t)){try{const r=await of(t);return J(await r.json())}catch(e){return J({error:true,reason:"unreachable"})}}
       return J({error:true},403)}
-    if(/^\/(ping|search|fetch|battery|dictate|fishtts|open|reveal|setdata|uninstall|pick|fs|ls)(\/|$)/.test(path))return J({ok:false},404);
+    if(/^\/(ping|search|fetch|battery|dictate|fishtts|open|reveal|setdata|uninstall|pick|fs|ls|music|musicart|sysinfo)(\/|$)/.test(path))return J({ok:false},404);
     return of(u,o);
   };
 })();
@@ -899,7 +908,7 @@ window.GH_MODE=true;
 <script>/* ===== Local runtime: replaces Claude-hosted services with Ollama + browser storage ===== */
 (function(){
   const LS_CFG="m01.local.cfg";
-  const cfg=Object.assign({url:"http://localhost:11434",model:"qwen2.5:7b",vision:"",ctx:12288},(()=>{try{return JSON.parse(localStorage.getItem(LS_CFG)||"{}")}catch(e){return{}}})());
+  const cfg=Object.assign({url:"http://localhost:11434",model:"qwen3.5:9b",vision:"",ctx:12288},(()=>{try{return JSON.parse(localStorage.getItem(LS_CFG)||"{}")}catch(e){return{}}})());
   if(window.GH_MODE)cfg.backend="gemini";
   window.LOCAL_CFG=cfg;
   window.saveLocalCfg=()=>{try{localStorage.setItem(LS_CFG,JSON.stringify(cfg))}catch(e){}};
@@ -963,13 +972,17 @@ window.GH_MODE=true;
     if(opts.images&&opts.images.length){const last=merged[merged.length-1];const imgs=await Promise.all([...opts.images].map(async b=>({type:"image",source:{type:"base64",media_type:b.type||"image/png",data:await blobToB64(b)}})));last.content=[...imgs,{type:"text",text:String(last.content)}]}
     const tools=(opts.tools||[]).map(t=>({name:t.name,description:t.description,input_schema:t.inputSchema||{type:"object",properties:{}}}));
     let text="";
+    const budget={quick:0,default:2000,complex:6000,deep:12000}[opts.modelTier]??2000;
     try{
       for(let round=0;round<6;round++){
-        const useTools=tools.length&&round<5;
+        const useTools=tools.length&&round<5,useThink=budget>0&&window.__claudeThink!==false;
+        const body={model:cfg.claudeModel||"claude-haiku-5-5",max_tokens:(useThink?budget:0)+(opts.modelTier==="quick"?600:opts.modelTier==="deep"?6000:opts.modelTier==="complex"?4000:1600),system,messages:merged,stream:true,tools:useTools?tools:undefined};
+        if(useThink)body.thinking={type:"enabled",budget_tokens:budget};
         const res=await fetch(cfg.claudeUrl||"https://api.anthropic.com/v1/messages",{method:"POST",signal:opts.signal,
           headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-          body:JSON.stringify({model:cfg.claudeModel||"claude-haiku-5-5",max_tokens:opts.modelTier==="quick"?600:opts.modelTier==="complex"?4000:1600,system,messages:merged,stream:true,tools:useTools?tools:undefined})});
+          body:JSON.stringify(body)});
         if(!res.ok){let j=null;try{j=await res.json()}catch(e){}const msg=(j&&j.error&&j.error.message)||("HTTP "+res.status);
+          if(useThink&&res.status===400&&/think|budget/i.test(msg)){window.__claudeThink=false;round--;continue}
           if(res.status===401||res.status===403||/credit|billing|balance/i.test(msg))throw{code:"auth_error",message:msg};
           if(res.status===429||res.status===529)throw{code:"rate_limited",message:msg};
           throw{code:"claude_error",message:msg}}
@@ -978,14 +991,16 @@ window.GH_MODE=true;
         for(;;){const {value,done}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
           while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith("data:"))continue;
             let j;try{j=JSON.parse(line.slice(5))}catch(e){continue}
-            if(j.type==="content_block_start")blocks[j.index]=j.content_block.type==="tool_use"?{type:"tool_use",id:j.content_block.id,name:j.content_block.name,json:""}:{type:"text",text:""};
+            if(j.type==="content_block_start"){const cb=j.content_block;blocks[j.index]=cb.type==="tool_use"?{type:"tool_use",id:cb.id,name:cb.name,json:""}:cb.type==="thinking"?{type:"thinking",thinking:"",signature:""}:cb.type==="redacted_thinking"?{type:"redacted_thinking",data:cb.data}:{type:"text",text:""}}
             else if(j.type==="content_block_delta"){const b=blocks[j.index];if(!b)continue;
               if(j.delta.type==="text_delta"){b.text+=j.delta.text;const d=sep()+j.delta.text;text+=d;roundText+=j.delta.text;try{opts.onText&&opts.onText({text,delta:d})}catch(e){}}
-              else if(j.delta.type==="input_json_delta")b.json+=j.delta.partial_json}
+              else if(j.delta.type==="input_json_delta")b.json+=j.delta.partial_json
+              else if(j.delta.type==="thinking_delta")b.thinking+=j.delta.thinking||"";
+              else if(j.delta.type==="signature_delta")b.signature+=j.delta.signature||""}
             else if(j.type==="message_delta"&&j.delta)stop=j.delta.stop_reason||stop;
             else if(j.type==="error")throw{code:/overload/i.test((j.error&&j.error.type)||"")?"rate_limited":"claude_error",message:(j.error&&j.error.message)||"error"};
           }}
-        const content=blocks.filter(Boolean).map(b=>b.type==="text"?(b.text?{type:"text",text:b.text}:null):{type:"tool_use",id:b.id,name:b.name,input:(()=>{try{return b.json?JSON.parse(b.json):{}}catch(e){return{}}})()}).filter(Boolean);
+        const content=blocks.filter(Boolean).map(b=>b.type==="thinking"?{type:"thinking",thinking:b.thinking,signature:b.signature}:b.type==="redacted_thinking"?{type:"redacted_thinking",data:b.data}:b.type==="text"?(b.text?{type:"text",text:b.text}:null):{type:"tool_use",id:b.id,name:b.name,input:(()=>{try{return b.json?JSON.parse(b.json):{}}catch(e){return{}}})()}).filter(Boolean);
         if(stop!=="tool_use"||!useTools)break;
         merged.push({role:"assistant",content});const results=[];
         for(const b of content.filter(x=>x.type==="tool_use")){const tool=(opts.tools||[]).find(t=>t.name===b.name);let out;
@@ -1016,7 +1031,7 @@ window.GH_MODE=true;
       for(let round=0;round<6;round++){
         const useTools=!!tools&&round<5;
         const body={contents};if(system)body.systemInstruction={parts:[{text:system}]};if(useTools)body.tools=tools;
-        body.generationConfig={thinkingConfig:{thinkingLevel:opts.modelTier==="quick"?"low":opts.modelTier==="complex"?"high":"medium"}};
+        body.generationConfig={thinkingConfig:{thinkingLevel:opts.modelTier==="quick"?"low":(opts.modelTier==="complex"||opts.modelTier==="deep")?"high":"medium"}};
         let j=null;
         for(let attempt=0;attempt<4;attempt++){
           const model=cfg.geminiModel||"gemini-3.6-flash";
@@ -1065,16 +1080,34 @@ window.GH_MODE=true;
     if(Array.isArray(input)&&messages.length>1&&messages[0].role==="user")messages[0].role="system";
     let model=cfg.model;
     if(opts.images&&opts.images.length){
-      if(!cfg.vision)throw{code:"images_unavailable",message:"no vision model"};
-      model=cfg.vision;const last=messages[messages.length-1];last.images=await Promise.all([...opts.images].map(blobToB64));
+      const selfSees=typeof chatSeesPictures==="function"&&chatSeesPictures(model);
+      if(!cfg.vision&&!selfSees)throw{code:"images_unavailable",message:"no vision model"};
+      const imgs=await Promise.all([...opts.images].map(blobToB64));const last=messages[messages.length-1];
+      if(selfSees)last.images=imgs;
+      else if(opts.visionDirect){model=cfg.vision;last.images=imgs}
+      else{
+        // the picture model is only a tool: it looks first, then her usual chat model answers in character
+        const zh=zhOut();let seen="";
+        try{const r=await fetch(cfg.url.replace(/\/$/,"")+"/api/chat",{method:"POST",signal:opts.signal,headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({model:cfg.vision,stream:false,messages:[{role:"user",content:zh?"請仔細描述這張（些）圖片：人物、表情、物品、場景、顏色，並完整抄下看得到的所有文字。用繁體中文，條列清楚。":"Describe the picture(s) in detail: people, expressions, objects, setting, colours, and copy out all visible text.",images:imgs}],options:{num_predict:700,temperature:.2}})});
+          const j=await r.json();seen=toTrad(String(j&&j.message&&j.message.content||"")).trim()}catch(e){if(e&&e.name==="AbortError")throw e}
+        if(!seen)throw{code:"upstream_error",message:"picture model gave no answer"};
+        const tag=zh?`［看圖工具看到的內容］\n${seen}\n［以上是對方傳來的圖片，請你當作自己看到的來回應］`:`[What the picture tool saw]\n${seen}\n[Above is the picture they sent — respond as if you saw it yourself]`;
+        last.content=(typeof last.content==="string"?last.content:"")+"\n\n"+tag;
+      }
     }
+    const canThink=/qwen3|deepseek-r1|gpt-oss|magistral|qwq|phi4-reasoning/i.test(model);
+    // thinking has a time limit worked out for THIS computer: total target (Medium ~10 s, Slow ~20 s, Deep ~35 s)
+    // minus how long this computer has been taking to write the answer itself; when it runs out she answers from her notes
+    const thinkMs=canThink?thinkBudget(model,opts.modelTier):0;let thinkOn=canThink&&thinkMs>0,thinkCut=false;
     let text="";
     const tools=(opts.tools||[]).map(t=>({type:"function",function:{name:t.name,description:t.description,parameters:t.inputSchema||{type:"object",properties:{}}}}));
     try{
       for(let round=0;round<5;round++){
         const useTools=tools.length&&round<4;
+        const t0=Date.now();let thinkTxt="",cut=false;
         const res=await fetch(cfg.url.replace(/\/$/,"")+"/api/chat",{method:"POST",signal:opts.signal,headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({model,messages,stream:true,tools:useTools?tools:undefined,options:{num_ctx:cfg.ctx,temperature:.65,top_p:.9,repeat_penalty:1.15,repeat_last_n:256,num_predict:opts.modelTier==="quick"?260:opts.modelTier==="complex"?1600:800}})});
+          body:JSON.stringify({model,messages,stream:true,tools:useTools?tools:undefined,think:canThink?(/gpt-oss/i.test(model)?(thinkOn?(opts.modelTier==="default"?"low":opts.modelTier==="complex"?"medium":"high"):"low"):thinkOn):undefined,options:{num_ctx:cfg.ctx,temperature:.65,top_p:.9,repeat_penalty:1.15,repeat_last_n:256,num_predict:(thinkOn?{default:1500,complex:3500,deep:8000}[opts.modelTier]||0:0)+(opts.modelTier==="quick"?260:opts.modelTier==="deep"?2400:opts.modelTier==="complex"?1600:800)}})});
         if(!res.ok){const t=await res.text().catch(()=>"");throw{code:"upstream_error",message:t||("HTTP "+res.status),status:res.status}}
         const rd=res.body.getReader();const dec=new TextDecoder();let buf="",roundText="",calls=[];
         const sep=()=>text&&!roundText?"\n\n":"";
@@ -1083,11 +1116,17 @@ window.GH_MODE=true;
           while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line)continue;
             let j;try{j=JSON.parse(line)}catch(e){continue}
             if(j.error)throw{code:"upstream_error",message:j.error};
+            if(j.done&&!thinkOn&&!cut&&!calls.length)perfNote(model,opts.modelTier,Date.now()-t0,j);
             if(j.message&&j.message.tool_calls)calls.push(...j.message.tool_calls);
+            if(j.message&&j.message.thinking){thinkTxt+=j.message.thinking;
+              if(thinkOn&&!roundText&&Date.now()-t0>thinkMs){cut=true;try{await rd.cancel()}catch(e){}break read}}
             const delta=toTrad(j.message&&j.message.content||"");
             if(delta){const d=sep()+delta;text+=d;roundText+=delta;try{opts.onText&&opts.onText({text,delta:d})}catch(e){}
               if(looping(roundText)){looped=true;try{await rd.cancel()}catch(e){}break read}}
           }}
+        if(cut){thinkOn=false;thinkCut=true;const L=messages[messages.length-1];const zh=zhOut();
+          L.content=(typeof L.content==="string"?L.content:"")+(zh?`\n\n（你剛才已經先想過了，這是你的思考筆記：\n${thinkTxt.slice(-3000)}\n現在直接回答對方，不要再提到思考過程。）`:`\n\n(You have already thought about this; your notes:\n${thinkTxt.slice(-3000)}\nNow answer directly without mentioning the thinking.)`);
+          round--;continue}
         if(looped){const tail=roundText.slice(-40),la=roundText.lastIndexOf(tail),lb=roundText.lastIndexOf(tail,la-1),per=Math.max(1,la-lb),first=roundText.indexOf(tail);let keep=roundText.slice(0,Math.min(roundText.length,first+per));const sm=keep.match(/^[\s\S]*[。！？!?.\n」）)]/);if(sm&&keep.length-sm[0].length<per)keep=sm[0];text=text.slice(0,text.length-roundText.length)+keep;roundText=keep;try{opts.onText&&opts.onText({text,delta:""})}catch(e){}break}
         if(!calls.length||!useTools)break;
         messages.push({role:"assistant",content:roundText,tool_calls:calls});
@@ -1108,7 +1147,7 @@ window.GH_MODE=true;
     if(!text.trim())throw{code:"empty_completion",message:"empty"};
     return{text,truncated:false,modelTierApplied:"default"};
   }
-  sample.limits=async()=>({maxPromptBytes:262144,tools:{maxCount:8},images:(cfg.backend==="claude"||cfg.backend==="gemini")?{maxCount:5,maxInputBytes:5e6,mediaTypes:["image/jpeg","image/png","image/webp","image/gif"]}:cfg.vision?{maxCount:4,maxInputBytes:20e6,mediaTypes:["image/jpeg","image/png","image/webp","image/gif"]}:undefined});
+  sample.limits=async()=>({maxPromptBytes:262144,tools:{maxCount:8},images:(cfg.backend==="claude"||cfg.backend==="gemini")?{maxCount:5,maxInputBytes:5e6,mediaTypes:["image/jpeg","image/png","image/webp","image/gif"]}:(cfg.vision||(typeof chatSeesPictures==="function"&&chatSeesPictures(cfg.model)))?{maxCount:4,maxInputBytes:20e6,mediaTypes:["image/jpeg","image/png","image/webp","image/gif"]}:undefined});
   sample.json=async(input,opts)=>{const r=await sample(input,opts);const m=r.text.match(/[\[{][\s\S]*[\]}]/);return JSON.parse(m?m[0]:r.text)};
   window.ollamaCheck=async()=>{
     try{const r=await fetch(cfg.url.replace(/\/$/,"")+"/api/tags");if(!r.ok)return{ok:false,why:"HTTP "+r.status};const j=await r.json();const names=(j.models||[]).map(m=>m.name);
@@ -1279,9 +1318,13 @@ window.GH_MODE=true;
     if(r.status===403){let t="";try{t=await r.text()}catch(e){}if(/insufficient|scope|PERMISSION/i.test(t))throw{code:"scope"}}
     if(!r.ok)throw{code:"http",status:r.status};
     return r}
-  async function listFiles(){const out={};let pt="";
-    for(let i=0;i<20;i++){const j=await (await g("/drive/v3/files?spaces=appDataFolder&pageSize=1000&fields=nextPageToken,files(id,name,version)"+(pt?"&pageToken="+encodeURIComponent(pt):""))).json();
-      for(const f of j.files||[])if(!out[f.name])out[f.name]=f;if(!j.nextPageToken)break;pt=j.nextPageToken}
+  async function listFiles(){const all=[];let pt="";
+    for(let i=0;i<20;i++){const j=await (await g("/drive/v3/files?spaces=appDataFolder&pageSize=1000&fields=nextPageToken,files(id,name,version,createdTime)"+(pt?"&pageToken="+encodeURIComponent(pt):""))).json();
+      all.push(...(j.files||[]));if(!j.nextPageToken)break;pt=j.nextPageToken}
+    // keep the oldest copy of each name; extra copies get merged in and removed
+    all.sort((a,b)=>String(a.createdTime||"").localeCompare(String(b.createdTime||""))||String(a.id).localeCompare(String(b.id)));
+    const out={};Object.defineProperty(out,"__dups",{value:{},enumerable:false});
+    for(const f of all){if(!out[f.name])out[f.name]=f;else(out.__dups[f.name]=out.__dups[f.name]||[]).push(f)}
     return out}
   const download=async id=>await (await g("/drive/v3/files/"+id+"?alt=media")).json();
   async function upload(name,obj,file){const body=JSON.stringify(obj);
@@ -1323,27 +1366,32 @@ window.GH_MODE=true;
     const localHas=fresh.some(([p])=>/\/logs\//.test(p));
     let pick="cloud";if(!cloudHas)pick="local";else if(localHas)pick=await askMerge();
     const t=pick==="local"?Date.now():1;for(const [p] of fresh){m.docs[p]={t};st.dirty.add(shard(p))}}
-  async function full(first){
-    const files=await listFiles();const m=st.meta;
+  async function full(first,known){
+    const files=known||await listFiles();const m=st.meta;const dups=files.__dups||{};
     if(first)await firstStamp(files);
     await syncKeys(files);
     const remoteShards=new Set();
     for(const [name,f] of Object.entries(files)){const mm=name.match(/^m01-(.+)\.json$/);if(!mm||mm[1]==="keys")continue;const sh=mm[1];remoteShards.add(sh);
-      if(m.seen[sh]===f.version&&!first)continue;
+      if(m.seen[sh]===f.version&&!first&&!dups[name])continue;
       let rem=null;try{rem=await download(f.id)}catch(e){continue}
-      const rd=(rem&&rem.docs)||{};
+      const rd=Object.assign({},(rem&&rem.docs)||{});
+      for(const x of dups[name]||[]){try{const o=await download(x.id);for(const [p,e] of Object.entries((o&&o.docs)||{}))if(!rd[p]||e.t>rd[p].t)rd[p]=e}catch(e){}st.dirty.add(sh)}
       for(const [p,e] of Object.entries(rd)){if(!p.startsWith(PRE))continue;const me=m.docs[p]||{},lt=me.t||0,base=me.s||0;
         if(e.t===lt)continue;
         // both sides changed since the last sync: combine chats / memories instead of dropping one side
         const both=lt>base&&e.t>base&&!me.del&&!e.del;let merged=null;
         if(both){let loc;try{loc=(await st.base.doc(p).get()).data()}catch(x){}if(loc!==undefined)merged=mergeDoc(p,loc,e.d)}
         if(merged){await st.base.doc(p).set(merged);m.docs[p]={t:Math.max(Date.now(),e.t+1),s:e.t};st.dirty.add(sh);st.changed=true}
-        else if(e.t>lt){if(e.del)await st.base.doc(p).delete();else await st.base.doc(p).set(e.d);m.docs[p]=e.del?{t:e.t,s:e.t,del:1}:{t:e.t,s:e.t};st.changed=true}
+        else if(e.t>lt){let cur;try{cur=(await st.base.doc(p).get()).data()}catch(x){}
+          const same=e.del?cur===undefined:(cur!==undefined&&JSON.stringify(cur)===JSON.stringify(e.d));
+          if(!same){if(e.del)await st.base.doc(p).delete();else await st.base.doc(p).set(e.d);st.changed=true}
+          m.docs[p]=e.del?{t:e.t,s:e.t,del:1}:{t:e.t,s:e.t}}
         else st.dirty.add(sh)}
       for(const p of Object.keys(m.docs))if(shard(p)===sh&&!rd[p])st.dirty.add(sh);
       m.seen[sh]=f.version}
     for(const p of Object.keys(m.docs)){const sh=shard(p);if(!remoteShards.has(sh))st.dirty.add(sh)}
-    await pushDirty(files)}
+    await pushDirty(files);
+    for(const list of Object.values(dups))for(const x of list){try{await g("/drive/v3/files/"+x.id,{method:"DELETE"})}catch(e){}}}
   async function pushDirty(files){
     const todo=[...st.dirty];st.dirty.clear();
     try{for(const sh of todo){const c=await content(sh);const r=await upload("m01-"+sh+".json",c,files["m01-"+sh+".json"]);if(r&&r.version)st.meta.seen[sh]=r.version;
@@ -1358,7 +1406,7 @@ window.GH_MODE=true;
     if(!signedIn()||!st.base)return false;await loadMeta();
     if(web()&&!webToken()&&st.wait){try{await Promise.race([st.wait,sleep(9000)])}catch(e){}}
     st.state="sync";st.changed=false;paint();
-    try{await Promise.race([full(isFirst()),sleep(25000).then(()=>{throw{code:"offline"}})]);done()}catch(e){fail(e)}
+    try{await Promise.race([full(isFirst()),sleep(60000).then(()=>{throw{code:"offline"}})]);done()}catch(e){fail(e)}
     return st.changed}
   /* while the app is open: upload changes; if another device changed something, reload to pick it up */
   let liveT=null;
@@ -1366,12 +1414,22 @@ window.GH_MODE=true;
   async function live(){
     if(!signedIn()||st.busy||!st.base)return;st.busy=true;st.state="sync";paint();
     try{const files=await listFiles();const m=st.meta;
-      const changed=Object.entries(files).some(([n,f])=>{const mm=n.match(/^m01-(.+)\.json$/);return mm&&mm[1]!=="keys"&&m.seen[mm[1]]!==undefined&&m.seen[mm[1]]!==f.version||mm&&mm[1]!=="keys"&&m.seen[mm[1]]===undefined});
-      if(changed){st.pendingReload=true;tryReload()}else await pushDirty(files);
+      const changed=Object.keys(files.__dups||{}).length>0||Object.entries(files).some(([n,f])=>{const mm=n.match(/^m01-(.+)\.json$/);return mm&&mm[1]!=="keys"&&m.seen[mm[1]]!==f.version});
+      if(changed){st.changed=false;await full(false,files);if(st.changed){st.pendingReload=true;tryReload()}}else await pushDirty(files);
       done()}catch(e){fail(e)}finally{st.busy=false}}
-  function idle(){return !(typeof S!=="undefined"&&(S.busy||S.streaming))&&!(($("input")||{}).value||"").trim()&&[...document.querySelectorAll("#setupPop,#tour,#aiPick,#ghKey,#cloudMerge")].every(e=>e.hidden)}
+  function idle(){const a=document.activeElement;return !(typeof S!=="undefined"&&(S.busy||S.streaming))&&!(($("input")||{}).value||"").trim()&&!(a&&a.closest&&a.closest("#pSet")&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&[...document.querySelectorAll("#setupPop,#tour,#aiPick,#ghKey,#cloudMerge")].every(e=>e.hidden)}
   async function reload(){try{sessionStorage.setItem("m01.autoboot","1")}catch(e){}try{await Promise.race([saveMeta(true),sleep(3000)])}catch(e){}location.reload()}
-  function tryReload(){if(!st.pendingReload)return;if(idle())reload();else setTimeout(tryReload,15000)}
+  // safety net against restart loops: at most one reload every 45 seconds and five in half an hour
+  function reloadWait(){let a=[];try{a=JSON.parse(sessionStorage.getItem("m01.reloads")||"[]")}catch(e){}const now=Date.now();a=a.filter(t=>now-t<30*60e3);
+    if(a.length>=5)return -1;return a.length?Math.max(0,45e3-(now-a[a.length-1])):0}
+  function noteReload(){let a=[];try{a=JSON.parse(sessionStorage.getItem("m01.reloads")||"[]")}catch(e){}a=a.filter(t=>Date.now()-t<30*60e3);a.push(Date.now());try{sessionStorage.setItem("m01.reloads",JSON.stringify(a))}catch(e){}}
+  function tryReload(){if(!st.pendingReload)return;if(!idle()){setTimeout(tryReload,15000);return}
+    const w=typeof refreshFromDb==="function"?0:reloadWait();
+    if(w<0){st.pendingReload=false;if(typeof toast==="function")toast(en()?"Another device added something — it will show next time you open M-01.":"另一台裝置有新的內容，下次打開 M-01 就會看到。",6000);return}
+    if(w>0){setTimeout(tryReload,w+500);return}
+    st.pendingReload=false;
+    if(typeof refreshFromDb==="function"){refreshFromDb().then(ok=>{if(!ok){noteReload();reload()}});return}
+    noteReload();reload()}
   document.addEventListener("visibilitychange",()=>{if(!signedIn())return;if(document.hidden){if(st.dirty.size)live()}else schedule(800)});
   setInterval(()=>{if(signedIn()&&document.body.classList.contains("booted"))schedule(500)},5*60e3);
 
@@ -1805,6 +1863,20 @@ async function init(){
   ensureConvs();paintConvBar();paintPrefs();fillSettings();setStatusUI();renderStage();paintSnd();loadSprites();renderThread();renderFacts();renderFiles();updateStats();
   loadChunks(); // background
 }
+/* another device changed something: reload the memory in place (no restart) */
+async function refreshFromDb(){
+  if(!S.db||!S.uid)return false;const db=S.db,uid=S.uid;
+  try{
+    const [p,mem,logs,files]=await Promise.all([S.base.get(),db.doc(`data/users/${uid}/memory`).get(),S.base.collection("logs").get(),S.base.collection("files").get()]);
+    if(p.exists)Object.assign(S.settings,dclone(p.data()));
+    if(mem.exists)S.facts=dclone(mem.data().facts||[]);
+    S.logs=logs.docs.map(d=>({id:d.id,...dclone(d.data())})).sort((a,b)=>(a.day+"_"+String(a.part).padStart(3,"0")+(a.conv||""))<(b.day+"_"+String(b.part).padStart(3,"0")+(b.conv||""))?-1:1);
+    try{const cv=await db.doc(`data/users/${uid}/convs`).get();if(cv.exists)S.convs=dclone(cv.data().list||[])}catch(e){}
+    S.files=files.docs.map(d=>({id:d.id,...dclone(d.data())}));S.idxDirty=true;
+  }catch(e){console.warn("refresh",e);return false}
+  ensureConvs();paintConvBar();paintPrefs();fillSettings();renderStage();loadSprites();renderThread();renderFacts();renderFiles();updateStats();loadChunks();
+  return true;
+}
 async function loadChunks(){
   try{
     const snap=await S.base.collection("chunks").get();
@@ -1959,7 +2031,7 @@ async function handleFiles(list){
     S.pending.push(chip);renderPending();
     try{
       if(isImg){
-        if(!S.imagesOK){toast("圖片已存下。目前的模型看不懂圖片，要讓她看懂請到「設定 → LOCAL AI」填看圖模型。",7000)}else chip.blob=file;
+        if(!S.imagesOK){toast(isEN()?"Picture saved. This model can’t see pictures — switch to Qwen 3.5 in Settings → AI model and she can.":"圖片已存下。目前的模型看不懂圖片；到「設定 → AI 模型」換成 Qwen 3.5，她就看得懂了。",8000)}else chip.blob=file;
         let hash="";try{const buf=await file.arrayBuffer();hash=[...new Uint8Array(await crypto.subtle.digest("SHA-256",buf))].map(b=>b.toString(16).padStart(2,"0")).join("")}catch(e){}
         const same=hash&&S.files.find(x=>x.hash===hash);
         if(same){chip.fileId=same.id;chip.dupOf=same}
@@ -2009,7 +2081,7 @@ async function summarizeFile(f,preview,blob){
   if(!S.sample)return;
   try{
     let text;
-    if(blob){text=(await S.sample("用繁體中文，以 2 到 4 句話描述這張圖片的內容，包含看得到的文字、人物、物品、地點等重點，方便日後搜尋。只輸出描述。",{images:[blob],modelTier:"quick"})).text}
+    if(blob){text=(await S.sample("用繁體中文，以 2 到 4 句話描述這張圖片的內容，包含看得到的文字、人物、物品、地點等重點，方便日後搜尋。只輸出描述。",{images:[blob],visionDirect:true,modelTier:"quick"})).text}
     else{text=(await S.sample(`用繁體中文，以 2 到 3 句話摘要這份檔案「${f.name}」的內容與用途，只輸出摘要。\n\n${preview.slice(0,8000)}`,{modelTier:"quick"})).text}
     f.summary=text.trim().slice(0,600);S.idxDirty=true;
     if(S.db&&!f.temp)queueWrite(()=>S.base.collection("files").doc(f.id).update({summary:f.summary}));
@@ -2033,7 +2105,7 @@ function rulesTurn0(userText){
   return `你是「${st.botName||"Claude"}」，是${st.userName?`「${st.userName}」`:"使用者"}的 AI 陪伴夥伴，同時也幫忙回答各種問題。
 個性與說話方式：${st.persona}
 
-現在時間：${stamp(now.getTime())}（星期${"日一二三四五六"[now.getDay()]}）
+現在時間：${stamp(now.getTime())}（星期${"日一二三四五六"[now.getDay()]}）${window.__wxLine?window.__wxLine():""}${window.__musicLine?window.__musicLine():""}
 你們從 ${first?dayOf(first.t):"今天"} 開始聊天，至今共 ${allMsgs().length} 則訊息。
 
 【長期記憶的運作】
@@ -2079,7 +2151,7 @@ function historyTurns(){
   return out;
 }
 const TOOLS=[
-  {name:"search_memory",description:"用關鍵字搜尋所有過去的對話與上傳檔案全文。回傳最相關的片段（含日期與來源）。中文請用 2 字以上的關鍵詞，可一次給多個詞。",
+  {name:"search_memory",description:"用關鍵字搜尋所有過去的對話與上傳檔案全文。回傳最相關的片段（含日期與來源）。中文請用 2 字以上的關鍵詞，可一次給多個詞。對方以前可能用中文或英文講，找不到時換另一種語言的關鍵詞再搜一次。",
    inputSchema:{type:"object",properties:{query:{type:"string",description:"關鍵詞"}},required:["query"]},
    execute:({query})=>{showTool(`翻找記憶：「${query}」`);const r=search(String(query||""),10);return r.length?r.map(x=>({source:x.d.label,file_id:x.d.kind==="file"?x.d.ref.id:undefined,text:x.d.text.slice(0,600)})):"沒有找到相關內容"}},
   {name:"read_day",description:"讀取某一天的完整對話紀錄。輸入日期 YYYY-MM-DD。",
@@ -2150,17 +2222,7 @@ async function sendCore(ov){
   if(typeof LOCAL_CFG!=="undefined"&&(!LOCAL_CFG.backend||LOCAL_CFG.backend==="ollama")&&input.length>1&&input[input.length-1].role==="user")input[input.length-1]={...input[input.length-1],content:input[input.length-1].content+styleHint()};
   delete um._ctx;
   S.ctl=new AbortController();
-  {const tier=S.settings.tier||"default";
-   if(tier!=="quick"&&!images.length&&input.length>1){
-    try{showTool(tier==="complex"?"仔細想一想…":"想一下…");
-      const pin=input.map(m=>({role:m.role,content:m.content}));const L=pin[pin.length-1];
-      L.content=String(L.content)+(tier==="complex"?"\n\n（先不要回答。用 3～6 個條列寫出：對方真正想知道什麼、回答要包含的重點、原因和具體例子，以及哪些事實要以查到的資料為準。只輸出條列，不要其他文字。）":"\n\n（先不要回答。用 2～3 個條列寫出這次回答的重點。只輸出條列，不要其他文字。）");
-      const pr=await S.sample(pin,{signal:S.ctl.signal,modelTier:"default"});
-      const plan=toTraditional(visible(pr.text||"")).slice(0,1500).trim();
-      if(plan)input[0]={...input[0],content:input[0].content+"\n\n【你事先想好的回答重點（照著寫成回答，不要提到你有先想過）】\n"+plan};
-    }catch(e){/* planning is optional */}
-   }}
-  const opts={signal:S.ctl.signal,modelTier:S.settings.tier||"default",onText:({text})=>{const em=text.match(EXP_RE);if(em&&EXPR[em[1].trim()]!==undefined&&exprNow!==EXPR[em[1].trim()])setExpr(EXPR[em[1].trim()]);const v=visible(text);if(v){if(!S.streaming){S.streaming=true;refreshMood()}bub.innerHTML=md(v);toolEl.textContent="";scrollEnd()}}};
+  const opts={signal:S.ctl.signal,modelTier:effTier(),onText:({text})=>{const em=text.match(EXP_RE);if(em&&EXPR[em[1].trim()]!==undefined&&exprNow!==EXPR[em[1].trim()])setExpr(EXPR[em[1].trim()]);const v=visible(text);if(v){if(!S.streaming){S.streaming=true;refreshMood()}bub.innerHTML=md(v);toolEl.textContent="";scrollEnd()}}};
   if(images.length)opts.images=images.slice(0,S.imgLimits?.maxCount||images.length);
   if(S.toolsOK&&!S.incog)opts.tools=TOOLS;else opts.cache=false;
   let reply="",note="";
@@ -2179,7 +2241,7 @@ async function sendCore(ov){
   // memory markers
   const saved=[];let mm;MEM_RE.lastIndex=0;if(S.incog)reply=reply.replace(MEM_RE,"");
   if(S.incog)reply=reply.replace(FOLLOW_RE0,"");else if(typeof addFollowsFrom==="function")addFollowsFrom(reply);
-  while((mm=MEM_RE.exec(reply))){mm[1].split("\n").map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!S.facts.some(f=>f.text===s)){S.facts.push({id:rid(),text:s.slice(0,300),t:Date.now()});saved.push(s)}})}
+  while((mm=MEM_RE.exec(reply))){mm[1].split("\n").map(s=>isEN()?s.trim():toTraditional(s.trim())).filter(Boolean).forEach(s=>{if(!S.facts.some(f=>f.text===s)){S.facts.push({id:rid(),text:s.slice(0,300),t:Date.now()});saved.push(s)}})}
   if(saved.length){saveFacts();renderFacts()}
   const finalText=visible(reply)+(note?(reply?"\n\n":"")+"（"+note+"）":"");
   w.remove();
@@ -2366,7 +2428,7 @@ function setExpr(k,hold=7000){
 }
 function wake(){lastActive=Date.now();if(moodBase==="sleep"){moodBase="idle";flashMood("wave",1400)}}
 ["pointerdown","keydown"].forEach(ev=>addEventListener(ev,wake,true));
-setInterval(()=>{if(!S.busy&&!S.streaming&&moodBase==="idle"&&Date.now()-lastActive>5*60*1000&&document.body.classList.contains("booted")){moodBase="sleep";applyMood()}},20000);
+setInterval(()=>{if(!S.busy&&!S.streaming&&moodBase==="idle"&&Date.now()-lastActive>10*60*1000&&document.body.classList.contains("booted")){moodBase="sleep";applyMood()}},20000);
 function setMood(m){moodBase=m;if(!moodTimer)applyMood()}
 function flashMood(m,ms=1400){clearTimeout(moodTimer);applyMood(m);moodTimer=setTimeout(()=>{moodTimer=null;applyMood()},ms)}
 function refreshMood(){lastActive=Date.now();setMood(S.speaking||S.streaming?"talking":S.busy?"thinking":"idle")}
@@ -2504,10 +2566,10 @@ function openSec(gid,focusSel){
   openTab("pSet");const g=$(gid);if(!g)return;g.open=true;
   requestAnimationFrame(()=>{paneScrollTo(focusSel&&g.querySelector(focusSel)||g);g.classList.remove("flash");void g.offsetWidth;g.classList.add("flash")});
 }
-(function(){let open=[];try{open=JSON.parse(localStorage.getItem("m01.sgOpen")||"[]")}catch(e){}
+(function(){let open=[];try{open=JSON.parse(localStorage.getItem("m01.sgOpen")||"[]").slice(-1)}catch(e){}
   document.querySelectorAll("#pSet details.sgrp").forEach(d=>{if(open.includes(d.id))d.open=true;
     d.querySelector("summary").addEventListener("click",e=>{if(e.target.closest(".help"))e.preventDefault()});
-    d.addEventListener("toggle",()=>{try{const o=[...document.querySelectorAll("#pSet details.sgrp")].filter(x=>x.open).map(x=>x.id);localStorage.setItem("m01.sgOpen",JSON.stringify(o))}catch(e){}
+    d.addEventListener("toggle",()=>{if(d.open)document.querySelectorAll("#pSet details.sgrp[open]").forEach(o=>{if(o!==d)o.open=false});try{const o=[...document.querySelectorAll("#pSet details.sgrp")].filter(x=>x.open).map(x=>x.id);localStorage.setItem("m01.sgOpen",JSON.stringify(o))}catch(e){}
       if(d.open&&d.id==="g_ai"&&typeof paintBackend==="function")try{paintBackend()}catch(e){}})})})();
 function openTab(id){
   document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab===id));
@@ -2565,7 +2627,7 @@ function applyAccent(h){
   b.onclick=e=>{e.preventDefault();S.settings.accent=c;applyAccent(c);saveSettingsQuiet()};sw.insertBefore(b,$("accentPick"))}})();
 $("accentPick").addEventListener("input",e=>{applyAccent(e.target.value)});
 $("accentPick").addEventListener("change",e=>{S.settings.accent=e.target.value;saveSettingsQuiet()});
-function volume(){const v=Number(S.settings.volume);return isFinite(v)?Math.max(0,Math.min(100,v))/100:.7}
+function volume(){const v=Number(S.settings.volume);return isFinite(v)?Math.max(0,Math.min(100,v))/100:.5}
 /* ---------- language (中文 / English) ---------- */
 const I18N={
 "正在連線你的記憶庫":"Connecting to your memory…","待命中":"Standing by","聊天":"Chat","重點":"Memory","檔案":"Files","搜尋":"Search","設定":"Settings","下載 App":"Get App",
@@ -2634,7 +2696,7 @@ const I18N={
 "❌ 連不到 Ollama。請確認 Ollama 有開著。":"❌ Can't reach Ollama. Make sure it's running.","連不到 Ollama":"Can't reach Ollama",
 "那天沒有對話紀錄":"No chats that day","正在想":"Thinking",
 };
-Object.assign(I18N,{"記憶資料夾":"Memory folder","看圖模型（下載後會自動填好，通常不用改）":"Picture model (filled in automatically after download)","點一下分類就會展開；設定會自動儲存。": "Tap a group to open it. Settings save automatically.", "帳號與同步": "Account & sync", "用 Google 登入，換電腦、換手機都能接著聊": "Sign in with Google to continue on any computer or phone", "AI 模型": "AI model", "選 Gemini、本地 AI 或 Claude，設定金鑰": "Choose Gemini, local AI or Claude, and set keys", "語音": "Voice", "用 Fish Audio 讓她把回覆唸出來": "Have her read replies aloud with Fish Audio", "角色圖": "Character", "放角色的表情圖片（最少兩張）": "Her expression pictures (at least two)", "外觀與音效": "Look & sound", "介面風格、主題顏色、音效、左右版面": "Interface style, colour, sounds and layout", "個人化": "Personal", "語言、你的稱呼、她的名字和個性": "Language, your name, her name and personality", "記憶與資料": "Memory & data", "記憶資料夾、備份、還原、解除安裝": "Memory folder, backup, restore, uninstall", "備份、還原": "Backup and restore", "介面風格": "Interface style", "機甲（預設：深色、橘色）": "Mecha (default: dark, orange)", "可愛粉嫩": "Cute pink", "復古終端機": "Retro terminal", "淺色簡約": "Light & simple", "夜空霓虹": "Night neon", "音效風格": "Sound set", "機甲（預設）": "Mecha (default)", "柔和泡泡": "Soft bubbles", "復古 8-bit": "Retro 8-bit", "清脆木琴": "Wooden marimba", "科幻電子": "Sci-fi electronic", "試聽音效": "Play sounds", "版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。": "Layout: swap her and the chat left/right, or drag the divider in the middle to resize — it snaps at the middle and at a quarter.", "左右換邊": "Swap sides", "恢復預設版面": "Reset layout"});
+Object.assign(I18N,{"看圖片工具（裝好後會自動填，通常不用改）":"Picture reader (filled in automatically)","清亮（預設）":"Clear (default)","機甲（舊版）":"Mecha (old default)","對話、記憶和角色圖存在這台裝置裡；用 Google 登入的話，也會自動同步到你自己的雲端。備份檔可以拿來保險，或搬到沒有登入的電腦。":"Chats, memory and character pictures are saved on this device; sign in with Google and they also sync to your own cloud. A backup file is extra insurance, or a way to move to a computer where you aren’t signed in.","記憶資料夾":"Memory folder","看圖模型（下載後會自動填好，通常不用改）":"Picture model (filled in automatically after download)","點一下分類就會展開；設定會自動儲存。": "Tap a group to open it. Settings save automatically.", "帳號與同步": "Account & sync", "用 Google 登入，換電腦、換手機都能接著聊": "Sign in with Google to continue on any computer or phone", "AI 模型": "AI model", "選 Gemini、本地 AI 或 Claude，設定金鑰": "Choose Gemini, local AI or Claude, and set keys", "語音": "Voice", "用 Fish Audio 讓她把回覆唸出來": "Have her read replies aloud with Fish Audio", "角色圖": "Character", "放角色的表情圖片（最少兩張）": "Her expression pictures (at least two)", "外觀與音效": "Look & sound", "介面風格、主題顏色、音效、左右版面": "Interface style, colour, sounds and layout", "個人化": "Personal", "語言、你的稱呼、她的名字和個性": "Language, your name, her name and personality", "記憶與資料": "Memory & data", "記憶資料夾、備份、還原、解除安裝": "Memory folder, backup, restore, uninstall", "備份、還原": "Backup and restore", "介面風格": "Interface style", "機甲（預設：深色、橘色）": "Mecha (default: dark, orange)", "可愛粉嫩": "Cute pink", "復古終端機": "Retro terminal", "淺色簡約": "Light & simple", "夜空霓虹": "Night neon", "音效風格": "Sound set", "機甲（預設）": "Mecha (default)", "柔和泡泡": "Soft bubbles", "復古 8-bit": "Retro 8-bit", "清脆木琴": "Wooden marimba", "科幻電子": "Sci-fi electronic", "試聽音效": "Play sounds", "版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。": "Layout: swap her and the chat left/right, or drag the divider in the middle to resize — it snaps at the middle and at a quarter.", "左右換邊": "Swap sides", "恢復預設版面": "Reset layout"});
 const I18N_RE=[
  [/^顯示更早的 (\d+) 則$/,"Show $1 earlier"],
  [/^已記下：(.+)$/s,"Noted: $1"],[/^你的方案不能用 (\S+)，已改用 (\S+)$/,"Your plan can't use $1 — switched to $2"],[/^(\S+) 現在不能用（免費額度用完或需要付費方案），已自動改用 (\S+)$/,"$1 isn't available right now (free quota used up or paid plan needed) — switched to $2"],[/^上網查：「(.*)」$/,"Searching the web: \"$1\""],[/^✅ 使用 Gemini（(.+)），金鑰 (.*)$/,"✅ Using Gemini ($1), key $2"],[/^(Gemini|Claude) 連線成功$/,"Connected to $1"],[/^❌ (?:金鑰無效或沒有額度|免費額度暫時用完|連不到（電腦有網路嗎？）|測試失敗)：(.*)$/s,"❌ Test failed: $1"],[/^✅ 使用 Claude（(.+)），金鑰 (.*)$/,"✅ Using Claude ($1), key $2"],[/^已儲存（(.+)），要換再貼新的$/,"Saved ($1) — paste a new one to replace"],[/^查天氣：(.*)$/,"Checking weather: $1"],[/^❌ (?:金鑰無效或餘額不足|連不到 Claude（電腦有網路嗎？）|測試失敗)：(.*)$/s,"❌ Test failed: $1"],[/^出錯了：(.*)$/s,"Something went wrong: $1"],
@@ -2675,8 +2737,8 @@ const HELP_EN={
   files:["Files","<ul><li>Upload with the paperclip in Chat. The full text is saved and she’ll look it up when you ask.</li><li>“Delete” removes the file and its contents, and she won’t remember it any more.</li></ul>"],
   search:["Search","<ul><li>Search everything you’ve said and every file’s contents by keyword.</li><li>For Chinese, use words of two or more characters.</li></ul>"],
   voice:["Voice (Fish Audio)","<ol><li>Sign up at fish.audio, create a key under API Keys and paste it here.</li><li>The accent comes from the voice: paste one fish.audio voice link for Chinese and one for English. With Accent on Auto, Chinese replies use the Chinese voice and English replies the English one; you can also fix it to Chinese or English.</li><li>“S2.1 Pro Free” is free with fair-use limits; the paid S2.1 Pro needs API credit on Fish Audio (separate from a website membership).</li><li>Turn on “Read replies aloud” to hear every answer, or press “Read aloud” under a reply.</li><li>Voice volume follows the speaker button; nothing is read while muted. She lip-syncs while talking.</li><li>Only use voices you made or have permission to use — no voices imitating real people.</li></ol>"],
-  localai:["Local AI (Ollama)","<ol><li>Make sure Ollama is running (llama icon in the menu bar or taskbar).</li><li>The default chat model is <code>qwen2.5:7b</code>. To switch, run <code>ollama pull model-name</code> in Terminal, enter it here and press “Save & test connection”.</li><li>To let her see images: run <code>ollama pull gemma3:4b</code> and enter <code>gemma3:4b</code> as the vision model.</li><li>“Can’t reach Ollama”: quit and reopen Ollama, then reopen this app.</li><li>Local AI not smart enough? Switch “AI source” to Claude and paste an Anthropic API key (pay per use, separate from a claude.ai subscription). The key stays on this computer.</li></ol>"],
-  sprites:["Character images","<ol><li>“Eyes open (neutral)” is required; “Mouth open” alternates with it for lip-sync; “Eyes closed” makes her blink every few seconds.</li><li>Other expressions are optional: she picks one when replying (e.g. “Shy” when praised), uses “Thinking” while looking things up, and switches to “Asleep” after 5 idle minutes. Missing ones fall back to neutral.</li><li>Keep every image the same size with the character in the same place — change only the mouth or eyes so switching doesn’t jump. Transparent PNGs work best.</li><li>Convert HEIC photos first: open in Preview → File → Export → PNG.</li><li>Please use art you drew yourself or have permission to use.</li></ol>"],
+  localai:["Local AI (Ollama)","<ol><li>Make sure Ollama is running (llama icon in the menu bar or taskbar).</li><li>Download a chat model right here: Light (qwen3.5:4b) for 8GB computers, Standard (qwen3.5:9b) for 16GB or more, Powerful (qwen3.5:27b) for 32GB Macs or 20GB+ graphics cards. The one that fits this computer is marked.</li><li>These models see pictures themselves and can think before answering, so the speed levels (Fast / Medium / Slow / Deep) really change something.</li><li>Downloads fail? Update Ollama from ollama.com/download — newer models need a newer Ollama.</li><li>“Can’t reach Ollama”: quit and reopen Ollama, then reopen this app.</li><li>Local AI not smart enough? Switch “AI source” to Claude and paste an Anthropic API key (pay per use, separate from a claude.ai subscription). The key stays on this computer.</li></ol>"],
+  sprites:["Character images","<ol><li>“Eyes open (neutral)” is required; “Mouth open” alternates with it for lip-sync; “Eyes closed” makes her blink every few seconds.</li><li>Other expressions are optional: she picks one when replying (e.g. “Shy” when praised), uses “Thinking” while looking things up, and switches to “Asleep” after 10 idle minutes. Missing ones fall back to neutral.</li><li>Keep every image the same size with the character in the same place — change only the mouth or eyes so switching doesn’t jump. Transparent PNGs work best.</li><li>Convert HEIC photos first: open in Preview → File → Export → PNG.</li><li>Please use art you drew yourself or have permission to use.</li></ol>"],
   profile:["Name & personality","<ul><li>“Partner’s name” shows on the name plate and in the big scrolling background text.</li><li>“Theme colour”: click a swatch or use the picker on the right for any colour.</li><li>“Language” switches the interface, and she’ll reply in that language too.</li><li>Volume is on the speaker button at the top-right: click it for a vertical slider, with Mute below.</li><li>“Personality & speaking style” decides how she talks — add a few sample lines to help her.</li><li>Changes save automatically — no button to press.</li></ul>"],
   folder:["Memory folder","<ul><li>Everything lives in Documents/Companion: <code>對話/</code> holds daily chat logs, <code>記憶重點.md</code> her key notes, <code>檔案/</code> your uploads.</li><li>You can edit 記憶重點.md directly — she follows it the next time the app opens.</li><li><code>_資料（請勿修改）</code> is the app’s own data — don’t touch it.</li><li>To see it on other devices, sync this folder with Google Drive for desktop.</li></ul>"],
   dl:["What is Get App","<ul><li><b style=\"display:inline;font-size:inherit\">Web version</b> (this one): uses your Claude account, works on phones and computers, memory lives in your Claude account.</li><li><b style=\"display:inline;font-size:inherit\">Desktop app</b>: uses a local AI (Ollama) — free, no Claude account, memory saved in Documents/Companion.</li><li>The two memories are separate. To move: Settings → Copy all memory here, save as a .json file, then Settings → Restore from backup in the app.</li><li>Each zip includes “先看我.txt” with full steps and fixes.</li></ul>"],
@@ -2685,7 +2747,7 @@ const HELP_EN={
 };
 function styleHint(){
   const p=String(S.settings.persona||"").split(/[。\n]/)[0].slice(0,70);
-  const t=S.settings.tier||"default",len=t==="quick"?"這次只回 1～2 句。":t==="complex"?"這次要回答得完整詳細。":"";
+  const t=effTier(),len=t==="quick"?"這次只回 1～2 句。":(t==="complex"||t==="deep")?"這次要回答得完整詳細。":"";
   return S.replyLang==="en"?`\n\n(Reply reminder: answer what I said directly, in English, in ${S.settings.botName||"Claude"}'s tsundere-but-caring voice. Don't change the subject, don't repeat earlier lines, no emoticons or emoji. First line: [[表情：…]]. ${t==="quick"?"Keep it to 1–2 sentences.":t==="complex"?"Give a full, detailed answer.":""})`
     :`\n\n（回覆提醒：用「${S.settings.botName||"Claude"}」的語氣${p?"——"+p:""}。先直接回答我說的，不要轉移話題、不要重複之前講過的句子；繁體中文、自然口語；不要顏文字、不要 emoji；第一行寫 [[表情：…]]。${len}）`;
 }
@@ -2697,10 +2759,10 @@ function localRule(){
 }
 function isEN(){return (S.settings&&S.settings.lang)==="en"}
 function detectLang(t){t=String(t||"");const cjk=(t.match(/[\u3400-\u9fff]/g)||[]).length,lat=(t.match(/[A-Za-z]/g)||[]).length;if(lat>=3&&lat>cjk*2)return"en";if(cjk)return"zh";return null}
-function tierRule(){const t=S.settings.tier||"default";
-  return t==="quick"?"\n\n【回覆長度：簡短】只用 1～2 句，直接講重點。":t==="complex"?"\n\n【回覆長度：詳細】這次一定要回答得長而完整：至少 6～10 句，或分 3～5 點、每點都有具體內容和例子；閒聊時也要多聊幾句、多分享一點想法。":"\n\n【回覆長度：一般】閒聊 1～3 句；對方問問題時要完整回答，需要時可以分點。";}
+function tierRule(){const t=effTier();
+  return t==="quick"?"\n\n【回覆長度：簡短】只用 1～2 句，直接講重點。":(t==="complex"||t==="deep")?"\n\n【回覆長度：詳細】這次一定要回答得長而完整：至少 6～10 句，或分 3～5 點、每點都有具體內容和例子；閒聊時也要多聊幾句、多分享一點想法。":"\n\n【回覆長度：一般】閒聊 1～3 句；對方問問題時要完整回答，需要時可以分點。";}
 function langRule(){
-  if(S.replyLang==="en")return"\n\n【Language】The user is writing in English. Reply in natural English this time, keeping your personality. Keep the special markers exactly: the first line is [[表情：X]] with X one of the Chinese words listed, and [[記住：…]] may contain English."+tierRule();
+  if(S.replyLang==="en")return"\n\n【Language】The user is writing in English. Reply in natural English this time, keeping your personality. Keep the special markers exactly: the first line is [[表情：X]] with X one of the Chinese words listed."+(isEN()?"":" IMPORTANT: anything inside [[記住：…]] or [[追蹤：…]] must be written in Traditional Chinese (繁體中文), even though you reply in English.")+tierRule();
   if(S.replyLang==="zh")return"\n\n【語言】對方這句用中文，請用繁體中文（台灣用語）回答。"+tierRule();
   return (isEN()?"\n\n【Language】Reply in natural English unless the user writes in Chinese.":"")+tierRule();
 }
@@ -2775,7 +2837,7 @@ function toggleVolPop(){
 }
 document.addEventListener("pointerdown",e=>{const pop=$("volPop");if(!pop.hidden&&!e.target.closest("#volPop")&&!e.target.closest("#sndBtn"))pop.hidden=true},true);
 addEventListener("keydown",e=>{if(e.key==="Escape")$("volPop").hidden=true});
-function paintPrefs(){if(typeof applyTheme==="function")applyTheme(S.settings.theme||(()=>{try{return localStorage.getItem("m01.theme")}catch(e){return""}})()||"mecha");if($("sndSet"))$("sndSet").value=S.settings.sndSet||"mecha";applyAccent(S.settings.accent||"#FF7A3D");paintVol();applyLang();try{paintModelChip()}catch(e){}}
+function paintPrefs(){if(typeof applyTheme==="function")applyTheme(S.settings.theme||(()=>{try{return localStorage.getItem("m01.theme")}catch(e){return""}})()||"mecha");if($("sndSet"))$("sndSet").value=S.settings.sndSet||"clean";applyAccent(S.settings.accent||"#FF7A3D");paintVol();applyLang();try{paintModelChip()}catch(e){}}
 $("langSel").onchange=e=>{S.settings.lang=e.target.value==="en"?"en":"zh";applyLang();if(typeof checkFish==="function")checkFish();if(typeof renderThread==="function")renderThread();saveSettingsQuiet();playSfx("press",.55)};
 paintPrefs();
 $("convBtn").onclick=e=>{e.stopPropagation();const l=$("convList");if(l.hidden){renderConvList();l.hidden=false}else l.hidden=true};
@@ -2802,7 +2864,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="0.9.23",APP_STAGE="Beta",APP_BUILD="2026-11-05 23:30";
+const APP_VER="0.10.29",APP_STAGE="Beta",APP_BUILD="2026-11-06 01:35";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -2813,7 +2875,13 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
- {v:"0.9.23",d:"11/05 23:30",add:[["版本改成 Beta","Now labelled Beta"],["點一下她會有反應，說的話常常跟你們最近聊的內容有關","Tap her and she reacts — often about what you have been talking about"],["設定分成幾個分類、可以折疊；沒放角色圖時按「前往設定」會直接打開角色圖","Settings are grouped and collapsible; “Go to settings” with no character opens the character section"],["五種介面風格（機甲、可愛粉嫩、復古終端機、淺色簡約、夜空霓虹）和五種音效","Five interface styles (Mecha, Cute pink, Retro terminal, Light, Night neon) and five sound sets"],["電腦螢幕上可以把角色和聊天左右換邊，也可以拖中間調整大小（正中間和四分之一會吸附）","On computer screens, swap her and the chat left/right, or drag the middle to resize (snaps at the middle and a quarter)"],["分享按鈕：一鍵複製網頁版和 GitHub 連結","Share button: copy the web version and GitHub links"],["本地 AI 寫清楚標準版和輕量版差在哪；可以下載或刪除看圖模型，下載後自動使用","Local AI explains standard vs light; download or delete a picture model, used automatically"],["新手教學更詳細，會自動切到要介紹的分頁","A more detailed guided tour that opens the right tab for each step"],["有新版本時馬上提醒，按一下就更新（電腦版之後的更新不用重新安裝）","New versions are announced right away and install in one click (future desktop updates need no reinstall)"]],fix:[["在設定頁打開教學時，框框會指錯地方","The guided tour pointed at the wrong place when started from Settings"],["Google 登入用的資料改放在背景程式裡，不再出現在網頁程式中","Google sign-in details now live in the background helper, not in the page"]]},
+ {v:"0.10.29",d:"11/06 01:35",add:[["她醒著的時候會主動找你說話：依天氣關心你、問你在做什麼、接續剛剛聊的事、說說你在聽的歌（設定 → 小工具可以關掉）","While awake she speaks up now and then: caring about you because of the weather, asking what you’re doing, following up on what you talked about, or commenting on your song (turn it off in Settings → Widgets)"],["睡著時，她說話的泡泡會顯示 Zzz…","While she sleeps, her speech bubble shows Zzz…"],["10 分鐘沒動靜才會睡著（原本 5 分鐘）","She now falls asleep after 10 quiet minutes (was 5)"],["設定 → 外觀與音效：聊天區背景透明度五段，預設中間","Settings → Look & sound: five levels of chat-area see-through, the middle one by default"],["新手教學補完整：天氣、音樂、語音輸入、語音、記憶與資料、離開都有介紹","The guided tour now covers everything: weather, music, voice input, voice, memory & data and leaving"]],fix:[["Windows 的 Spotify 封面：電腦給不出封面時，改用歌名和歌手到 iTunes 找","Spotify cover on Windows: when the computer gives none, it’s found on iTunes by song and artist"]]},
+ {v:"0.10.28",d:"11/06 01:20",add:[["天氣和 Spotify 移到上方橫條，在時鐘兩邊左右對稱；橫條加寬一點","Weather and Spotify moved to the top bar, mirrored on both sides of the clock; the bar is a little taller"],["設定分類打開後放著不動，一陣子會自己收起來（正在打字時不會）","Settings groups close by themselves after a while untouched (not while you’re typing)"],["更新紀錄可以折疊：只展開最新一版，較早的版本收在一起","The update log folds: only the newest version is open, older ones are tucked away"],["本地 AI 的思考秒數改成依你的電腦實測：量出這台電腦寫回答要多久，剩下的時間才拿來思考","Local AI thinking time now adapts to your computer: it measures how long this computer takes to write an answer and uses the rest to think"]],fix:[["Spotify 封面不顯示：Mac 改用安全連線載入封面，Windows 讀不到時會換方法再試幾次，還是沒有就到 Spotify 找","Spotify cover not showing: on Mac it now loads over a secure link; on Windows it retries another way, and falls back to Spotify’s page"],["拿掉音樂的音量調整和天氣、音樂的收合按鈕","Removed the music volume control and the fold buttons on weather and music"]]},
+ {v:"0.10.27",d:"11/06 01:40",add:[["全介面加上流暢動畫：設定分類展開收合、彈出選單、開關、提示、送出和收到訊息、換邊、切換主題","Smooth animation everywhere: settings groups, pop-ups, switches, notices, sending and receiving messages, swapping sides and changing themes"],["角色旁邊顯示 Spotify 正在播的歌：方形封面、暫停、上下首、拖進度條、調音量，還有跟著節奏跳動的音樂條（App 版，免費帳號也能用）","What Spotify is playing, next to her: square cover, pause, previous/next, a draggable progress bar, volume and bars that move to the beat (desktop app; free accounts work)"],["對面顯示你所在地的天氣：溫度、體感、接下來幾小時的降雨機率，會提醒你帶傘；點一下她會跟你說","The weather where you are on the other side: temperature, feels-like and the next hours’ chance of rain, with an umbrella reminder — tap it and she tells you"],["她聊天時也知道現在的天氣和你在聽的歌","She now knows the weather and the song you’re playing when you chat"],["設定新增「小工具」：開關音樂和天氣、設定天氣地點","New Settings → Widgets: turn music and weather on or off and set the weather location"],["自動清理舊版本留下、用不到的檔案（不會動到聊天和記憶）","Automatically removes leftovers from older versions (chats and memory are never touched)"]],fix:[["不再在資料夾裡另外寫一份對話副本","No more extra copies of chats written into the folder"]]},
+ {v:"0.10.26",d:"11/06 01:30",add:[["回答速度改成 快（約 5 秒）／中（約 10 秒）／慢（約 20 秒）／詳細（30 秒以上），會思考的 AI 照時間分級","Speed levels are now Fast (~5 s) / Medium (~10 s) / Slow (~20 s) / Deep (30 s+) for AIs that can think"],["不會思考的本地模型不再顯示速度選項","Local models that can’t think no longer show speed options"],["看圖片工具不再出現在選項裡：傳圖片或檔案時自動使用","The picture tool no longer shows in the options — it’s used automatically when you send a picture or file"],["AI 用英文聊天時，記住和追蹤的筆記也會用中文寫；搜尋記憶會中英文都找","When the AI chats in English, its notes are still written in Chinese, and memory search tries both languages"]],fix:[["本地 9b 選「中」要等快 20 秒：拿掉多餘的事前規劃，思考限時","Local 9b on Medium took ~20 s: removed the extra planning step and capped thinking time"],["解除安裝不再問要不要刪聊天資料（資料在你的 Google 帳號或這台電腦）","Uninstall no longer asks about deleting chat data (it’s in your Google account or on this computer)"]]},
+ {v:"0.10.25",d:"11/06 00:40",add:[["本地 AI 換成新一代的 Qwen 3.5：輕量版（4b）、標準版（9b）、強力版（27b）","Local AI is now the newer Qwen 3.5: Light (4b), Standard (9b), Powerful (27b)"],["會看你的電腦記憶體和顯示卡，標出「建議你的電腦用這個」；看不到時可以自己選 8／16／32GB","Suggests the model that fits your computer’s memory and graphics card; pick 8/16/32GB yourself if it can’t tell"],["新模型自己看得懂圖片，不用另外裝看圖片工具","The new models see pictures themselves — no picture tool needed"],["本地 AI 的低／中／高變成真的：低直接回答，中、高先思考","Local Low/Medium/High is now real: Low answers right away, Medium and High think first"],["進階：可以輸入任何模型名稱下載","Advanced: download any model by name"],["安裝程式會看記憶體，直接建議要裝哪個","The installer looks at your memory and suggests which model to install"]],fix:[]},
+ {v:"0.10.24",d:"11/06 00:10",add:[["其他裝置有新內容時，直接在畫面上更新，不會再重新開啟 App","Changes from your other devices now appear in place — the app no longer restarts"],["Claude 的思考程度變成真的：中、高會先思考再回答","Claude’s thinking levels are now real: Medium and High think before answering"],["選單裡會說明每種 AI 的思考程度實際上做什麼（本地 qwen2.5 沒有思考功能，只會改變回答長短）","The menu explains what thinking does for each AI (local qwen2.5 can’t think; it only changes answer length)"],["看圖片改成工具：先由它看圖，再交給聊天 AI 照平常的樣子回答","The picture model is now a tool: it looks first, then her chat AI answers as usual"],["所有音效重新調整，每一組的音量都差不多大；預設音量改成 50","All sound sets re-tuned to about the same loudness; default volume is now 50"]],fix:[["打開 App 時會跳出「已全部匯出到資料夾」","“Exported everything to the folder” popped up every time the app opened"],["拖曳線吸附後會一直亮著","The divider stayed bright after snapping"],["「個人化」裡多出不需要的「回覆方式」","An unneeded “reply style” field showed in Personal"]]},
+ {v:"0.10.23",d:"11/05 23:30",add:[["版本改成 Beta","Now labelled Beta"],["點一下她會有反應，說的話常常跟你們最近聊的內容有關","Tap her and she reacts — often about what you have been talking about"],["設定分成幾個分類、可以折疊；沒放角色圖時按「前往設定」會直接打開角色圖","Settings are grouped and collapsible; “Go to settings” with no character opens the character section"],["五種介面風格（機甲、可愛粉嫩、復古終端機、淺色簡約、夜空霓虹）和五種音效","Five interface styles (Mecha, Cute pink, Retro terminal, Light, Night neon) and five sound sets"],["電腦螢幕上可以把角色和聊天左右換邊，也可以拖中間調整大小（正中間和四分之一會吸附）","On computer screens, swap her and the chat left/right, or drag the middle to resize (snaps at the middle and a quarter)"],["分享按鈕：一鍵複製網頁版和 GitHub 連結","Share button: copy the web version and GitHub links"],["本地 AI 寫清楚標準版和輕量版差在哪；可以下載或刪除看圖模型，下載後自動使用","Local AI explains standard vs light; download or delete a picture model, used automatically"],["新手教學更詳細，會自動切到要介紹的分頁","A more detailed guided tour that opens the right tab for each step"],["有新版本時馬上提醒，按一下就更新（電腦版之後的更新不用重新安裝）","New versions are announced right away and install in one click (future desktop updates need no reinstall)"],["預設音效換成比較好聽的「清亮」（舊的機甲音效還可以選）","New, nicer default sounds (“Clear”); the old Mecha set is still available"],["本地聊天 AI 改成二選一（換的時候自動刪掉舊的），另外可以安裝或刪除「看圖片和檔案的 AI」","Local chat AI is now pick-one (switching deletes the old one), plus a separate picture & file AI you can install or delete"],["設定一次只展開一個分類","Only one settings group opens at a time"],["中間的拖曳線跟著主題顏色，平常淡淡亮著，拖的時候才變亮","The divider follows the theme colour: faint normally, bright while dragging"],["不再顯示記憶資料夾，用 Google 登入同步就好","The memory folder is no longer shown — Google sign-in handles syncing"]],fix:[["用一陣子後 App 會自動重新開啟、一直循環","The app kept restarting itself after a while"],["在設定頁打開教學時，框框會指錯地方","The guided tour pointed at the wrong place when started from Settings"],["Google 登入用的資料改放在背景程式裡，不再出現在網頁程式中","Google sign-in details now live in the background helper, not in the page"]]},
  {v:"0.9.22",d:"11/05 21:30",add:[["電腦版和 GitHub 網頁版可以用 Google 帳號登入：對話、記憶、角色圖和 AI 金鑰會自動同步到你自己 Google 雲端硬碟的隱藏資料夾，換電腦、換手機都能接著聊","Desktop app and GitHub web version: sign in with Google — chats, memories, character pictures and AI keys sync to a hidden folder in your own Google Drive, so you can pick up on any computer or phone"],["兩台裝置同一天都有聊天的話，兩邊的對話會合併，不會蓋掉","If two devices both chatted, the chats are combined instead of one overwriting the other"],["電腦版第一次打開不用再設定資料夾，改成問要不要用 Google 登入","Desktop app: first launch no longer walks you through the folder — it offers Google sign-in instead"]],fix:[["登入時沒勾「Google 雲端硬碟」權限的話，會提醒你再登入一次並打勾","If the Google Drive box wasn’t ticked at sign-in, M-01 now tells you to sign in again and tick it"]]},
  {v:"0.9.21",d:"11/05 21:00",add:[["電腦版的本地 AI 變成可選：安裝時可以選不要，只用 Gemini 或 Claude，省下 2～5GB","Desktop app: local AI is now optional — skip it at install and use Gemini or Claude, saving 2–5GB"],["「設定 → AI」可以看本地模型佔多少空間、刪掉，或之後再下載（有進度條）","Settings → AI: see how much space each local model uses, delete it, or download one later (with progress)"],["第一次打開、沒有本地 AI 時，會請你選一個 AI（貼上免費的 Gemini 金鑰就能開始）","First run without local AI asks you to pick one (paste a free Gemini key to start)"]],fix:[["沒裝 Ollama 時，打開 App 不會再等 30 秒","Opening the app no longer waits 30 seconds when Ollama isn’t installed"]]},
  {v:"0.9.20",d:"11/05 20:30",add:[["角色圖可以一次放好幾張或直接選 zip，會依檔名自動放到對的格子","Add many character pictures at once (or a zip) — they go into the right slots by file name"],["電腦版和 GitHub 網頁版：一鍵「套用範例角色」","Desktop app and GitHub web version: one-click “Use the sample character”"]],fix:[]},
@@ -2873,7 +2941,7 @@ function aboutHelp(){
   const F=en?[
     ["Chat & memory",["Remembers every conversation and file for good, and you can search all of it","Saves key points about you by itself — add, edit or delete them in Memory","Multiple chats, incognito mode, edit or delete your own messages"]],
     ["Files",["Send images, PDF, Word, Excel and text files — she reads them and can look things up later"]],
-    ["Character",["12 expression images (eyes open/closed, mouth open, happy, shy, angry…)","Lip-sync while talking, blinking, falls asleep after 5 idle minutes","Rename her and change her personality"]],
+    ["Character",["12 expression images (eyes open/closed, mouth open, happy, shy, angry…)","Lip-sync while talking, blinking, falls asleep after 10 idle minutes","Rename her and change her personality"]],
     ["Look & feel",["Custom theme colour, 中文 / English","Volume slider and mute, hover effects and sounds","Her name scrolls in the background"]],
     web?["Backup",["Copy all memory as JSON — import it into the desktop app"]]:["AI",["Local AI (Ollama): free and works offline","Gemini: free tier, smarter than local","Claude: paid per use, the smartest"]],
     web?["Desktop app",["Get App: Mac and Windows versions with local AI, web search, weather, Fish Audio voice and a memory folder"]]:["Online & data",["Web search with sources, weather for any Taiwan city","Memory saved in a folder you choose, backed up with Google Drive","Edit 記憶重點.md directly; voice typing; one-click uninstall"]],
@@ -2881,7 +2949,7 @@ function aboutHelp(){
   ]:[
     ["聊天與記憶",["永久記住所有對話和上傳的檔案，全部都能搜尋","會自己記下關於你的重點，可以在「重點」新增、刪除","多個對話、無痕模式、可以編輯或刪除自己的訊息"]],
     ["檔案",["傳圖片、PDF、Word、Excel、文字檔，她會讀內容，之後也能幫你查"]],
-    ["角色",["12 種表情圖（張眼、閉眼、張嘴、開心、害羞、生氣……）","說話時對嘴、會眨眼、5 分鐘沒動會睡著","可以改她的名字和個性"]],
+    ["角色",["12 種表情圖（張眼、閉眼、張嘴、開心、害羞、生氣……）","說話時對嘴、會眨眼、10 分鐘沒動會睡著","可以改她的名字和個性"]],
     ["外觀",["自訂主題顏色、中文／English","音量滑桿和靜音、按鈕滑過特效與音效","背景會跑她的名字"]],
     web?["備份",["複製全部記憶（JSON），可以匯入電腦版"]]:["AI",["本地 AI（Ollama）：免費、不用網路","Gemini：有免費額度，比本地聰明","Claude：按用量付費，最聰明"]],
     web?["電腦版",["「下載 App」有 Mac、Windows 版：本地 AI、上網查資料、查天氣、Fish Audio 語音、記憶資料夾"]]:["上網與資料",["上網查資料附來源、查天氣（台灣各縣市）","記憶存在你選的資料夾，可用 Google 雲端硬碟備份","可以直接編輯「記憶重點.md」、語音輸入、一鍵解除安裝"]],
@@ -2889,8 +2957,9 @@ function aboutHelp(){
   ];
   const feats=F.map(([h,l])=>`<span class="about-h">${h}</span><ul>${l.map(x=>`<li>${x}</li>`).join("")}</ul>`).join("");
   const log=CHANGELOG.map((c,i)=>{const body=`${c.add.length?`<b class="cl-t">${en?"Added":"新增"}</b><ul>${c.add.map(x=>`<li>${en?x[1]:x[0]}</li>`).join("")}</ul>`:""}${c.fix.length?`<b class="cl-t">${en?"Fixes":"修正"}</b><ul>${c.fix.map(x=>`<li>${en?x[1]:x[0]}</li>`).join("")}</ul>`:""}`;
-    return `<details class="cl"${i===0?" open":""}><summary>${cmpVer(c.v,"0.9.23")>=0?"Beta":"Alpha"} ${c.v}<span>${c.d}</span></summary>${body}</details>`}).join("");
-  return ["M-01 Companion",ver+`<p style="margin:4px 0 6px"><a href="#" id="tourAgain" style="color:var(--accent)">${en?"Replay the guided tour →":"重新看使用教學 →"}</a></p><span class="about-h">${en?"WHAT'S NEW":"更新紀錄"}</span>`+log+feats+`<span class="about-h">${en?"NOTES":"注意事項"}</span><ul>${notes.map(n=>`<li>${n}</li>`).join("")}</ul>`];
+    return `<details class="cl"${i===0?" open":""}><summary>${cmpVer(c.v,"0.10.0")>=0?"Beta":"Alpha"} ${c.v}<span>${c.d}</span></summary><div class="fx-dt">${body}</div></details>`});
+  const logHtml=log[0]+(log.length>1?`<details class="cl-all"><summary>${en?`Earlier versions (${log.length-1})`:`較早的版本（${log.length-1} 個）`}</summary><div class="fx-dt">${log.slice(1).join("")}</div></details>`:"");
+  return ["M-01 Companion",ver+`<p style="margin:4px 0 6px"><a href="#" id="tourAgain" style="color:var(--accent)">${en?"Replay the guided tour →":"重新看使用教學 →"}</a></p><span class="about-h">${en?"WHAT'S NEW":"更新紀錄"}</span>`+logHtml+feats+`<span class="about-h">${en?"NOTES":"注意事項"}</span><ul>${notes.map(n=>`<li>${n}</li>`).join("")}</ul>`];
 }
 function storageHelp(){
   const en=isEN();
@@ -2929,7 +2998,11 @@ function showSetup(){
 function maybeSetup(){if(isDesk()&&(S.settings.setup||0)<3&&!(window.cloud&&cloud.signedIn()))showSetup()}
 
 /* ---------- model + thinking picker next to the input ---------- */
-const TIERS=[["quick","低","簡短、最快","Low","Short and fastest"],["default","中","先想一下再回答","Medium","Thinks a little first"],["complex","高","仔細想、回答完整（比較慢）","High","Thinks it through, fuller answer (slower)"]];
+const TIERS=[["quick","快","不思考，直接回答（約 5 秒）","Fast","No thinking, answers right away (~5 s)"],["default","中","先想一下再回答（約 10 秒）","Medium","Thinks a little first (~10 s)"],["complex","慢","想清楚再回答（約 20 秒）","Slow","Thinks it through (~20 s)"],["deep","詳細","仔細思考，回答最完整（30 秒以上）","Deep","Thinks carefully, fullest answer (30 s+)"]];
+/* which AI can really think; models that can't just get one setting */
+function localThinks(m){return /qwen3|deepseek-r1|gpt-oss|magistral|qwq|phi4-reasoning/i.test(String(m||""))}
+function canChooseTier(){if(typeof LOCAL_CFG==="undefined")return true;const b=LOCAL_CFG.backend||"ollama";return b!=="ollama"||localThinks(LOCAL_CFG.model)}
+function effTier(){return canChooseTier()?(S.settings.tier||"default"):"default"}
 const GEMINI_MODELS=[["gemini-3.6-flash","Gemini 3.6 Flash","建議：聰明又穩定，免費額度夠日常聊天","Recommended: smart and steady, enough free usage for daily chat"],["gemini-3.8-flash","Gemini 3.8 Flash","最聰明的 Flash，但免費額度最少、常會用完","Smartest Flash, but the smallest free quota"],["gemini-3.5-flash-lite","Gemini 3.5 Flash-Lite","最快、免費次數最多，但比較不聰明","Fastest and most free usage, but less smart"]];
 const CLAUDE_MODELS=[["claude-haiku-5-5","Claude Haiku 5.5","便宜又快，日常聊天夠用","Cheap and fast, fine for daily chat"],["claude-sonnet-5-5","Claude Sonnet 5.5","比較聰明，費用約 Haiku 的 10 倍以上","Smarter, roughly 10× Haiku's cost"]];
 async function probeGemini(force){
@@ -2960,13 +3033,43 @@ function modelLabel(){
   if(b==="claude"){const m=LOCAL_CFG.claudeModel||"claude-haiku-5-5";return (CLAUDE_MODELS.find(x=>x[0]===m)||[0,m])[1]}
   return (isEN()?"Local · ":"本地 · ")+LOCAL_CFG.model;
 }
-function paintModelChip(){const t=TIERS.find(x=>x[0]===(S.settings.tier||"default"))||TIERS[1];$("mchipTxt").innerHTML=`${esc(modelLabel())} · <b>${isEN()?t[3]:t[1]}</b>`}
+/* how fast this computer runs each local model (measured from real answers, kept on this computer) */
+function perfAll(){try{return JSON.parse(localStorage.getItem("m01.lmPerf")||"{}")}catch(e){return{}}}
+function perfNote(model,tier,ms,j){
+  if(!model||!(ms>300))return;const all=perfAll(),p=all[model]||{};const k=tier==="deep"?"deep":tier==="complex"?"complex":tier==="quick"?"quick":"default";
+  const ema=(old,v)=>old?Math.round(old*.6+v*.4):Math.round(v);
+  p[k]=ema(p[k],Math.min(ms,180000));
+  if(j&&j.eval_count>8&&j.eval_duration>0)p.tps=Math.round(ema(p.tps,j.eval_count/(j.eval_duration/1e9))*10)/10;
+  p.n=(p.n||0)+1;p.t=Date.now();all[model]=p;try{localStorage.setItem("m01.lmPerf",JSON.stringify(all))}catch(e){}
+}
+const TIER_TARGET={default:10000,complex:20000,deep:35000};
+function answerMs(model,tier){const p=perfAll()[model]||{};const k=tier==="deep"?"deep":tier==="complex"?"complex":"default";
+  if(p[k])return p[k];const base=p.default||(p.quick&&p.quick*1.3);if(base)return base*(k==="deep"?1.8:k==="complex"?1.4:1);
+  if(p.tps)return 900+({default:300,complex:450,deep:600}[k])/p.tps*1000;return 0}
+function thinkBudget(model,tier){const goal=TIER_TARGET[tier];if(!goal)return 0;const a=answerMs(model,tier);
+  if(!a)return{default:4000,complex:11000,deep:30000}[tier];   // not measured yet: a first guess, corrected after the first answers
+  return Math.max(1500,Math.round(goal-a))}
+/* what "thinking" really does for the AI in use */
+function thinkNote(en){
+  const b=typeof LOCAL_CFG==="undefined"?"claude-web":(LOCAL_CFG.backend||"ollama");
+  if(b==="gemini")return en?"Gemini thinks for real; times are rough — it depends on Google’s servers.":"Gemini 會真的思考；秒數只是大概，要看 Google 那邊的速度。";
+  if(b==="claude")return en?"Claude thinks for real; longer levels think more and cost a bit more.":"Claude 會真的思考；越慢的等級想得越多，也會貴一點。";
+  if(b==="ollama"){const m=LOCAL_CFG.model||"";if(localThinks(m)){const a=answerMs(m,"default"),p=perfAll()[m]||{};
+      if(!a)return en?"The times adjust to this computer: after the first few answers it measures how fast it writes, then gives her the rest of the time to think. Thinking stops when time is up and she answers.":"秒數會依這台電腦自動調整：先回答幾次、量出這台電腦寫一段回答要多久，剩下的時間才拿來思考。時間到就會停下來回答。";
+      const sec=(a/1000).toFixed(a<10000?1:0),slow=a>TIER_TARGET.default-1500;
+      return en?`Measured on this computer: an answer takes about ${sec} s${p.tps?` (${p.tps} tokens/s)`:""}, so she gets the rest of each level’s time to think.${slow?" This computer is on the slow side, so Medium will take a bit longer than 10 s.":""}`
+        :`這台電腦實測：寫一段回答大約 ${sec} 秒${p.tps?`（每秒 ${p.tps} 個字詞）`:""}，每個等級剩下的時間就拿來思考。${slow?"這台電腦比較慢，「中」會比 10 秒久一點。":""}`}
+    return en?`This model (${m}) can’t think, so there’s nothing to choose — it always answers right away. For speed levels, switch to Qwen 3.5 in Settings → AI.`:`這個模型（${m}）不會思考，所以沒有速度可以選，都是直接回答。想要可以選的話，到「設定 → AI 模型」換成 Qwen 3.5。`}
+  return"";
+}
+function paintModelChip(){const t=TIERS.find(x=>x[0]===(S.settings.tier||"default"))||TIERS[1];$("mchipTxt").innerHTML=`${esc(modelLabel())}`+(canChooseTier()?` · <b>${isEN()?t[3]:t[1]}</b>`:"")}
 async function openModelPop(){
   const pop=$("modelPop"),chip=$("modelChip");
   if(!pop.hidden){pop.hidden=true;chip.setAttribute("aria-expanded","false");return}
   const en=isEN(),tier=S.settings.tier||"default";let h="";
   {const ct=TIERS.find(x=>x[0]===tier)||TIERS[1];
-   h+=`<div class="mp-h">${en?"THINKING":"思考程度"}</div><div class="mp-seg">${TIERS.map(t=>`<button data-tier="${t[0]}" aria-pressed="${t[0]===tier}">${en?t[3]:t[1]}</button>`).join("")}</div><div class="mp-note" id="mpNote">${en?ct[4]:ct[2]}</div>`;}
+   h+=canChooseTier()?`<div class="mp-h">${en?"SPEED":"回答速度"}</div><div class="mp-seg mp-seg4">${TIERS.map(t=>`<button data-tier="${t[0]}" aria-pressed="${t[0]===tier}">${en?t[3]:t[1]}</button>`).join("")}</div><div class="mp-note" id="mpNote">${en?ct[4]:ct[2]}</div><div class="mp-note mp-why">${thinkNote(en)}</div>`
+     :`<div class="mp-h">${en?"SPEED":"回答速度"}</div><div class="mp-note mp-why">${thinkNote(en)}</div>`;}
   if(typeof LOCAL_CFG!=="undefined"){
     const b=LOCAL_CFG.backend||"ollama";
     let names=[];if(!window.GH_MODE)try{const r=await ollamaCheck();names=r.ok?r.names:[]}catch(e){}
@@ -3023,9 +3126,12 @@ function tourSteps(){
   // [where, title, text, tab to open first, settings group to open]
   const T=[
     [".composer .box",en?"Chat":"聊天",en?"Type here to talk to her. Enter sends, Shift+Enter starts a new line. The paperclip on the left sends pictures and files (PDF, Word, Excel, code…) and she reads them — you can also drag files in. To ask about something from before, just ask; she looks through her memory.":"在這裡打字跟她聊天：Enter 送出、Shift+Enter 換行。左邊的迴紋針可以傳圖片和檔案（PDF、Word、Excel、程式碼…），她會讀內容；也可以直接把檔案拖進來。想問以前聊過的事，直接問就好，她會去翻記憶。","chat"],
-    ["#modelChip",app?(en?"AI & thinking":"AI・思考程度"):(en?"Thinking":"思考程度"),app?(en?"Switch the AI here. Local AI is free and works offline; Gemini has a free quota and is smarter; Claude is the smartest but paid. Thinking: Low is fastest, Medium thinks a little first, High thinks it through (slower).":"點這裡切換 AI：本地 AI 免費、不用網路；Gemini 有免費額度、比較聰明；Claude 最聰明但要付費。思考程度：低最快、中會先想一下、高想得最完整但比較慢。"):(en?"Low is fastest, Medium thinks a little first, High thinks it through but is slower.":"思考程度：低最快、中會先想一下、高想得最完整但比較慢。"),"chat"],
+    ["#modelChip",app?(en?"AI & speed":"AI・回答速度"):(en?"Speed":"回答速度"),app?(en?"Switch the AI here (local, Gemini, Claude) and choose the speed: Fast (~5 s, no thinking), Medium (~10 s), Slow (~20 s) or Deep (30 s+). Slower levels think longer and answer better. Local models that can’t think have no speed choice.":"點這裡切換 AI（本地、Gemini、Claude）和回答速度：快（約 5 秒，不思考）、中（約 10 秒）、慢（約 20 秒）、詳細（30 秒以上）。越慢想得越久、回答越好。不會思考的本地模型沒有速度可以選。"):(en?"Fast (~5 s), Medium (~10 s), Slow (~20 s) or Deep (30 s+): slower levels think longer and answer better.":"快（約 5 秒）、中（約 10 秒）、慢（約 20 秒）、詳細（30 秒以上）：越慢想得越久、回答越好。"),"chat"],
+    ["#mic",en?"Talk instead of typing":"用說的",en?"Click the microphone and speak — your words are typed in for you. Click again to stop.":"按麥克風直接說話，會自動幫你打成文字，再按一次停止。","chat"],
     [".convbar",en?"Chats":"對話",en?"Click the chat name to switch, rename or delete chats. “＋ New chat” starts a fresh one. “Incognito” isn’t saved and isn’t remembered. In every chat she still remembers the key points about you.":"點對話名稱可以切換、改名、刪除以前的對話；「＋ 新對話」開一段新的；「無痕」聊的內容不會被保存、也不會被記住。不管在哪段對話，她都記得關於你的重點。","chat"],
-    ["#heroWrap",en?"Her":"她",en?"Her mouth moves when she talks and her face follows her mood. Tap her and she’ll say something — often about what you’ve been talking about. Leave her alone long enough and she falls asleep.":"這是她：說話時會對嘴、表情會跟著心情變。點她一下會有反應，常常會跟你們最近聊的事有關。太久沒理她，她會睡著。","chat"],
+    ["#heroWrap",en?"Her":"她",en?"Her mouth moves when she talks and her face follows her mood. Tap her and she’ll say something — often about what you’ve been talking about. Now and then she speaks up on her own: about the weather, your song or what you talked about. After 10 quiet minutes she falls asleep and her bubble shows Zzz…; say something to wake her.":"這是她：說話時會對嘴、表情會跟著心情變。點她一下會有反應，常常跟你們最近聊的事有關。她也會不定時主動找你說話：關心天氣、聊你在聽的歌、接續剛剛的話題。10 分鐘沒動靜她會睡著，泡泡會顯示 Zzz…，跟她說話就會醒來。","chat"],
+    ["#wxCard",en?"Weather":"天氣",en?"Left of the clock: the weather where you are, today’s high and low, and the chance of rain for the next few hours. Hover for details; tap it and she tells you (with an umbrella reminder if needed).":"時鐘左邊是你所在地的天氣：溫度、高低溫和接下來幾小時的降雨機率。滑鼠移上去看詳細，點一下她會告訴你（要下雨會提醒帶傘）。","chat"],
+    ["#muCard",en?"Music":"音樂",en?"Right of the clock: what Spotify is playing on this computer, with its cover. Previous, play/pause and next are on the right; drag the thin line along the bottom to jump in the song. A free Spotify account works.":"時鐘右邊是這台電腦 Spotify 正在播的歌和封面：右邊有上一首、暫停、下一首，拖下面那條細線可以跳到歌曲的任何位置。免費帳號也能用。","chat"],
     ["#splitter",en?"Layout":"版面",en?"Drag this line to make her or the chat bigger — it snaps at the middle and at a quarter. The ⇄ button in the middle swaps the two sides. Double-click the line to reset.":"拖這條線可以把她或聊天區調大，拖到正中間或四分之一的地方會自動吸附；中間的 ⇄ 可以把兩邊換位置，點兩下這條線就恢復預設。","chat"],
     ['.tab[data-tab="pMem"]',en?"Memory":"重點",en?"She writes down key points about you (likes, plans, important people) and uses them later. Add your own, or delete anything she got wrong.":"她會自己記下關於你的事（喜好、計畫、重要的人），之後聊天會用到。你可以自己新增，記錯的也可以刪掉。","pMem"],
     ['.tab[data-tab="pFiles"]',en?"Files":"檔案",en?"Every file you’ve sent is listed here — open or delete them. She remembers what’s inside, so you can ask about them later.":"你傳過的檔案都在這裡，可以重新打開或刪掉。她會記得檔案內容，之後問也找得到。","pFiles"],
@@ -3033,14 +3139,18 @@ function tourSteps(){
     ['.tab[data-tab="pDl"]',en?"Get the app":"下載 App",en?"The desktop app adds local AI, web search, weather and voice. Download it here.":"電腦版多了本地 AI、上網查資料、查天氣和語音，可以在這裡下載。","pDl"],
     ["#g_acc>summary",en?"Settings · Account":"設定・帳號與同步",en?"Settings are grouped — tap a group to open it. Sign in with Google here and your chats and memories are saved to your own Google Drive, so you can continue on another computer or phone.":"設定分成幾個分類，點一下就會展開。在「帳號與同步」用 Google 登入，對話和記憶會存到你自己的雲端，換電腦、換手機都能接著聊。","pSet"],
     ["#g_ai>summary",en?"Settings · AI":"設定・AI 模型",app?(en?"Choose the AI and paste keys. The desktop app can also download or delete local AI models here, with a note on which one to pick.":"選要用哪個 AI、貼金鑰。電腦版也可以在這裡下載或刪除本地 AI 模型，裡面有寫該選哪個。"):(en?"Paste your free Gemini key and pick the model.":"貼上免費的 Gemini 金鑰、選模型。"),"pSet"],
+    ["#g_voice>summary",en?"Settings · Voice":"設定・語音",en?"Let her read her replies aloud with Fish Audio (a free voice model is available), with her mouth moving as she speaks.":"用 Fish Audio 讓她把回覆唸出來（有免費的聲音模型），說話時角色會跟著對嘴。","pSet"],
     ["#g_char>summary",en?"Settings · Character":"設定・角色圖",en?"Add her expression pictures — at least “mouth closed” and “mouth open” — or use the sample character in one click.":"放她的表情圖片（最少「嘴巴閉上」和「嘴巴張開」兩張），也可以一鍵套用範例角色。","pSet"],
-    ["#g_look>summary",en?"Settings · Look & sound":"設定・外觀與音效",en?"Five interface styles (Mecha, Cute pink, Retro terminal, Light, Night neon), the theme colour, five sound sets, and the layout.":"五種介面風格（機甲、可愛粉嫩、復古終端機、淺色簡約、夜空霓虹）、主題顏色、五種音效，還有左右版面。","pSet"],
+    ["#g_look>summary",en?"Settings · Look & sound":"設定・外觀與音效",en?"Five interface styles (Mecha, Cute pink, Retro terminal, Light, Night neon), how see-through the chat area is (five levels), the theme colour, five sound sets, and the layout.":"五種介面風格（機甲、可愛粉嫩、復古終端機、淺色簡約、夜空霓虹）、聊天區背景透明度（五段）、主題顏色、五種音效，還有左右版面。","pSet"],
+    ["#g_widget>summary",en?"Settings · Widgets":"設定・小工具",en?"Turn music, weather and her talking to you on her own on or off, and set the weather location (or let it find you automatically).":"開關音樂、天氣，以及她會不會主動找你說話；也可以設定天氣地點（或讓它自動判斷）。","pSet"],
     ["#g_prof>summary",en?"Settings · Personal":"設定・個人化",en?"Language, what she calls you, her name and her personality.":"語言、你希望被怎麼稱呼、她的名字和個性。","pSet"],
+    ["#g_data>summary",en?"Settings · Memory & data":"設定・記憶與資料",en?"Back up and restore everything, and uninstall. Leftovers from older versions are cleaned up automatically — your chats and memory are never touched.":"備份、還原全部資料，以及解除安裝。舊版本留下的東西會自動清掉，聊天和記憶不會被動到。","pSet"],
     ["#shareBtn",en?"Share":"分享",en?"Send the web version or the GitHub page to friends.":"把網頁版或 GitHub 連結傳給朋友。","chat"],
     ["#sndBtn",en?"Volume":"音量",en?"A vertical volume slider, with Mute below.":"點一下會出現直立的音量滑桿，下面有靜音。","chat"],
   ];
-  if(app)T.push(["#folderBtn",en?"Memory folder":"記憶資料夾",en?"Opens the folder on this computer where everything is saved.":"一鍵打開這台電腦上存放記憶的資料夾。","chat"]);
+  if(false)T.push(["#folderBtn",en?"Memory folder":"記憶資料夾",en?"Opens the folder on this computer where everything is saved.":"一鍵打開這台電腦上存放記憶的資料夾。","chat"]);
   T.push(["#infoBtn",en?"Version & updates":"版本與更新",en?"Features, the update log and notes. When a new version is out a red dot appears here and you can update in one click.":"功能介紹、更新紀錄和注意事項。有新版本時這裡會出現紅點，可以一鍵更新。","chat"]);
+  if(app)T.push(["#powerBtn",en?"Leave":"離開",en?"Closes the app. Everything is already saved.":"關閉 App。所有東西都已經自動存好了。","chat"]);
   T.push(["#tourBtn",en?"Guided tour":"新手教學",en?"Forgot something? Press this anytime to see this tour again. Now say hi to her!":"忘記怎麼用的話，隨時按這個按鈕再看一次。現在跟她打聲招呼吧！","chat"]);
   return T.filter(x=>document.querySelector(x[0]));
 }
@@ -3093,7 +3203,7 @@ const HOV_SEL='button:not(:disabled),.tab,label.pick,label.toggle,summary,a[href
 let hovEl=null,hovT=0;
 function hoverTick(){
   if(!soundOn()||!actx||!document.body.classList.contains("booted"))return;
-  try{actx.resume();const t=actx.currentTime,v=.06*volume()/.7,o=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain();
+  try{actx.resume();const t=actx.currentTime,v=.06*volume()/.6,o=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain();
     o.type="sine";o.frequency.setValueAtTime(2400,t);o.frequency.exponentialRampToValueAtTime(1500,t+.045);
     o2.type="triangle";o2.frequency.setValueAtTime(1200,t);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+.07);
@@ -3128,8 +3238,8 @@ const HELP={
   files:["檔案","<ul><li>從聊天區的迴紋針上傳，檔案全文會被保存，之後問她檔案內容她會去翻。</li><li>按「刪除」會把檔案和內容都移除，她就不會再記得。</li></ul>"],
   search:["搜尋","<ul><li>輸入關鍵字，可以搜尋所有聊過的話和檔案內容。</li><li>中文建議用兩個字以上的詞，例如「拉麵」「考試」。</li></ul>"],
   voice:["語音（Fish Audio）","<ol><li>到 fish.audio 註冊，進「API Keys」建立金鑰，貼到這裡。</li><li>口音跟著聲音走：「中文聲音」和「英文聲音」各貼一個 fish.audio 聲音網址。「口音」選自動時，中文回覆用中文聲音、英文回覆用英文聲音；也可以固定用中文或英文。</li><li>「S2.1 Pro Free」免費，但有合理使用限制；付費的 S2.1 Pro 要先在 Fish Audio 儲值 API 額度（跟網站會員分開算）。</li><li>打開「回覆完自動唸出來」，她每次回答都會唸；不然可以按每則回覆下面的「朗讀」。</li><li>音量跟右上角喇叭一樣；靜音時不會唸。說話時角色會對嘴。</li><li>請只用你自己建立或有授權的聲音，不要用模仿真實人物的聲音。</li></ol>"],
-  localai:["本地 AI（Ollama）","<ol><li>確認 Ollama 有開著（選單列或工作列有小羊駝圖示）。</li><li>聊天模型預設 <code>qwen2.5:7b</code>；要換模型先在終端機執行 <code>ollama pull 模型名稱</code>，再填進來按「儲存並測試連線」。</li><li>想讓她看懂圖片：執行 <code>ollama pull gemma3:4b</code>，在看圖模型填 <code>gemma3:4b</code>。</li><li>顯示「連不到 Ollama」：關掉 Ollama 再重新打開，然後重開這個 App。</li><li>覺得本地 AI 太笨：「AI 來源」改成 Claude，貼上 Anthropic 的 API 金鑰（按用量付費，跟 claude.ai 訂閱分開）。金鑰只存在這台電腦。</li></ol>"],
-  sprites:["角色圖怎麼放","<ol><li>「張眼（平常）」必填；「張嘴」說話時跟它交替做出對嘴；「閉眼」讓她每幾秒眨一次眼。</li><li>其他表情都是選填：她回話時會自己挑表情（例如被稱讚時用「害羞」），查資料時用「思考」，5 分鐘沒互動會換成「睡著」。沒放的表情就用平常那張。</li><li>每張圖的大小和角色位置要一樣，只改嘴巴或眼睛，切換才不會跳。最好用去背 PNG。</li><li>HEIC 照片請先轉成 PNG：用「預覽程式」打開 → 檔案 → 輸出 → 選 PNG。</li><li>請使用你自己畫的或有授權的圖。</li></ol>"],
+  localai:["本地 AI（Ollama）","<ol><li>確認 Ollama 有開著（選單列或工作列有小羊駝圖示）。</li><li>在這裡就能下載聊天模型：輕量版（qwen3.5:4b）給 8GB 的電腦、標準版（qwen3.5:9b）給 16GB 以上、強力版（qwen3.5:27b）給 32GB 的 Mac 或顯示卡 20GB 以上的電腦。適合你電腦的那個會標出來。</li><li>這些模型自己看得懂圖片，也會先思考再回答，所以回答速度（快／中／慢／詳細）是真的有差。</li><li>下載失敗？到 ollama.com/download 更新 Ollama，新模型需要比較新的 Ollama。</li><li>顯示「連不到 Ollama」：關掉 Ollama 再重新打開，然後重開這個 App。</li><li>覺得本地 AI 太笨：「AI 來源」改成 Claude，貼上 Anthropic 的 API 金鑰（按用量付費，跟 claude.ai 訂閱分開）。金鑰只存在這台電腦。</li></ol>"],
+  sprites:["角色圖怎麼放","<ol><li>「張眼（平常）」必填；「張嘴」說話時跟它交替做出對嘴；「閉眼」讓她每幾秒眨一次眼。</li><li>其他表情都是選填：她回話時會自己挑表情（例如被稱讚時用「害羞」），查資料時用「思考」，10 分鐘沒互動會換成「睡著」。沒放的表情就用平常那張。</li><li>每張圖的大小和角色位置要一樣，只改嘴巴或眼睛，切換才不會跳。最好用去背 PNG。</li><li>HEIC 照片請先轉成 PNG：用「預覽程式」打開 → 檔案 → 輸出 → 選 PNG。</li><li>請使用你自己畫的或有授權的圖。</li></ol>"],
   profile:["稱呼與個性","<ul><li>「夥伴的名字」會顯示在名牌上，背景流動的大字也會跟著變。</li><li>「主題顏色」可以點色塊，或用最右邊的調色盤自訂任何顏色。</li><li>「語言」可以切換中文或英文，介面和她回話的語言都會跟著換。</li><li>音量在右上角喇叭鍵：點一下會出現直立的滑桿，往上拉變大聲，下面有「靜音」。</li><li>「個性與說話方式」決定她怎麼講話，可以加幾句範例台詞讓她學得更像。</li><li>改完會自動儲存，不用按按鈕。</li></ul>"],
   folder:["記憶資料夾","<ul><li>所有記憶存在「文件/Companion」：<code>對話/</code> 是每天的紀錄，<code>記憶重點.md</code> 是她記下的重點，<code>檔案/</code> 是上傳過的檔案。</li><li>你可以直接打開「記憶重點.md」修改，下次開 App 她就會照新的內容記。</li><li><code>_資料（請勿修改）</code> 是 App 自己用的，不要動。</li><li>想在手機或別台電腦看：用 Google 雲端硬碟電腦版同步這個資料夾。</li></ul>"],
   data:["備份與還原",IS_LOCAL?"<ul><li>「下載全部記憶備份」會把對話、重點、檔案打包成一個 JSON 檔（App 版會存到 <code>Companion/備份/</code>）。</li><li>「從備份還原」可以把備份檔匯入，換電腦或從網頁版搬過來時用。</li></ul>":"<ul><li>「複製全部記憶」會把對話、重點、檔案複製成 JSON 文字，貼到記事本存成 .json 檔就是備份。</li><li>想搬到電腦版 App：在 App 的設定用「從備份還原」匯入這個檔案。</li></ul>"],
@@ -3245,10 +3355,10 @@ function fsFlush(){
   }).catch(e=>{console.warn("backup",e);FS.ok=false;fsState("⚠️ 寫入資料夾失敗，請重新選擇備份資料夾。")});
 }
 function fsMark(kind,v){if(kind==="day")FS.dirtyDays.add(v);else if(kind==="facts")FS.dirtyFacts=true;else FS.dirtyFiles.add(v);clearTimeout(FS.timer);FS.timer=setTimeout(fsFlush,1500)}
-async function fsExportAll(){
-  if(!FS.ok){toast("請先選擇備份資料夾");return}
+async function fsExportAll(quiet){
+  if(!FS.ok){if(!quiet)toast("請先選擇備份資料夾");return}
   new Set(allMsgs().map(m=>dayOf(m.t))).forEach(d=>FS.dirtyDays.add(d));FS.dirtyFacts=true;S.files.forEach(f=>FS.dirtyFiles.add(f.id));
-  fsFlush();await FS.q;toast("已全部匯出到「"+FS.dir.name+"」");
+  fsFlush();await FS.q;if(!quiet)toast("已全部匯出到「"+FS.dir.name+"」");
 }
 $("fsPick").onclick=async()=>{
   if(FS.primary){try{const d=await window.showDirectoryPicker({id:"m01-data",mode:"readwrite",startIn:"documents"});await localKV.set("dataDir",d);toast("已更換，重新載入中…");setTimeout(()=>location.reload(),900)}catch(e){}return}
@@ -3263,17 +3373,17 @@ $("unBtn").onclick=()=>{
   const pop=$("setupPop");pop.hidden=false;$("stStep").textContent="UNINSTALL";$("stTitle").textContent=en?"Uninstall M-01?":"確定要解除安裝 M-01？";
   const path=esc(deskPath());
   $("stBody").innerHTML=(en?`<p>The app will be removed from this computer. Tick anything else you want to delete:</p>`:`<p>App 會從這台電腦移除。要一起刪掉的請打勾：</p>`)+
-    `<label class="un-opt"><input type="checkbox" id="unData"><span><b>${en?"Memory data":"記憶資料"}</b>${en?`Moved to the ${bin} — you can still get it back.`:`會移到${bin}，後悔還救得回來。`}<code>${path}</code></span></label>`+
-    `<label class="un-opt"><input type="checkbox" id="unModel"><span><b>${en?"Chat model":"聊天模型"}</b>${en?"Frees 2–5GB. Not needed if you use Gemini or Claude.":"可以騰出 2～5GB。只用 Gemini 或 Claude 的話用不到。"}</span></label>`+
+    `<p class="note">${(window.cloud&&cloud.signedIn())?(en?"Your chats and memories stay in your Google account — sign in again after reinstalling, or on another computer, and they come back.":"你的對話和記憶都在你的 Google 帳號裡，重新安裝、或在別台電腦登入，就會全部回來。"):(en?"Your chats and memories are kept on this computer, so reinstalling picks up where you left off. (Sign in with Google first if you want them in the cloud too.)":"你的對話和記憶會留在這台電腦，重新安裝就能接著用。（想放到雲端的話，先在設定裡用 Google 登入。）")}</p>`+
+    `<label class="un-opt"><input type="checkbox" id="unModel"><span><b>${en?"Local AI model":"本地 AI 模型"}</b>${en?"Frees 3–17GB. Not needed if you use Gemini or Claude.":"可以騰出 3～17GB。只用 Gemini 或 Claude 的話用不到。"}</span></label>`+
     `<label class="un-opt"><input type="checkbox" id="unKeys" checked disabled><span><b>${en?"Settings & API keys":"設定和 API 金鑰"}</b>${en?"Always removed with the app.":"一定會跟 App 一起移除。"}</span></label>`+
     `<p class="muted">${en?"Ollama itself is not removed.":"Ollama 本身不會被移除。"}</p>`;
-  $("unData").onchange=e=>{data=e.target.checked};$("unModel").onchange=e=>{model=e.target.checked};
+  if($("unData"))$("unData").onchange=e=>{data=e.target.checked};$("unModel").onchange=e=>{model=e.target.checked};
   const box=$("stBtns");box.innerHTML="";
   const b1=document.createElement("button");b1.textContent=en?"Cancel":"取消";b1.onclick=()=>{pop.hidden=true};
   const b2=document.createElement("button");b2.className="danger";b2.textContent=en?"Uninstall":"解除安裝";
   b2.onclick=async()=>{
     b1.disabled=b2.disabled=true;b2.textContent=en?"Uninstalling…":"移除中…";$("stBody").querySelectorAll("input").forEach(i=>i.disabled=true);
-    if(model){for(const m of [...new Set([LOCAL_CFG.model,"qwen2.5:7b","qwen2.5:3b",LOCAL_CFG.vision].filter(Boolean))])
+    if(model){for(const m of [...new Set([LOCAL_CFG.model,"qwen3.5:4b","qwen3.5:9b","qwen3.5:27b","qwen2.5:7b","qwen2.5:3b",LOCAL_CFG.vision].filter(Boolean))])
       await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:m})}).catch(()=>{})}
     try{await writeQ}catch(e){}
     let j=null;try{j=await (await fetch("/uninstall?data="+(data?1:0),{headers:{"X-M01":"1"}})).json()}catch(e){}
@@ -3303,10 +3413,10 @@ async function readFactsFile(){
   }catch(e){/* no file yet */}
 }
 function fsShowPrimary(){
-  if(FS.dir.server){fsState(`✅ 記憶直接存在：${FS.dir.path}。可以打開裡面的「記憶重點.md」修改，下次打開時她就會照新的內容記。`);$("fsPick").hidden=true;$("fsAll").hidden=true;$("fsDeskBtns").hidden=false;$("unSec").hidden=false;fsExportAll();return}
+  if(FS.dir.server){fsState(`✅ 記憶直接存在：${FS.dir.path}。可以打開裡面的「記憶重點.md」修改，下次打開時她就會照新的內容記。`);$("fsPick").hidden=true;$("fsAll").hidden=true;$("fsDeskBtns").hidden=false;$("unSec").hidden=false;fsExportAll(true);return}
   fsState(`✅ 記憶直接存在資料夾「${FS.dir.name}」。你可以在裡面打開「記憶重點.md」修改，下次打開 App 時她就會照新的內容記。`);
   $("fsPick").textContent="更換記憶資料夾";
-  fsExportAll();
+  fsExportAll(true);
 }
 
 
@@ -3455,36 +3565,74 @@ setInterval(()=>{try{checkUpdate(true)}catch(e){}},30*60e3);
 
 
 /* ---------- local AI is optional: list / delete / download models, and pick an AI on first run ---------- */
-function isVisionModel(n){return /(^|[^a-z])(qwen[0-9.]*-?vl|llava|bakllava|minicpm-v|moondream|gemma3|llama3\.2-vision|granite3\.2-vision)/i.test(String(n||""))}
+function isVisionModel(n){return /qwen2\.5-?vl|bakllava|moondream|granite3\.2-vision/i.test(String(n||""))}
 async function refreshImageLimits(){try{const lim=await S.sample.limits();S.imagesOK=!!lim.images;S.imgLimits=lim.images||null}catch(e){}}
 let lmPulling=null;
 async function renderLocalModels(){
   const box=$("lmBox");if(!box||window.GH_MODE)return;if(lmPulling)return;const en=isEN();
   let j=null;try{const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/tags");if(r.ok)j=await r.json()}catch(e){}
   if(!j){box.innerHTML=`<p class="note">${en?'Ollama isn’t installed or isn’t running, so there’s no local AI yet. To use it: install Ollama from <a href="https://ollama.com/download">ollama.com/download</a>, open it, then come back here to download a model. You can also just use Gemini (free) or Claude instead.':'目前沒有本地 AI（沒安裝 Ollama，或 Ollama 沒打開）。想用的話：先到 <a href="https://ollama.com/download">ollama.com/download</a> 安裝 Ollama 並打開，再回到這裡下載模型。也可以直接改用 Gemini（免費）或 Claude。'}</p>`;return}
-  const ms=(j.models||[]).filter(m=>!/embed/i.test(m.name)),gb=b=>(b/1e9).toFixed(1)+" GB",have=n=>ms.some(m=>m.name===n);
-  const chatMs=ms.filter(m=>!isVisionModel(m.name)),visMs=ms.filter(m=>isVisionModel(m.name));
-  // the picture model is used automatically: no need to pick it
+  const ms=(j.models||[]).filter(m=>!/embed/i.test(m.name)),gb=b=>(b/1e9).toFixed(1)+" GB",inst=n=>ms.find(m=>m.name===n);
+  const visMs=ms.filter(m=>isVisionModel(m.name));
+  // a separate picture model is only needed when the chat model can't see pictures itself
   if(visMs.length&&!visMs.some(m=>m.name===LOCAL_CFG.vision)){LOCAL_CFG.vision=visMs[0].name;$("lcVision").value=LOCAL_CFG.vision;saveLocalCfg();refreshImageLimits()}
   else if(!visMs.length&&LOCAL_CFG.vision&&isVisionModel(LOCAL_CFG.vision)){LOCAL_CFG.vision="";$("lcVision").value="";saveLocalCfg();refreshImageLimits()}
-  const row=(m,tag)=>`<div class="row"><div class="t">${esc(m.name)}<div class="d">${gb(m.size||0)}${tag||""}</div></div><button data-del="${esc(m.name)}">${en?"Delete":"刪除"}</button></div>`;
-  let h=`<div class="lm-h">${en?"Chat models on this computer":"這台電腦上的聊天模型"}</div>`;
-  h+=chatMs.length?chatMs.map(m=>row(m,m.name===LOCAL_CFG.model?(en?" · in use":" · 使用中"):"")).join(""):`<p class="note">${en?"None yet — download one below.":"還沒有下載聊天模型，可以在下面下載。"}</p>`;
-  const btns=(have("qwen2.5:7b")?"":`<button class="sbtn" data-pull="qwen2.5:7b">${en?"Download standard (4.7GB)":"下載標準版（4.7GB）"}</button>`)+(have("qwen2.5:3b")?"":`<button class="sbtn" data-pull="qwen2.5:3b">${en?"Download light (1.9GB)":"下載輕量版（1.9GB）"}</button>`);
-  if(btns)h+=`<div class="inline">${btns}</div>`;
-  h+=`<div class="lm-cmp"><div><b>${en?"Standard · qwen2.5:7b · 4.7GB":"標準版 · qwen2.5:7b · 4.7GB"}</b><span>${en?"Smarter, more natural Chinese, stays in character better. Use it if the computer has 16GB of memory or more.":"比較聰明、中文比較自然，也比較能維持她的個性。電腦記憶體 16GB 以上就選這個。"}</span></div>
-    <div><b>${en?"Light · qwen2.5:3b · 1.9GB":"輕量版 · qwen2.5:3b · 1.9GB"}</b><span>${en?"Faster and smaller, for 8GB computers or older laptops. Makes more mistakes and forgets her personality more often.":"比較快、比較省空間，適合 8GB 記憶體或比較舊的電腦。缺點是比較容易答錯、忘記她的個性。"}</span></div>
-    <div><b>${en?"Not sure?":"不知道選哪個？"}</b><span>${en?"Start with standard. If replies take more than about 10 seconds, switch to light — or use Gemini (free, smarter, needs internet).":"先用標準版；如果每次回覆都要等超過 10 秒左右，就改用輕量版，或直接改用 Gemini（免費、更聰明，但要網路）。"}</span></div></div>`;
-  h+=`<div class="lm-h">${en?"Picture model (lets her see images)":"看圖模型（讓她看得懂圖片）"}</div>`;
-  h+=visMs.length?visMs.map(m=>row(m,en?" · used automatically when you send a picture":" · 傳圖片時會自動使用")).join("")
-    :`<p class="note" style="margin:0">${en?"Without it, local AI can’t look at pictures you send (Gemini and Claude can). It’s only used when you send an image — no need to switch to it.":"沒有它的話，本地 AI 看不到你傳的圖片（Gemini 和 Claude 本來就看得懂）。下載後會自動在你傳圖片時使用，不用另外切換。"}</p><div class="inline"><button class="sbtn" data-pull="qwen2.5vl:3b">${en?"Download picture model (3.2GB)":"下載看圖模型（3.2GB）"}</button></div>`;
-  h+=`<p class="note" style="margin:0">${en?"Deleting a model frees its disk space; you can download it again any time.":"刪掉模型可以把空間省下來，之後隨時可以再下載。"}</p>`;
+  const dev=await deviceInfo(),rec=recommendModel(dev),CH=chatChoices(en);
+  const chatOnes=CH.filter(c=>inst(c[0])),legacy=ms.filter(m=>/^qwen2\.5(:|$)/.test(m.name)&&!isVisionModel(m.name)).map(m=>m.name);
+  let h=`<div class="lm-dev">${devLine(dev,rec,en)}</div>`;
+  h+=`<div class="lm-h">${en?"Chat AI — pick one":"聊天 AI（選一個）"}</div><p class="note" style="margin:0">${en?"All three are the same newer model (Qwen 3.5) in different sizes: they understand pictures themselves and can think before answering. Switching downloads the new one and then deletes the old one.":"三個都是同一代的新模型（Qwen 3.5），只差在大小：自己就看得懂圖片，也會先思考再回答。換的時候會先下載新的，再自動刪掉舊的。"}</p>`;
+  for(const c of CH){const m=inst(c[0]),using=m&&LOCAL_CFG.model===c[0],others=[...CH.filter(x=>x[0]!==c[0]&&inst(x[0])).map(x=>x[0]),...legacy];
+    const isRec=rec&&rec.model===c[0];
+    h+=`<div class="lm-card${m?" on":""}${isRec?" rec":""}"><div class="lm-ct"><b>${c[1]} <small>${c[0]} · ${c[2]}</small>${isRec?`<i class="lm-rec">${en?"Best for this computer":"建議你的電腦用這個"}</i>`:""}</b><span>${c[3]}</span>${m?`<em>${using?(en?"Installed · in use":"已安裝 · 使用中"):(en?"Installed":"已安裝")}</em>`:""}</div>
+      <div class="lm-ca">${m?(using?`<button data-del="${c[0]}">${en?"Delete":"刪除"}</button>`:`<button class="sbtn" data-use="${c[0]}">${en?"Use":"使用"}</button><button data-del="${c[0]}">${en?"Delete":"刪除"}</button>`):`<button class="sbtn" data-pull="${c[0]}" data-replace="${others.join(",")}">${others.length?(en?"Switch to this":"改用這個"):(en?"Download":"下載")}</button>`}</div></div>`}
+  if(legacy.length)h+=`<p class="note warnnote" style="margin:0">${en?`You still have the older ${legacy.join(", ")}. Pick one of the models above and the old one is deleted automatically.`:`你還有舊版的 ${legacy.join("、")}。在上面選一個新模型，舊的會自動刪掉。`}</p>`;
+  const cur=LOCAL_CFG.model||"",selfSees=chatSeesPictures(cur);
+  // pictures are handled automatically: a separate picture model only matters for chat models that can't see, and is removed once it's not needed
+  if(selfSees&&visMs.length&&!renderLocalModels._cleaning){renderLocalModels._cleaning=true;
+    for(const v of visMs){try{await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:v.name})})}catch(e){}}
+    LOCAL_CFG.vision="";$("lcVision").value="";saveLocalCfg();renderLocalModels._cleaning=false;return renderLocalModels()}
+  const known=new Set([...CH.map(c=>c[0]),...legacy,...visMs.map(m=>m.name)]);
+  const extra=ms.filter(m=>!known.has(m.name));
+  if(extra.length)h+=`<div class="lm-h">${en?"Other models":"其他模型"}</div>`+extra.map(m=>`<div class="row"><div class="t">${esc(m.name)}<div class="d">${gb(m.size||0)}${m.name===cur?(en?" · in use":" · 使用中"):""}</div></div>${m.name===cur?"":`<button class="sbtn" data-use="${esc(m.name)}">${en?"Use":"使用"}</button>`}<button data-del="${esc(m.name)}">${en?"Delete":"刪除"}</button></div>`).join("");
+  h+=`<details class="lm-adv"><summary>${en?"Advanced: download any model by name":"進階：輸入模型名稱下載"}</summary><div class="inline"><input id="lmName" placeholder="${en?"e.g. qwen3.6:35b-a3b":"例如 qwen3.6:35b-a3b"}" spellcheck="false" autocomplete="off"><button class="sbtn" id="lmGo">${en?"Download":"下載"}</button></div><p class="note" style="margin:0">${en?'Names come from <a href="https://ollama.com/library">ollama.com/library</a>. Bigger models are smarter but need more memory; if a model doesn’t fit your graphics card it still runs, just much slower.':'名稱可以到 <a href="https://ollama.com/library">ollama.com/library</a> 找。越大越聰明，但需要更多記憶體；放不進顯示卡的模型一樣能跑，只是會慢很多。'}</p></details>`;
+  if(!chatOnes.length&&!legacy.length&&!extra.length)h+=`<p class="note warnnote" style="margin:0">${en?"No chat AI installed yet — download one above, or use Gemini / Claude.":"還沒有安裝聊天 AI：在上面下載一個，或改用 Gemini／Claude。"}</p>`;
   box.innerHTML=h;
   box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
     if(!b.classList.contains("sure")){b.classList.add("sure");b.textContent=en?"Sure? Delete":"確定刪除？";setTimeout(()=>{if(b.isConnected){b.classList.remove("sure");b.textContent=en?"Delete":"刪除"}},4000);return}
     deleteLocalModel(b.dataset.del,ms.find(m=>m.name===b.dataset.del))});
-  box.querySelectorAll("[data-pull]").forEach(b=>b.onclick=()=>pullLocalModel(b.dataset.pull));
+  box.querySelectorAll(".lm-card button[data-del]").forEach(b=>b.classList.add("sbtn"));
+  box.querySelectorAll("[data-pull]").forEach(b=>b.onclick=()=>pullLocalModel(b.dataset.pull,b.dataset.replace||""));
+  box.querySelectorAll("[data-use]").forEach(b=>b.onclick=async()=>{LOCAL_CFG.model=b.dataset.use;LOCAL_CFG.backend="ollama";$("lcModel").value=b.dataset.use;saveLocalCfg();refreshImageLimits();await checkAI();paintModelChip();renderLocalModels();toast((en?"Now using ":"已改用 ")+b.dataset.use)});
+  box.querySelectorAll("[data-ram]").forEach(b=>b.onclick=()=>{try{localStorage.setItem("m01.ramGB",b.dataset.ram)}catch(e){}renderLocalModels()});
+  const go=$("lmGo");if(go)go.onclick=()=>{const n=$("lmName").value.trim().replace(/^ollama (pull|run) /,"");if(!/^[\w.\-\/]+(:[\w.\-]+)?$/.test(n)){toast(en?"That doesn’t look like a model name":"這看起來不像模型名稱");return}pullLocalModel(n,"")};
 }
+/* which local model fits this computer */
+let devCache=null;
+async function deviceInfo(){
+  if(devCache)return devCache;let d={ram:0,vram:0,gpu:"",os:/Mac/i.test(navigator.userAgent)?"mac":"win",src:"none"};
+  try{const r=await fetch("/sysinfo",{headers:{"X-M01":"1"}});if(r.ok){const j=await r.json();if(j&&j.ok&&j.ram>0){d={ram:j.ram,vram:j.vram||0,gpu:j.gpu||j.chip||"",os:j.os,src:"auto"};devCache=d;return d}}}catch(e){}
+  let g=0;try{g=+localStorage.getItem("m01.ramGB")||0}catch(e){}
+  if(g)d.ram=g*2**30,d.src="manual";
+  return d;
+}
+function chatChoices(en){return[
+  ["qwen3.5:4b",en?"Light":"輕量版","3.3GB",en?"For computers with 8GB of memory. Quick, but makes more mistakes.":"適合 8GB 記憶體的電腦。快，但比較容易答錯。"],
+  ["qwen3.5:9b",en?"Standard":"標準版","6.6GB",en?"For 16GB or more — e.g. a 16GB MacBook, or a PC with a 12GB graphics card. Clearly smarter than Light.":"適合 16GB 以上的電腦，例如 16GB 的 MacBook、或有 12GB 顯示卡的電腦。比輕量版聰明很多。"],
+  ["qwen3.5:27b",en?"Powerful":"強力版","17GB",en?"For 32GB+ Macs, or PCs with a 20GB+ graphics card. Smartest, but runs much slower if it doesn’t fit the graphics card.":"適合 32GB 以上的 Mac，或顯示卡有 20GB 以上的電腦。最聰明，但放不進顯示卡時會慢很多。"]]}
+function recommendModel(d){
+  const gb=d.ram/2**30,vr=d.vram/2**30;if(!gb)return null;
+  if(d.os==="mac")return{model:gb>=30?"qwen3.5:27b":gb>=15?"qwen3.5:9b":"qwen3.5:4b"};
+  if(vr>=20)return{model:"qwen3.5:27b"};if(vr>=8)return{model:"qwen3.5:9b"};
+  return{model:gb>=15?"qwen3.5:9b":"qwen3.5:4b"};
+}
+function devLine(d,rec,en){
+  const gb=Math.round(d.ram/2**30),vr=Math.round(d.vram/2**30);
+  const pick=`<span class="lm-ram">${[8,16,32].map(n=>`<button class="sbtn${gb===n||(n===32&&gb>32)?" on":""}" data-ram="${n}">${n===32?(en?"32GB+":"32GB 以上"):n+"GB"}</button>`).join("")}</span>`;
+  if(d.src!=="auto")return `${en?"How much memory (RAM) does this computer have?":"這台電腦有多少記憶體（RAM）？"} ${pick}${!gb?`<small>${en?"Windows: Settings → System → About. Mac:  menu → About This Mac.":"Windows：設定 → 系統 → 關於；Mac：左上角蘋果選單 →「關於這台 Mac」。"}</small>`:""}`;
+  const what=[`${gb}GB ${en?"memory":"記憶體"}`,d.gpu?esc(d.gpu)+(vr?`（${vr}GB）`:""):""].filter(Boolean).join(" · ");
+  return `${en?"This computer":"你的電腦"}：${what}`;
+}
+function chatSeesPictures(n){return /qwen3\.5|qwen3\.6|qwen3\.8|qwen3-vl|gemma3|gemma4|llama3\.2-vision|mistral-small3|llava|minicpm-v/i.test(String(n||""))}
 async function deleteLocalModel(name,info){
   const en=isEN();let ok=false;
   try{const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:name})});ok=r.ok}catch(e){}
@@ -3499,7 +3647,7 @@ async function deleteLocalModel(name,info){
   }
   await checkAI();paintModelChip();renderLocalModels();
 }
-async function pullLocalModel(name){
+async function pullLocalModel(name,replace){
   const box=$("lmBox"),en=isEN();if(lmPulling)return;
   const ctl=new AbortController();lmPulling=ctl;
   box.innerHTML=`<div class="lm-h">${en?"Downloading ":"下載中 "}${esc(name)}</div><div class="lm-bar"><i id="lmFill"></i></div><p class="note" id="lmTxt" style="margin:0">${en?"Starting…":"準備中…"}</p><div class="inline"><button class="sbtn" id="lmCancel">${en?"Cancel":"取消"}</button></div>`;
@@ -3518,8 +3666,12 @@ async function pullLocalModel(name){
       if(err)break}
   }catch(e){if(e&&e.name==="AbortError")err=en?"cancelled":"已取消";else err=String(e&&e.message||e)}
   lmPulling=null;
-  if(ok&&isVisionModel(name)){LOCAL_CFG.vision=name;$("lcVision").value=name;saveLocalCfg();refreshImageLimits();toast(en?"Picture model ready — she can look at images now.":"看圖模型下載好了，現在她看得懂圖片了。",6000)}
-  else if(ok){LOCAL_CFG.model=name;LOCAL_CFG.backend="ollama";$("lcModel").value=name;saveLocalCfg();toast((en?"Downloaded ":"下載好了：")+name,6000);await checkAI();paintModelChip()}
+  if(ok&&isVisionModel(name)){LOCAL_CFG.vision=name;$("lcVision").value=name;saveLocalCfg();refreshImageLimits();toast(en?"Picture reader installed — she can see pictures you send now.":"看圖片工具裝好了，現在你傳的圖片她看得懂了。",6000)}
+  else if(ok){LOCAL_CFG.model=name;LOCAL_CFG.backend="ollama";$("lcModel").value=name;saveLocalCfg();
+    const freedL=[];for(const old of String(replace||"").split(",").filter(x=>x&&x!==name)){try{const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:old})});if(r.ok)freedL.push(old)}catch(e){}}
+    const freed=freedL.join(en?", ":"、");refreshImageLimits();
+    toast((en?"Now using ":"已改用 ")+name+(freed?(en?` — deleted ${freed} to save space`:`，並刪掉了 ${freed} 省空間`):""),7000);await checkAI();paintModelChip()}
+  else if(/newer version|update ollama|requires ollama|412/i.test(err)){toast(en?"This model needs a newer Ollama. Download the latest from ollama.com/download, install it, then try again.":"這個模型需要比較新的 Ollama：到 ollama.com/download 下載最新版安裝後再試一次。",10000)}
   else toast((en?"Download didn’t finish: ":"下載沒有完成：")+err,7000);
   renderLocalModels();
 }
@@ -3546,7 +3698,7 @@ function showAiPick(){
      <input id="apKey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…"><p class="msg" id="apMsg"></p>
      <div class="acts"><button class="pbtn" id="apSave">${en?"Save and start":"儲存並開始"}</button></div></div>
    <div class="opt"><b>${en?"Local AI — free, works offline, needs disk space":"本地 AI：免費、不用網路，但要佔硬碟空間"}</b>
-     <span style="font-size:13.5px;color:var(--muted)">${en?"Install Ollama, open it, then download a model in Settings → AI (standard 4.7GB or light 1.9GB).":"先安裝 Ollama 並打開，再到「設定 → AI」下載模型（標準版 4.7GB／輕量版 1.9GB）。"}</span>
+     <span style="font-size:13.5px;color:var(--muted)">${en?"Install Ollama, open it, then download a model in Settings → AI — it suggests the size that fits this computer (3.3GB–17GB).":"先安裝 Ollama 並打開，再到「設定 → AI」下載模型，它會依你的電腦建議大小（3.3GB～17GB）。"}</span>
      <div class="acts"><a class="sbtn" href="https://ollama.com/download">${en?"Get Ollama":"下載 Ollama"}</a><button class="sbtn" id="apLocal">${en?"Go to Settings":"到設定"}</button></div></div>
    <div class="opt"><b>${en?"Claude — smartest, paid per use":"Claude：最聰明，按用量付費"}</b><div class="acts"><button class="sbtn" id="apClaude">${en?"Set up Claude":"設定 Claude"}</button></div></div>
    <button class="skip" id="apSkip">${en?"Later":"稍後再說"}</button></div>`;
@@ -3586,7 +3738,7 @@ async function checkAI(){
   }
   paintBackend();
   const r=await ollamaCheck();
-  if(r.ok&&!r.hasModel&&r.names&&r.names.length){const pick=["qwen2.5:7b","qwen2.5:3b","qwen2.5:latest","qwen2.5:1.5b"].find(n=>r.names.includes(n));
+  if(r.ok&&!r.hasModel&&r.names&&r.names.length){const pick=["qwen3.5:9b","qwen3.5:4b","qwen3.5:27b","qwen3.5:latest","qwen2.5:7b","qwen2.5:3b","qwen2.5:latest","qwen2.5:1.5b"].find(n=>r.names.includes(n));
     if(pick&&pick!==LOCAL_CFG.model){LOCAL_CFG.model=pick;saveLocalCfg();$("lcModel").value=pick;paintModelChip();return checkAI()}}
   S.aiOK=r.ok&&r.hasModel;
   $("aiState").textContent=!r.ok?"❌ 連不到 Ollama。請確認 Ollama 有開著。":r.hasModel?`✅ 已連線，使用模型 ${LOCAL_CFG.model}`:`⚠️ Ollama 已連線，但還沒下載 ${LOCAL_CFG.model}。請在終端機執行：ollama pull ${LOCAL_CFG.model}`;
@@ -3643,7 +3795,7 @@ async function checkFish(){
  $("fishClear").onclick=async()=>{stopVoice();await fetch("/secret?p=fish",{method:"DELETE",headers:{"X-M01":"1"}}).catch(()=>{});await checkFish();toast(isEN()?"Key deleted":"已刪除金鑰")};
 }
 checkFish();
-$("lcSave").onclick=async()=>{LOCAL_CFG.model=$("lcModel").value.trim()||"qwen2.5:7b";LOCAL_CFG.vision=$("lcVision").value.trim();LOCAL_CFG.url=$("lcUrl").value.trim()||"http://localhost:11434";saveLocalCfg();
+$("lcSave").onclick=async()=>{LOCAL_CFG.model=$("lcModel").value.trim()||"qwen3.5:9b";LOCAL_CFG.vision=$("lcVision").value.trim();LOCAL_CFG.url=$("lcUrl").value.trim()||"http://localhost:11434";saveLocalCfg();
   try{const lim=await S.sample.limits();S.imagesOK=!!lim.images;S.imgLimits=lim.images||null}catch(e){}
   $("aiState").textContent="檢查中…";await checkAI();toast(S.aiOK?"已連線":"請看設定頁的提示")};
 checkAI();
@@ -3657,10 +3809,10 @@ async function audioInit(){
   for(const [k,u] of Object.entries(SFX_SRC)){try{const b=Uint8Array.from(atob(u.split(",")[1]),c=>c.charCodeAt(0)).buffer;sfxBuf[k]=await actx.decodeAudioData(b)}catch(e){console.warn("sfx",k,e)}}
 }
 function playSfx(k,vol=.7){
-  if(!soundOn()||!actx||!sfxBuf[k])return;try{actx.resume();const s=actx.createBufferSource(),g=actx.createGain();g.gain.value=vol*(typeof volume==="function"?volume()/.7:1);s.buffer=sfxBuf[k];s.connect(g).connect(actx.destination);s.start()}catch(e){}
+  if(!soundOn()||!actx||!sfxBuf[k])return;try{actx.resume();const s=actx.createBufferSource(),g=actx.createGain();g.gain.value=vol*(typeof volume==="function"?volume()/.6:1);s.buffer=sfxBuf[k];s.connect(g).connect(actx.destination);s.start()}catch(e){}
 }
 function bootChime(){
-  if(!soundOn()||!actx)return;const t=actx.currentTime,out=actx.createGain();out.gain.value=.22*(typeof volume==="function"?volume()/.7:1);out.connect(actx.destination);
+  if(!soundOn()||!actx)return;const t=actx.currentTime,out=actx.createGain();out.gain.value=.22*(typeof volume==="function"?volume()/.6:1);out.connect(actx.destination);
   const sweep=actx.createOscillator(),sg=actx.createGain();sweep.type="sawtooth";sweep.frequency.setValueAtTime(70,t);sweep.frequency.exponentialRampToValueAtTime(420,t+.6);
   const lp=actx.createBiquadFilter();lp.type="lowpass";lp.frequency.setValueAtTime(300,t);lp.frequency.exponentialRampToValueAtTime(4000,t+.6);
   sg.gain.setValueAtTime(0,t);sg.gain.linearRampToValueAtTime(.5,t+.08);sg.gain.exponentialRampToValueAtTime(.001,t+.75);
@@ -3770,23 +3922,27 @@ paintSnd();
   $("themeSel").onchange=e=>{const t=e.target.value;S.settings.theme=t;applyTheme(t);S.settings.accent=THEME_ACCENT[t];applyAccent(THEME_ACCENT[t]);saveSettingsQuiet();playSfx("press",.5)};
 
   /* ---------- sound sets (the default "mecha" set uses the recorded sounds) ---------- */
-  const N=(type,f0,f1,st,dur,g,lp)=>({type,f0,f1,st,dur,g,lp});
+  window.__SND_LVL={"clean": {"press": 2.54, "exit": 2.57, "hover": 2.63, "boot": 1.53}, "bubble": {"press": 1.26, "exit": 0.98, "hover": 0.9, "boot": 0.72}, "retro": {"press": 1.91, "exit": 2.45, "hover": 1.43, "boot": 1.22}, "wood": {"press": 0.98, "exit": 0.99, "hover": 0.83, "boot": 0.42}, "scifi": {"press": 3.67, "exit": 5.37, "hover": 1.72, "boot": 1.19}};  // measured so every set plays at about the same loudness
+  const N=(type,f0,f1,st,dur,g,lp,lpf)=>({type,f0,f1,st,dur,g,lp,lpf});
   const SETS={
+    clean:{press:[N("sine",1046.5,1046.5,0,.11,.2),N("sine",1568,1568,.035,.14,.13)],hover:[N("sine",2093,2093,0,.035,.045)],
+      exit:[N("sine",880,880,0,.16,.17),N("sine",587.33,587.33,.1,.28,.17)],
+      boot:[523.25,659.25,783.99,987.77].map((f,i)=>N("sine",f,f,i*.09,.55,.15)).concat([N("triangle",261.63,261.63,.3,1.2,.09)])},
     bubble:{press:[N("sine",420,900,0,.1,.55)],exit:[N("sine",760,240,0,.3,.5)],hover:[N("sine",1300,1650,0,.045,.16)],
       boot:[N("sine",392,640,0,.14,.45),N("sine",523,860,.12,.14,.45),N("sine",659,1100,.24,.22,.45)]},
-    retro:{press:[N("square",880,880,0,.05,.2),N("square",1320,1320,.05,.06,.2)],exit:[N("square",660,660,0,.08,.18),N("square",440,440,.08,.08,.18),N("square",220,220,.16,.16,.18)],hover:[N("square",1760,1760,0,.025,.07)],
-      boot:[523,659,784,1047].map((f,i)=>N("square",f,f,i*.08,.09,.18)).concat([N("square",1568,1568,.34,.26,.16)])},
+    retro:{press:[N("square",880,880,0,.05,.2,0,3200),N("square",1320,1320,.05,.06,.2,0,3200)],exit:[N("square",660,660,0,.08,.18,0,3200),N("square",440,440,.08,.08,.18,0,3200),N("square",220,220,.16,.16,.18,0,3200)],hover:[N("square",1760,1760,0,.025,.07,0,3500)],
+      boot:[523,659,784,1047].map((f,i)=>N("square",f,f,i*.08,.09,.18,0,3200)).concat([N("square",1568,1568,.34,.26,.16,0,3200)])},
     wood:{press:[N("sine",784,784,0,.22,.6),N("sine",3136,3136,0,.06,.1)],exit:[N("sine",659,659,0,.2,.55),N("sine",440,440,.12,.34,.55)],hover:[N("sine",1568,1568,0,.07,.18)],
       boot:[523,587,659,784,880,1047].map((f,i)=>N("sine",f,f,i*.07,.32,.5))},
     scifi:{press:[N("sawtooth",180,900,0,.09,.22,1),N("sine",1760,2400,0,.05,.1)],exit:[N("sawtooth",900,90,0,.4,.26,1)],hover:[N("sine",2900,3400,0,.03,.07)],
       boot:[N("sawtooth",90,1400,0,.7,.28,1),N("sine",1047,1047,.55,.5,.28),N("sine",1568,1568,.66,.6,.2)]}};
   function synth(set,kind,vol){const def=SETS[set];if(!def||typeof actx==="undefined"||!actx||!soundOn())return;const notes=def[kind];if(!notes)return;
-    try{actx.resume();const t=actx.currentTime,out=actx.createGain();out.gain.value=(vol==null?.6:vol)*(volume()/.7);out.connect(actx.destination);
+    try{actx.resume();const t=actx.currentTime,out=actx.createGain();out.gain.value=(vol==null?.6:vol)*(volume()/.6)*(((window.__SND_LVL||{})[set]||{})[kind]||1);out.connect(actx.destination);
       for(const n of notes){const o=actx.createOscillator(),g=actx.createGain(),st=t+n.st;o.type=n.type;o.frequency.setValueAtTime(n.f0,st);if(n.f1!==n.f0)o.frequency.exponentialRampToValueAtTime(n.f1,st+n.dur);
         g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(n.g,st+.006);g.gain.exponentialRampToValueAtTime(.0001,st+n.dur);
-        let node=o;if(n.lp){const fl=actx.createBiquadFilter();fl.type="lowpass";fl.frequency.setValueAtTime(400,st);fl.frequency.exponentialRampToValueAtTime(5000,st+n.dur);o.connect(fl);node=fl}
+        let node=o;if(n.lpf){const fl=actx.createBiquadFilter();fl.type="lowpass";fl.frequency.value=n.lpf;o.connect(fl);node=fl}else if(n.lp){const fl=actx.createBiquadFilter();fl.type="lowpass";fl.frequency.setValueAtTime(400,st);fl.frequency.exponentialRampToValueAtTime(5000,st+n.dur);o.connect(fl);node=fl}
         node.connect(g).connect(out);o.start(st);o.stop(st+n.dur+.05)}}catch(e){}}
-  const sndSet=()=>(S.settings&&S.settings.sndSet)||"mecha";
+  const sndSet=()=>(S.settings&&S.settings.sndSet)||"clean";
   window.__synth=synth;
   const _p=playSfx,_h=hoverTick,_b=bootChime;
   playSfx=function(k,vol){if(sndSet()!=="mecha"){synth(sndSet(),k,vol);return}return _p(k,vol)};
@@ -3808,13 +3964,13 @@ paintSnd();
   sp.addEventListener("pointerdown",e=>{if(e.target.closest(".sw"))return;e.preventDefault();drag=true;try{sp.setPointerCapture(e.pointerId)}catch(x){}sp.classList.add("drag");document.body.classList.add("dragging")});
   sp.addEventListener("pointermove",e=>{if(!drag)return;const ar=app.getBoundingClientRect();let pct=(e.clientX-ar.left)/ar.width*100,st=L.swap?100-pct:pct;
     st=Math.max(20,Math.min(80,st));let snap=null;for(const p of [25,50,75])if(Math.abs(st-p)<3){st=p;snap=p}
-    if(snap!==null&&L.split!==snap){sp.classList.remove("snap");void sp.offsetWidth;sp.classList.add("snap");try{hoverTick()}catch(x){}}
+    if(snap!==null&&L.split!==snap){sp.classList.remove("snap");void sp.offsetWidth;sp.classList.add("snap");clearTimeout(sp._st);sp._st=setTimeout(()=>sp.classList.remove("snap"),450);try{hoverTick()}catch(x){}}
     L.split=Math.round(st*10)/10;applyLayout()});
-  const endDrag=()=>{if(!drag)return;drag=false;sp.classList.remove("drag");document.body.classList.remove("dragging");saveL()};
+  const endDrag=()=>{if(!drag)return;drag=false;sp.classList.remove("drag","snap");document.body.classList.remove("dragging");saveL()};
   sp.addEventListener("pointerup",endDrag);sp.addEventListener("pointercancel",endDrag);
   sp.addEventListener("dblclick",e=>{if(e.target.closest(".sw"))return;L.split=0;applyLayout();saveL()});
   const swap=()=>{L.swap=!L.swap;applyLayout();saveL();playSfx("press",.5)};
-  $("swapMini").onclick=e=>{e.stopPropagation();swap()};$("swapBtn").onclick=swap;
+  $("swapMini").onclick=e=>{e.stopPropagation();swap();e.currentTarget.blur()};$("swapBtn").onclick=swap;
   $("layoutReset").onclick=()=>{L.split=0;L.swap=false;applyLayout();saveL();toast(isEN()?"Layout reset":"版面已恢復預設")};
   addEventListener("resize",placeSplit);try{new ResizeObserver(placeSplit).observe(app)}catch(e){}
   applyLayout();
@@ -3864,6 +4020,7 @@ paintSnd();
       if(arr.length>=2){pool=arr.sort(()=>Math.random()-.5);poolAt=at}
     }catch(e){}finally{refilling=false}}
   window.__pokeRefill=refill;
+  window.__say=t=>say(t);
   function say(t){const th=document.querySelector("#heroWrap .thought");if(!th)return;clearTimeout(sayT);th.textContent=t;th.classList.add("say");
     sayT=setTimeout(()=>{th.classList.remove("say");setTimeout(()=>{if(!th.classList.contains("say"))th.textContent="···"},300)},Math.min(6500,2600+t.length*90))}
   function react(){const el=$("sprite");if(!el)return;el.classList.remove("poked");void el.offsetWidth;el.classList.add("poked");
@@ -3879,6 +4036,581 @@ paintSnd();
   $("heroWrap").addEventListener("click",e=>{if(e.target.closest("#sprite"))pokeHer()});
 })();
 </script>
+<!--x27-->
+<style id="x27css">
+/* ===== 0.10.27: motion everywhere, music & weather cards ===== */
+:root{--ease-out:cubic-bezier(.22,1,.36,1);--ease-spring:cubic-bezier(.34,1.5,.64,1)}
+/* popovers and overlays: in and out */
+@keyframes fxPopIn{from{opacity:0;transform:translateY(8px) scale(.965)}to{opacity:1;transform:none}}
+@keyframes fxPopOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(6px) scale(.975)}}
+@keyframes fxDropIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes fxDropOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-6px) scale(.985)}}
+@keyframes fxFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fxFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes fxCardIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+.fx-pop-in{animation:fxPopIn .24s var(--ease-out) both!important}
+.fx-pop-out{animation:fxPopOut .16s ease-in both!important;pointer-events:none!important}
+.fx-drop-in{animation:fxDropIn .24s var(--ease-out) both!important;transform-origin:top center}
+.fx-drop-out{animation:fxDropOut .16s ease-in both!important;pointer-events:none!important}
+.fx-fade-in{animation:fxFadeIn .26s ease-out both!important}
+.fx-fade-in>*{animation:fxCardIn .34s var(--ease-out) .04s both}
+.fx-fade-out{animation:fxFadeOut .18s ease-in both!important;pointer-events:none!important}
+@keyframes fxBarIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes fxBarOut{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-10px)}}
+.fx-bar-in{animation:fxBarIn .3s var(--ease-out) both!important}
+.fx-bar-out{animation:fxBarOut .18s ease-in both!important;pointer-events:none!important}
+/* toast */
+@keyframes fxToastIn{from{opacity:0;transform:translate(-50%,-10px) scale(.97)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes fxToastOut{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-8px)}}
+#toast.t-in{animation:fxToastIn .26s var(--ease-out) both}
+#toast.t-out{animation:fxToastOut .2s ease-in both}
+/* settings groups open and close smoothly (height is animated from script) */
+.sgrp>summary .sg-chev{transition:transform .28s var(--ease-out),margin .28s var(--ease-out)}
+.sgrp{transition:border-left-color .25s}
+.sgrp>summary{transition:background .18s}
+.sgrp.fx-anim>.sgb{overflow:hidden}
+/* switches: springy knob that stretches while pressed */
+.toggle input{transition:background .25s,border-color .25s,box-shadow .25s}
+.toggle input::after{transition:transform .32s var(--ease-spring),background .25s,width .18s var(--ease-out)!important}
+.toggle input:active::after{width:21px}
+.toggle input:checked:active::after{transform:translateX(17px)}
+.toggle input:checked{box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
+/* buttons give a little when pressed */
+:is(.sbtn,.pbtn,.cbtn,.cbtn2,.hbtn2,.tab,.mchip,.ctitle,.mu-b,.wx-r){transition:scale .14s var(--ease-out),background-color .18s,border-color .18s,color .18s,opacity .18s}
+:is(.sbtn,.pbtn,.cbtn,.cbtn2,.hbtn2,.tab,.mchip,.ctitle,.mu-b,.wx-r):active:not(:disabled){scale:.95}
+:is(input:not([type=checkbox]):not([type=range]):not([type=color]),textarea,select){transition:border-color .2s,box-shadow .2s,background-color .2s}
+/* messages: you send, she answers */
+@keyframes fxSend{0%{opacity:0;transform:translate(26px,18px) scale(.9)}60%{opacity:1;transform:translate(-2px,-2px) scale(1.01)}100%{opacity:1;transform:none}}
+@keyframes fxRecv{0%{opacity:0;transform:translate(-18px,10px) scale(.94);filter:blur(3px)}70%{filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
+.msg.user{animation:fxSend .42s var(--ease-out) both}
+.msg.assistant{animation:fxRecv .44s var(--ease-out) both}
+@keyframes fxLaunch{0%{scale:1}30%{scale:.9}65%{scale:1.06}100%{scale:1}}
+#send.fx-launch{animation:fxLaunch .4s var(--ease-out)}
+@keyframes fxBoxSent{0%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.45)}100%{box-shadow:0 0 0 10px rgba(var(--accent-rgb),0)}}
+.composer .box.fx-sent{animation:fxBoxSent .55s ease-out}
+/* record counters bump when they change */
+@keyframes fxBump{0%{transform:none}35%{transform:translateY(-3px) scale(1.18);color:var(--accent)}100%{transform:none}}
+.hchip b.fx-bump{display:inline-block;animation:fxBump .45s var(--ease-out)}
+/* lists slide in one after another */
+@keyframes fxRowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pane:not([hidden]) .fx-stagger>*{animation:fxRowIn .32s var(--ease-out) both}
+.pane:not([hidden]) .fx-stagger>*:nth-child(2){animation-delay:.03s}.pane:not([hidden]) .fx-stagger>*:nth-child(3){animation-delay:.06s}
+.pane:not([hidden]) .fx-stagger>*:nth-child(4){animation-delay:.09s}.pane:not([hidden]) .fx-stagger>*:nth-child(5){animation-delay:.12s}
+.pane:not([hidden]) .fx-stagger>*:nth-child(6){animation-delay:.15s}.pane:not([hidden]) .fx-stagger>*:nth-child(n+7){animation-delay:.18s}
+/* theme changes fade instead of jumping */
+:root.fx-theme *,:root.fx-theme *::before,:root.fx-theme *::after{transition:background-color .4s ease,color .4s ease,border-color .4s ease,fill .4s ease,stroke .4s ease!important}
+/* swapping sides glides */
+.app>.stage{view-transition-name:m01stage}.app>.console{view-transition-name:m01console}
+::view-transition-group(m01stage),::view-transition-group(m01console){animation-duration:.45s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+
+/* chat area background: five levels of see-through */
+.frame{background:rgba(var(--panel-rgb),var(--chat-a,.78))!important;transition:background-color .35s}
+:root[data-chat-a="2"] .frame,:root[data-chat-a="3"] .frame,:root[data-chat-a="4"] .frame,:root[data-chat-a="5"] .frame{backdrop-filter:blur(var(--chat-blur,6px));-webkit-backdrop-filter:blur(var(--chat-blur,6px))}
+.ca-seg{display:flex;gap:4px;margin-top:6px}
+.ca-seg button{all:unset;cursor:pointer;flex:1;text-align:center;padding:7px 0;font-size:12.5px;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);transition:background .2s,color .2s,border-color .2s,scale .14s}
+.ca-seg button:active{scale:.95}
+.ca-seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.ca-seg i{display:block;height:6px;margin:0 10px 5px;background:var(--ink);border-radius:1px}
+/* ---------- top bar: weather | clock | music, mirrored on both sides of the clock ---------- */
+.hud{padding-top:calc(16px + env(safe-area-inset-top));padding-bottom:16px}
+.hpill{position:absolute;top:calc(50% - 24px);height:48px;width:var(--pillw,300px);z-index:3;display:flex;align-items:center;gap:10px;padding:0 14px;
+  background:rgba(var(--panel-rgb),.78);border:1px solid var(--line);color:var(--ink);font-size:12px;line-height:1.3;overflow:hidden;
+  transition:opacity .35s,width .35s var(--ease-out),border-color .25s,background-color .25s;animation:fxPopIn .5s var(--ease-out) .35s both}
+.hpill[hidden]{display:none}
+.hpill:hover{border-color:var(--line2);background:rgba(var(--panel-rgb),.92)}
+#wxCard{right:calc(50% + var(--pillgap,52px));clip-path:polygon(12px 0,100% 0,100% 100%,0 100%);padding-left:20px;border-right:2px solid var(--accent);cursor:pointer}
+#muCard{left:calc(50% + var(--pillgap,52px));clip-path:polygon(0 0,calc(100% - 12px) 0,100% 100%,0 100%);padding-right:20px;border-left:2px solid var(--accent)}
+.hpill .p-sq{position:relative;width:36px;height:36px;flex:none;display:grid;place-items:center;overflow:hidden}
+.hpill .p-txt{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.hpill .p-l1{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hpill .p-l2{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;white-space:nowrap;min-width:0}
+.hpill .p-l2>span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* weather pill */
+#wxCard .p-sq svg{width:36px;height:36px}
+#wxCard .wx-temp{font-family:var(--font-display);font-size:22px;font-weight:400;line-height:1;margin-right:6px}
+#wxCard .p-l1{display:flex;align-items:baseline;gap:2px;font-weight:600}
+#wxCard .p-l1 .c{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#wxCard .wx-rain{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
+#wxCard .wx-rain b{font-family:var(--font-hud);font-size:11px;color:#7DB8FF;letter-spacing:.04em}
+#wxCard .wx-bars{display:flex;align-items:flex-end;gap:2px;height:16px}
+#wxCard .wx-bars i{width:4px;background:rgba(90,169,255,.85);min-height:2px;transform-origin:bottom;animation:wxBar .7s var(--ease-out) both}
+@keyframes wxBar{from{transform:scaleY(0)}to{transform:none}}
+#wxCard.msg .wx-rain{display:none}
+/* music pill */
+#muCard .p-sq{background:var(--panel3);border:1px solid var(--line2)}
+#muCard .p-sq svg{width:18px;height:18px;color:var(--dim)}
+#muCard .p-sq img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.1);transition:opacity .45s,transform .6s var(--ease-out)}
+#muCard .p-sq img.on{opacity:1;transform:none}
+#muCard .mu-bg{position:absolute;inset:-20px;background-size:cover;background-position:center;filter:blur(22px) saturate(1.4);opacity:.2;pointer-events:none;z-index:-1;transition:opacity .6s}
+#muCard .mu-viz{display:flex;align-items:flex-end;gap:2px;height:12px;flex:none}
+#muCard .mu-viz i{width:2px;height:100%;background:var(--accent);transform-origin:bottom;transform:scaleY(.1);border-radius:1px}
+#muCard .mu-ctl{display:flex;align-items:center;gap:2px;flex:none}
+.mu-b{all:unset;box-sizing:border-box;cursor:pointer;width:28px;height:28px;display:grid;place-items:center;color:var(--ink);border-radius:3px}
+.mu-b:hover{background:var(--panel3)}
+.mu-b svg{width:13px;height:13px}
+.mu-b.main{width:32px;height:32px;background:var(--accent);color:var(--accent-ink);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);border-radius:0}
+.mu-b.main:hover{background:var(--accent);filter:brightness(1.12)}
+#muCard .mu-prog{position:absolute;left:0;right:0;bottom:0;height:10px;display:flex;align-items:flex-end}
+#muCard .mu-prog input{-webkit-appearance:none;appearance:none;width:100%;height:10px;margin:0;background:transparent;cursor:pointer;--p:0%}
+#muCard .mu-prog input::-webkit-slider-runnable-track{height:2px;margin-top:8px;background:linear-gradient(to right,var(--accent) var(--p),rgba(255,255,255,.08) var(--p));transition:height .15s,margin .15s}
+#muCard .mu-prog input::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;margin-top:-4px;border-radius:50%;background:var(--ink);opacity:0;transition:opacity .15s}
+#muCard:hover .mu-prog input::-webkit-slider-runnable-track{height:4px;margin-top:6px}
+#muCard:hover .mu-prog input::-webkit-slider-thumb{opacity:1;margin-top:-3px}
+#muCard .mu-prog input::-moz-range-track{height:2px;background:rgba(255,255,255,.08)}
+#muCard .mu-prog input::-moz-range-progress{height:2px;background:var(--accent)}
+#muCard .mu-prog input::-moz-range-thumb{width:9px;height:9px;border:0;border-radius:50%;background:var(--ink)}
+#muCard.idle .mu-ctl,#muCard.idle .mu-prog,#muCard.idle .mu-viz{display:none}
+#muCard.idle{cursor:pointer}
+@keyframes muSwap{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#muCard .p-txt.swap{animation:muSwap .4s var(--ease-out)}
+/* weather icons */
+.wx-ico .sun{transform-origin:24px 24px;animation:wxSpin 18s linear infinite}
+@keyframes wxSpin{to{transform:rotate(360deg)}}
+.wx-ico .cloud{animation:wxDrift 5s ease-in-out infinite alternate}
+@keyframes wxDrift{from{transform:translateX(-1.5px)}to{transform:translateX(2px)}}
+.wx-ico .drop{animation:wxDrop 1.1s linear infinite;opacity:0}
+.wx-ico .drop:nth-of-type(2){animation-delay:.37s}.wx-ico .drop:nth-of-type(3){animation-delay:.74s}
+@keyframes wxDrop{0%{transform:translateY(-3px);opacity:0}20%{opacity:1}100%{transform:translateY(9px);opacity:0}}
+.wx-ico .bolt{animation:wxBolt 2.6s steps(1) infinite}
+@keyframes wxBolt{0%,86%,100%{opacity:0}88%,92%{opacity:1}}
+.wx-ico .flake{animation:wxDrop 2.2s linear infinite;opacity:0}
+.wx-ico .fogl{animation:wxDrift 3s ease-in-out infinite alternate}
+@keyframes zzzFloat{0%,100%{transform:translateY(0);opacity:.75}50%{transform:translateY(-4px);opacity:1}}
+#heroWrap .thought.zzz{opacity:1!important;animation:zzzFloat 2.6s ease-in-out infinite!important;letter-spacing:.18em;font-size:17px;color:var(--muted)}
+/* narrower windows: smaller pills, then only the essentials, then none */
+.hud.p-mid .hpill .p-l2{display:none}
+.hud.p-mid #wxCard .wx-rain .wx-bars{display:none}
+.hud.p-mid #muCard .mu-b:not(.main){display:none}
+.hud.p-none .hpill{display:none!important}
+@media (max-width:899px){.hpill{display:none!important}}
+/* the update log folds */
+details.cl-all{margin:6px 0}
+details.cl-all>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);padding:6px 0}
+details.cl-all>summary::-webkit-details-marker{display:none}
+details.cl-all>summary::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .25s var(--ease-out)}
+details.cl-all[open]>summary::before{transform:rotate(45deg)}
+details.cl-all>summary:hover{color:var(--ink)}
+details.cl>summary{cursor:pointer}
+.fx-dt{overflow:hidden}
+@media (prefers-reduced-motion:reduce){
+  .fx-pop-in,.fx-pop-out,.fx-drop-in,.fx-drop-out,.fx-fade-in,.fx-fade-out,.fx-fade-in>*,#toast.t-in,#toast.t-out,.msg.user,.msg.assistant,.hpill,#wxCard .wx-bars i,.hchip b.fx-bump,.pane .fx-stagger>*{animation-duration:.01s!important;animation-delay:0s!important}
+  .wx-ico *{animation:none!important}
+}
+</style>
+<script>/* ===== 0.10.27: smooth motion everywhere, music & weather on the character side, automatic clean-up ===== */
+(function(){
+  const reduce=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const E=()=>isEN();
+
+  /* ---------- 1. things that appear and disappear animate in and out ----------
+     The app shows and hides these by setting .hidden; we let them play an exit animation first.
+     While an element is on its way out, .hidden already reports true so the rest of the app behaves the same. */
+  const FX=[["#modelPop,#volPop,#helpPop,#sharePop","pop"],["#convList,#unSec,#banner","drop"],["#setupPop,#tour,#spLang","fade"],["#updBar","bar"]];
+  const kindOf=el=>{for(const [sel,k] of FX){try{if(el.matches(sel))return k}catch(e){}}return null};
+  const HD=Object.getOwnPropertyDescriptor(HTMLElement.prototype,"hidden");
+  if(HD&&HD.set&&!HTMLElement.prototype.__fxHidden){
+    Object.defineProperty(HTMLElement.prototype,"hidden",{configurable:true,enumerable:HD.enumerable,
+      get(){return this.__fxOut?true:HD.get.call(this)},
+      set(v){v=!!v;const k=(this.nodeType===1&&this.isConnected&&!reduce())?kindOf(this):null;
+        if(!k){if(this.__fxOut){clearTimeout(this.__fxT);this.__fxOut=false;this.classList.remove("fx-pop-out","fx-drop-out","fx-fade-out","fx-bar-out")}return HD.set.call(this,v)}
+        const shown=!HD.get.call(this);
+        if(!v){
+          if(this.__fxOut){clearTimeout(this.__fxT);this.__fxOut=false;this.classList.remove("fx-"+k+"-out");this.classList.add("fx-"+k+"-in");return}
+          if(shown)return;
+          HD.set.call(this,false);this.classList.remove("fx-"+k+"-in");void this.offsetWidth;this.classList.add("fx-"+k+"-in");
+          clearTimeout(this.__fxT);this.__fxT=setTimeout(()=>this.classList.remove("fx-"+k+"-in"),450);
+        }else{
+          if(!shown||this.__fxOut)return;
+          this.__fxOut=true;this.classList.remove("fx-"+k+"-in");this.classList.add("fx-"+k+"-out");clearTimeout(this.__fxT);
+          this.__fxT=setTimeout(()=>{this.__fxOut=false;this.classList.remove("fx-"+k+"-out");HD.set.call(this,true)},k==="fade"?180:160);
+        }}});
+    HTMLElement.prototype.__fxHidden=true;
+  }
+
+  /* toast slides in and out */
+  window.toast=function(msg,ms=3200){const el=$("toast");if(!el)return;el.textContent=msg;clearTimeout(toast._t);clearTimeout(toast._h);
+    const was=el.style.display==="block"&&!el.classList.contains("t-out");el.style.display="block";el.classList.remove("t-out");
+    if(!was){el.classList.remove("t-in");void el.offsetWidth;el.classList.add("t-in")}
+    toast._t=setTimeout(()=>{el.classList.remove("t-in");el.classList.add("t-out");toast._h=setTimeout(()=>{el.style.display="none";el.classList.remove("t-out")},200)},ms)};
+
+  /* ---------- 2. settings groups open and close smoothly ---------- */
+  const DD=Object.getOwnPropertyDescriptor(HTMLDetailsElement.prototype,"open");
+  function animBody(d,opening){
+    const b=d.querySelector(":scope>.sgb,:scope>.fx-dt");if(!b||reduce()){if(!opening)DD.set.call(d,false);return}
+    try{(d.__fxA||{}).cancel&&d.__fxA.cancel()}catch(e){}
+    d.classList.add("fx-anim");
+    if(opening){DD.set.call(d,true);const h=b.scrollHeight;
+      d.__fxA=b.animate([{height:"0px",opacity:0,transform:"translateY(-6px)"},{height:h+"px",opacity:1,transform:"none"}],{duration:Math.min(420,220+h/6),easing:"cubic-bezier(.22,1,.36,1)"});
+      d.__fxA.onfinish=()=>{d.classList.remove("fx-anim");d.__fxA=null}}
+    else{const h=b.offsetHeight;d.__closing=true;
+      d.__fxA=b.animate([{height:h+"px",opacity:1},{height:"0px",opacity:0}],{duration:Math.min(320,180+h/8),easing:"cubic-bezier(.4,0,.6,1)"});
+      d.__fxA.onfinish=()=>{d.__closing=false;d.classList.remove("fx-anim");d.__fxA=null;DD.set.call(d,false)};
+      d.__fxA.oncancel=()=>{d.__closing=false;d.classList.remove("fx-anim")}}
+  }
+  if(DD&&DD.set&&!HTMLDetailsElement.prototype.__fxOpen){
+    Object.defineProperty(HTMLDetailsElement.prototype,"open",{configurable:true,enumerable:DD.enumerable,
+      get(){return this.__closing?false:DD.get.call(this)},
+      set(v){v=!!v;if(!(this.classList.contains("sgrp")||this.classList.contains("cl")||this.classList.contains("cl-all"))||!this.isConnected)return DD.set.call(this,v);
+        const now=this.__closing?false:DD.get.call(this);if(now===v)return;animBody(this,v)}});
+    HTMLDetailsElement.prototype.__fxOpen=true;
+  }
+  document.addEventListener("click",e=>{const s=e.target.closest&&e.target.closest("details.sgrp>summary,details.cl>summary,details.cl-all>summary");if(!s||e.target.closest(".help"))return;
+    e.preventDefault();const d=s.parentElement;d.open=!d.open;try{playSfx("press",.35)}catch(x){}},true);
+  /* opening a group from elsewhere: scroll again once the other group has finished closing */
+  if(typeof window.openSec==="function"){const o=window.openSec;window.openSec=function(gid,focusSel){o(gid,focusSel);setTimeout(()=>{const g=$(gid);if(g)paneScrollTo(focusSel&&g.querySelector(focusSel)||g,true)},380)}}
+
+  /* ---------- 3. sending and receiving ---------- */
+  const sendBtn=$("send"),box=document.querySelector(".composer .box");
+  function launched(){if(reduce())return;sendBtn.classList.remove("fx-launch");box.classList.remove("fx-sent");void sendBtn.offsetWidth;sendBtn.classList.add("fx-launch");box.classList.add("fx-sent");
+    setTimeout(()=>{sendBtn.classList.remove("fx-launch");box.classList.remove("fx-sent")},600)}
+  sendBtn.addEventListener("click",()=>{if(!sendBtn.disabled)launched()},true);
+  $("input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing&&!sendBtn.disabled&&$("input").value.trim())launched()},true);
+
+  /* record counters bump when they change */
+  ["hMsgs","hFiles","hFacts"].forEach(id=>{const el=$(id);if(!el)return;let last=el.textContent;
+    new MutationObserver(()=>{if(el.textContent===last)return;const up=+el.textContent>+last;last=el.textContent;if(!up||reduce())return;el.classList.remove("fx-bump");void el.offsetWidth;el.classList.add("fx-bump")}).observe(el,{childList:true,characterData:true,subtree:true})});
+
+  /* lists in the panes slide in */
+  ["factList","fileList","followList","qOut"].forEach(id=>{const el=$(id);if(el)el.classList.add("fx-stagger")});
+
+  /* theme and colour changes fade */
+  function themeFade(){if(reduce())return;const r=document.documentElement;r.classList.add("fx-theme");clearTimeout(themeFade.t);themeFade.t=setTimeout(()=>r.classList.remove("fx-theme"),450)}
+  if(typeof window.applyTheme==="function"){const o=window.applyTheme;window.applyTheme=function(t){themeFade();return o(t)}}
+  if(typeof window.applyAccent==="function"){const o=window.applyAccent;window.applyAccent=function(){themeFade();return o.apply(this,arguments)}}
+
+  /* swapping sides glides across */
+  ["swapMini","swapBtn"].forEach(id=>{const b=$(id);if(!b||!b.onclick)return;const o=b.onclick;
+    b.onclick=function(e){const fake={stopPropagation(){},preventDefault(){},currentTarget:b,target:b};try{e&&e.stopPropagation&&e.stopPropagation()}catch(x){}
+      if(document.startViewTransition&&!reduce())document.startViewTransition(()=>o.call(b,fake));else o.call(b,fake);try{b.blur()}catch(x){}}});
+
+  /* ---------- 4. small helpers ---------- */
+  const desk=()=>!window.GH_MODE&&location.protocol==="http:"&&/^(127\.0\.0\.1|localhost)$/.test(location.hostname);
+  const W=()=>{S.settings.widgets=Object.assign({music:true,wx:true,city:"",precise:false,chat:true},S.settings.widgets||{});return S.settings.widgets};
+  const hud=document.querySelector("header.hud");
+  const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+  const ICON={
+    prev:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>',
+    next:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>',
+    play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg>',
+    pause:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
+    note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>'};
+  function sayLine(t){if(!t)return;try{if(window.__say&&document.querySelector("#heroWrap .thought"))window.__say(t);else toast(t,5000)}catch(e){}}
+
+  /* both pills get the same width, from whichever side has less room, so they stay mirrored around the clock */
+  function fit(){if(!hud)return;const hr=hud.getBoundingClientRect(),cx=hr.left+hr.width/2;
+    const clock=$("clock"),cr=clock&&clock.offsetParent?clock.getBoundingClientRect():null;const gap=cr&&cr.width?Math.round(cr.width/2+18):52;
+    let L=hr.left+16;for(const el of hud.querySelectorAll(".emblem,.title")){const r=el.getBoundingClientRect();if(r.width)L=Math.max(L,r.right+18)}
+    let R=hr.right-16;for(const el of hud.querySelectorAll(".hbtn2,.batt")){const r=el.getBoundingClientRect();if(r.width)R=Math.min(R,r.left-18)}
+    const room=Math.floor(Math.min(cx-gap-L,R-cx-gap));const w=Math.max(0,Math.min(310,room));
+    hud.style.setProperty("--pillw",w+"px");hud.style.setProperty("--pillgap",gap+"px");
+    hud.classList.toggle("p-none",w<120);hud.classList.toggle("p-mid",w>=120&&w<230)}
+  try{new ResizeObserver(fit).observe(hud)}catch(e){}addEventListener("resize",fit);
+
+  /* ---------- 5. music: what Spotify is playing (desktop app) ---------- */
+  const mu=document.createElement("div");mu.className="hpill idle";mu.id="muCard";mu.dataset.i18n="none";mu.hidden=true;hud.appendChild(mu);
+  mu.innerHTML=`<div class="mu-bg"></div><div class="p-sq">${ICON.note}<img alt=""></div>
+    <div class="p-txt"><div class="p-l1 mu-t"></div><div class="p-l2"><span class="mu-a"></span><span class="mu-viz">${"<i></i>".repeat(9)}</span></div></div>
+    <div class="mu-ctl"><button class="mu-b" id="muPrev" aria-label="上一首">${ICON.prev}</button><button class="mu-b main" id="muPlay" aria-label="播放或暫停">${ICON.play}</button><button class="mu-b" id="muNext" aria-label="下一首">${ICON.next}</button></div>
+    <div class="mu-prog"><input type="range" id="muSeek" min="0" max="100" step="0.5" value="0" aria-label="播放進度"></div>`;
+  const q=s=>mu.querySelector(s),bars=[...mu.querySelectorAll(".mu-viz i")];
+  let M={running:false,state:"",title:"",artist:"",art:"",dur:0,pos:0,id:"",app:""},mAt=0,mTimer=null,seeking=false,needHelper=false,artUrl="",artSig="",lastSaid=0,lastId="",tipT=0;
+  const oembed={};
+  const H={"X-M01":"1"};
+  async function muCall(cmd,v){try{const r=await fetch("/music?cmd="+cmd+(v!=null?"&v="+encodeURIComponent(v):""),{headers:H});if(!r.ok)return null;return await r.json()}catch(e){return null}}
+  function setRange(el,val,max){el.max=max;el.value=val;el.style.setProperty("--p",(max>0?Math.min(100,val/max*100):0)+"%")}
+  /* cover picture: Spotify's own link (Mac), the picture Windows hands over, or Spotify's public page for the song */
+  async function coverFor(j){
+    if(j.art&&/^https?:\/\//.test(j.art))return j.art.replace(/^http:/,"https:");
+    if(j.hasArt&&j.artKey){const sig=j.artKey+"#"+(j.artVer||0);if(sig===artSig&&artUrl)return artUrl;
+      try{const r=await fetch("/musicart?v="+encodeURIComponent(sig),{headers:H});if(r.ok){const b=await r.blob();if(b.size>200){if(artUrl.startsWith("blob:"))URL.revokeObjectURL(artUrl);artSig=sig;return URL.createObjectURL(b)}}}catch(e){}}
+    const m=/^spotify:track:([A-Za-z0-9]+)$/.exec(j.id||"");
+    if(m&&oembed[m[1]])return oembed[m[1]];if(m&&oembed[m[1]]===undefined){oembed[m[1]]="";
+      try{const o=await getJSON("https://open.spotify.com/oembed?url="+encodeURIComponent("https://open.spotify.com/track/"+m[1]));if(o&&o.thumbnail_url){oembed[m[1]]=o.thumbnail_url;return o.thumbnail_url}}catch(e){}}
+    return await itunesArt(j)}
+  /* last resort, for Windows too: look the song up by name and artist in Apple's public music catalogue.
+     It is loaded as a script (JSONP), so it needs nothing new from the computer-side helper. */
+  const itCache={};
+  function jsonp(url,ms){return new Promise(ok=>{const cb="__m01it"+Math.random().toString(36).slice(2);const sc=document.createElement("script");let done=false;
+    const fin=v=>{if(done)return;done=true;try{delete window[cb]}catch(e){window[cb]=undefined}sc.remove();ok(v)};
+    window[cb]=d=>fin(d);sc.onerror=()=>fin(null);setTimeout(()=>fin(null),ms||6000);sc.src=url+(url.includes("?")?"&":"?")+"callback="+cb;document.head.appendChild(sc)})}
+  const norm=x=>String(x||"").toLowerCase().replace(/[\s\-–—_.,'’"!?()（）\[\]【】「」]/g,"").replace(/feat.*$/,"");
+  async function itunesArt(j){const title=String(j.title||"").trim();if(!title)return"";const artist=String(j.artist||"").split(/[,、&]/)[0].trim();
+    const key=artist+"|"+title;if(itCache[key]!==undefined)return itCache[key];itCache[key]="";
+    for(const country of ["TW","US","JP"]){
+      const d=await jsonp(`https://itunes.apple.com/search?media=music&entity=song&limit=8&country=${country}&term=${encodeURIComponent((artist+" "+title).trim())}`);
+      const xs=(d&&d.results)||[];if(!xs.length)continue;
+      const nt=norm(title),na=norm(artist);
+      const hit=xs.find(x=>norm(x.trackName)===nt&&(!na||norm(x.artistName).includes(na)||na.includes(norm(x.artistName))))||xs.find(x=>norm(x.trackName).startsWith(nt)||nt.startsWith(norm(x.trackName)))||(na?xs.find(x=>norm(x.artistName).includes(na)):null);
+      if(hit&&/^https:\/\//.test(hit.artworkUrl100||"")){itCache[key]=hit.artworkUrl100.replace(/\/\d+x\d+bb\./,"/300x300bb.");return itCache[key]}}
+    return""}
+  async function setArt(j){const id=j.id||j.title||"";const url=await coverFor(j);const img=q(".p-sq img");
+    if((M.id||M.title||"")!==id&&id)return;   // the song changed while we were looking
+    if(url===artUrl&&(img.classList.contains("on")||!url))return;artUrl=url;
+    if(!url){img.classList.remove("on");img.removeAttribute("src");q(".mu-bg").style.backgroundImage="none";return}
+    const show=u=>{img.classList.remove("on");img.onload=()=>{img.classList.add("on");q(".mu-bg").style.backgroundImage=`url("${u.replace(/"/g,"%22")}")`};img.src=u};
+    img.onerror=async()=>{img.classList.remove("on");const bad=img.getAttribute("src");const alt=await itunesArt(j);if(alt&&alt!==bad&&(M.id||M.title||"")===id){artUrl=alt;show(alt)}else artUrl=""};
+    show(url)}
+  function paintMusic(){
+    const en=E(),w=W();const show=desk()&&w.music;mu.hidden=!show;if(!show)return;
+    const t=q(".mu-t"),a=q(".mu-a");mu.title="";
+    if(needHelper){mu.classList.add("idle");t.textContent=en?"Music needs a reinstall":"音樂功能要重新安裝";a.textContent=en?"Click to open the download page":"點一下打開下載頁面";setArt({});return}
+    if(!M.running||!M.title){mu.classList.add("idle");
+      if(M.reason==="denied"||M.reason==="timeout"){t.textContent=en?"Allow control of Spotify":"請允許控制 Spotify";a.textContent=en?"Click for how":"點一下看怎麼做"}
+      else{t.textContent=en?"Nothing playing":"目前沒有在播放";a.textContent=en?"Play something in Spotify":"在 Spotify 播首歌吧"}
+      setArt({});return}
+    mu.classList.remove("idle");
+    const txt=q(".p-txt");if(M.id!==lastId){lastId=M.id;if(!reduce()){txt.classList.remove("swap");void txt.offsetWidth;txt.classList.add("swap")}}
+    t.textContent=M.title;a.textContent=M.artist||M.album||"";mu.title=[M.title,M.artist,M.album].filter(Boolean).join(" — ");
+    $("muPlay").innerHTML=M.state==="playing"?ICON.pause:ICON.play;$("muPlay").setAttribute("aria-label",M.state==="playing"?(en?"Pause":"暫停"):(en?"Play":"播放"));
+    $("muPrev").setAttribute("aria-label",en?"Previous":"上一首");$("muNext").setAttribute("aria-label",en?"Next":"下一首");
+    $("muSeek").disabled=!(M.dur>0);setArt(M)}
+  mu.addEventListener("click",e=>{if(!mu.classList.contains("idle"))return;const en=E();
+    if(needHelper){fetch("/open?url="+encodeURIComponent("https://elvis071114-coder.github.io/m01/"),{headers:H}).catch(()=>{});return}
+    if(M.reason==="denied"||M.reason==="timeout")toast(en?"System Settings → Privacy & Security → Automation → turn on Spotify under M-01 Companion, then reopen the app.":"系統設定 → 隱私權與安全性 → 自動化 → 把 M-01 Companion 底下的 Spotify 打開，再重新開 App。",7000);
+    else poll()});
+  function posNow(){return M.state==="playing"?Math.min(M.dur||1e9,M.pos+(performance.now()-mAt)/1000):M.pos}
+  async function poll(cmd,v){
+    clearTimeout(mTimer);if(!desk()||!W().music){paintMusic();return}
+    if(document.hidden){mTimer=setTimeout(poll,4000);return}
+    const j=await muCall(cmd||"get",v);
+    if(j===null){const pg=await serverFS.ping().catch(()=>null);needHelper=!!(pg&&(pg.hv||1)<4);M.running=false;paintMusic();mTimer=setTimeout(poll,needHelper?60000:15000);return}
+    needHelper=false;
+    if(j.ok===false&&j.running){M=Object.assign(M,{running:false,reason:j.reason||"denied"});paintMusic();mTimer=setTimeout(poll,15000);return}
+    const prev=M.id;M=Object.assign({reason:""},j);mAt=performance.now();
+    if(M.running&&M.title&&M.id&&prev&&M.id!==prev)maybeComment();
+    paintMusic();
+    mTimer=setTimeout(poll,!M.running?8000:M.state==="playing"?2000:3500)}
+  function maybeComment(){if(Date.now()-lastSaid<10*60e3||Math.random()>.35)return;try{if(S.busy||S.streaming)return}catch(e){}lastSaid=Date.now();
+    const t=M.title.length>24?M.title.slice(0,24)+"…":M.title;
+    const zh=[`在聽〈${t}〉啊……還不錯嘛。`,`〈${t}〉？你的品味……也還可以啦。`,`這首〈${t}〉我好像也有點喜歡。`],en=[`Listening to “${t}”? …Not bad.`,`“${t}”, huh. Your taste is… acceptable.`,`I kind of like “${t}” too.`];
+    const a=E()?en:zh;sayLine(a[Math.floor(Math.random()*a.length)])}
+  /* bars rise and fall with a beat while music plays (Spotify does not share the sound itself, so the motion is drawn, not measured) */
+  let vizT0=performance.now(),levels=bars.map(()=>.1);
+  function hash(s){let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
+  function frame(now){
+    requestAnimationFrame(frame);
+    if(mu.hidden||mu.classList.contains("idle")||document.hidden)return;
+    if(!seeking&&M.dur>0){const p=posNow();setRange($("muSeek"),p,M.dur);if(now-tipT>900){tipT=now;$("muSeek").title=fmt(p)+" / "+fmt(M.dur)}}
+    const playing=M.state==="playing"&&!reduce();const h=hash(M.id||M.title);const bpm=84+(h%56),beat=60/bpm,t=(now-vizT0)/1000;
+    const kick=Math.exp(-((t%beat)/beat)*5.5),half=Math.exp(-((t%(beat/2))/(beat/2))*7);
+    bars.forEach((b,i)=>{const x=i/(bars.length-1);let target=.1;
+      if(playing){const f1=1.3+((h>>(i%16))&7)*.35,f2=2.1+i*.17;const wave=.5+.25*Math.sin(t*f1+i*1.7)+.25*Math.sin(t*f2+(h%97)*.1+i);
+        const shape=x<.3?(.75+kick*.6):x<.7?(.55+half*.35):(.35+half*.3);target=Math.max(.1,Math.min(1,wave*shape*(.85+.3*Math.sin(i*2.3+h))))}
+      levels[i]+=(target-levels[i])*(target>levels[i]?.45:.16);b.style.transform=`scaleY(${levels[i].toFixed(3)})`})}
+  requestAnimationFrame(frame);
+  $("muPlay").onclick=e=>{e.stopPropagation();M.state=M.state==="playing"?"paused":"playing";M.pos=posNow();mAt=performance.now();paintMusic();poll(M.state==="playing"?"play":"pause")};
+  $("muNext").onclick=e=>{e.stopPropagation();poll("next")};$("muPrev").onclick=e=>{e.stopPropagation();poll("prev")};
+  const seek=$("muSeek");seek.addEventListener("pointerdown",()=>seeking=true);
+  seek.addEventListener("input",()=>{seeking=true;setRange(seek,+seek.value,M.dur);seek.title=fmt(+seek.value)+" / "+fmt(M.dur)});
+  seek.addEventListener("change",()=>{const v=+seek.value;M.pos=v;mAt=performance.now();seeking=false;poll("seek",v.toFixed(1))});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)poll()});
+  window.__musicLine=()=>{if(!M.running||!M.title||M.state!=="playing")return"";return E()?`\nThey are listening to: “${M.title}” by ${M.artist||"?"} (Spotify).`:`\n對方正在聽的音樂：〈${M.title}〉— ${M.artist||"未知"}（Spotify）。`};
+
+  /* ---------- 6. weather where you are ---------- */
+  const wx=document.createElement("div");wx.className="hpill";wx.id="wxCard";wx.dataset.i18n="none";wx.hidden=true;hud.insertBefore(wx,mu);
+  const WMO_EN={0:"Clear",1:"Mostly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",56:"Freezing drizzle",57:"Freezing drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Showers",81:"Showers",82:"Violent showers",85:"Snow showers",86:"Snow showers",95:"Thunderstorm",96:"Thunderstorm, hail",99:"Thunderstorm, hail"};
+  const WMO_ZH={0:"晴朗",1:"大致晴朗",2:"多雲時晴",3:"陰天",45:"有霧",48:"有霧",51:"毛毛雨",53:"毛毛雨",55:"較大的毛毛雨",56:"凍毛毛雨",57:"凍毛毛雨",61:"小雨",63:"中雨",65:"大雨",66:"凍雨",67:"凍雨",71:"小雪",73:"中雪",75:"大雪",77:"雪粒",80:"短暫陣雨",81:"陣雨",82:"強陣雨",85:"陣雪",86:"陣雪",95:"雷雨",96:"雷雨夾冰雹",99:"雷雨夾冰雹"};
+  const kind=c=>c<=1?"sun":c===2?"part":c===3?"cloud":c<=48?"fog":c>=95?"storm":(c>=71&&c<=77)||c===85||c===86?"snow":"rain";
+  function icon(k,day){
+    const sun=day?'<g class="sun"><circle cx="24" cy="24" r="8" fill="#FFC23D"/>'+[0,45,90,135,180,225,270,315].map(a=>`<line x1="24" y1="9" x2="24" y2="5" stroke="#FFC23D" stroke-width="2.4" stroke-linecap="round" transform="rotate(${a} 24 24)"/>`).join("")+'</g>':'<path d="M28 12a11 11 0 1 0 9 17 9 9 0 0 1-9-17z" fill="#C9D3FF"/>';
+    const cloud=(x,y,c)=>`<g class="cloud"><path d="M${x+6} ${y+16}h22a7 7 0 0 0 0-14 10 10 0 0 0-19-2 6.5 6.5 0 0 0-3 16z" fill="${c}"/></g>`;
+    if(k==="sun")return`<svg class="wx-ico" viewBox="0 0 48 48">${sun}</svg>`;
+    if(k==="part")return`<svg class="wx-ico" viewBox="0 0 48 48"><g transform="translate(-6 -6)">${sun}</g>${cloud(8,20,"#D9DEE7")}</svg>`;
+    if(k==="cloud")return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(2,8,"#8E97A6")}${cloud(9,18,"#D9DEE7")}</svg>`;
+    if(k==="fog")return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(5,6,"#B8BFCB")}<g class="fogl" stroke="#B8BFCB" stroke-width="2.4" stroke-linecap="round"><line x1="8" y1="31" x2="40" y2="31"/><line x1="12" y1="37" x2="36" y2="37"/></g></svg>`;
+    if(k==="snow")return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(5,4,"#D9DEE7")}${[14,24,34].map(x=>`<circle class="flake" cx="${x}" cy="30" r="2.2" fill="#fff"/>`).join("")}</svg>`;
+    const drops=[15,24,33].map(x=>`<line class="drop" x1="${x}" y1="28" x2="${x-2}" y2="34" stroke="#5AA9FF" stroke-width="2.4" stroke-linecap="round"/>`).join("");
+    if(k==="storm")return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(5,3,"#7E8796")}<path class="bolt" d="M25 24l-6 10h5l-3 9 9-12h-5l3-7z" fill="#FFD23D"/>${drops}</svg>`;
+    return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(5,3,"#AEB6C3")}${drops}</svg>`}
+  let WX=null,wxBusy=false,wxTimer=null;
+  try{WX=JSON.parse(localStorage.getItem("m01.wx")||"null")}catch(e){}
+  async function locate(){
+    const w=W();
+    if(w.city){const name=w.city.trim().replace(/臺/g,"台");const k=Object.keys(TW_CITIES).find(c=>name.includes(c));if(k)return{lat:TW_CITIES[k][0],lon:TW_CITIES[k][1],name:k,how:"city"};
+      const g=await getJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=${E()?"en":"zh"}&format=json`).catch(()=>null);
+      if(g&&g.results&&g.results[0]){const x=g.results[0];return{lat:x.latitude,lon:x.longitude,name:x.name,how:"city"}}return{error:"city"}}
+    if(w.precise&&navigator.geolocation){const p=await new Promise(ok=>{try{navigator.geolocation.getCurrentPosition(x=>ok(x),()=>ok(null),{timeout:9000,maximumAge:30*60e3})}catch(e){ok(null)}});
+      if(p){const lat=+p.coords.latitude.toFixed(3),lon=+p.coords.longitude.toFixed(3);let name="";
+        const r=await getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${E()?"en":"zh"}`).catch(()=>null);
+        if(r)name=r.city||r.locality||r.principalSubdivision||"";return{lat,lon,name:window.__toTrad&&!E()?window.__toTrad(name):name,how:"gps"}}}
+    const ip=await getJSON("https://get.geojs.io/v1/ip/geo.json").catch(()=>null);
+    if(ip&&ip.latitude){return{lat:+(+ip.latitude).toFixed(3),lon:+(+ip.longitude).toFixed(3),name:ip.city||ip.region||ip.country||"",how:"ip"}}
+    return{error:"loc"}}
+  async function loadWx(force){
+    clearTimeout(wxTimer);if(!W().wx){paintWx();return}
+    if(!force&&WX&&WX.t&&Date.now()-WX.t<20*60e3&&WX.v===2){paintWx();wxTimer=setTimeout(loadWx,20*60e3-(Date.now()-WX.t)+500);return}
+    if(wxBusy)return;wxBusy=true;
+    try{const L=await locate();
+      if(L.error){WX=Object.assign(WX||{},{err:L.error});}
+      else{const f=await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`).catch(()=>null);
+        if(f&&f.current&&f.daily){const hrs=[];const ht=f.hourly&&f.hourly.time||[];
+          const i0=Math.max(0,ht.findIndex(t=>new Date(t)>=new Date(f.current.time.slice(0,13)+":00")));
+          for(let i=i0;i<i0+8&&i<ht.length;i++)hrs.push({h:+ht[i].slice(11,13),p:f.hourly.precipitation_probability[i]||0});
+          WX={v:2,t:Date.now(),loc:L,c:f.current,d:{code:f.daily.weather_code[0],max:f.daily.temperature_2m_max[0],min:f.daily.temperature_2m_min[0],rain:f.daily.precipitation_probability_max[0]},hrs};
+          try{localStorage.setItem("m01.wx",JSON.stringify(WX))}catch(e){}
+          maybeMorningLine()}
+        else WX=Object.assign(WX||{},{err:"net"})}}
+    catch(e){WX=Object.assign(WX||{},{err:"net"})}
+    finally{wxBusy=false;paintWx();wxTimer=setTimeout(loadWx,20*60e3)}}
+  function wxTip(en){if(!WX||!WX.c)return"";const c=WX.c,d=WX.d,k=kind(c.weather_code),soon=Math.max(0,...(WX.hrs||[]).slice(0,4).map(x=>x.p));
+    if(k==="storm")return en?"Thunderstorms — better stay inside if you can.":"有雷雨，能待在室內就待在室內吧。";
+    if(c.precipitation>0||k==="rain")return en?"It’s raining — take an umbrella!":"外面在下雨，出門記得帶傘！";
+    if(soon>=60||d.rain>=60)return en?`Rain likely later (${Math.max(soon,d.rain)}%) — bring an umbrella.`:`等一下很可能下雨（${Math.max(soon,d.rain)}%），帶把傘比較保險。`;
+    if(d.max>=33)return en?"Very hot today — drink plenty of water.":"今天很熱，記得多喝水。";
+    if(d.min<=14)return en?"Chilly — wear a jacket.":"有點冷，多穿件外套。";
+    if(c.wind_speed_10m>=35)return en?"Quite windy out there.":"外面風很大，小心一點。";
+    return""}
+  function paintWx(){
+    const en=E(),w=W();wx.hidden=!w.wx;if(!w.wx)return;
+    if(!WX||!WX.c){wx.classList.add("msg");wx.title="";
+      wx.innerHTML=`<div class="p-sq">${icon("cloud",true)}</div><div class="p-txt"><div class="p-l1">${WX&&WX.err?(en?"No weather right now":"現在拿不到天氣"):(en?"Getting the weather…":"正在取得天氣…")}</div><div class="p-l2"><span>${WX&&WX.err==="city"?(en?"Check the place in Settings → Widgets":"到「設定 → 小工具」檢查地點"):(en?"Click to try again":"點一下再試一次")}</span></div></div>`;fit();return}
+    wx.classList.remove("msg");
+    const c=WX.c,d=WX.d,k=kind(c.weather_code),cond=(en?WMO_EN:WMO_ZH)[c.weather_code]||"";const tip=wxTip(en);
+    const name=WX.loc&&WX.loc.name||"";const at=new Date(WX.t);const hh=String(at.getHours()).padStart(2,"0")+":"+String(at.getMinutes()).padStart(2,"0");
+    wx.title=[`${name} ${cond} ${Math.round(c.temperature_2m)}°C`,`${en?"Feels":"體感"} ${Math.round(c.apparent_temperature)}° · ${en?"Hi/Lo":"高/低"} ${Math.round(d.max)}°/${Math.round(d.min)}° · ${en?"Humidity":"濕度"} ${c.relative_humidity_2m}% · ${en?"Wind":"風"} ${Math.round(c.wind_speed_10m)} km/h`,tip,`${en?"Updated":"更新於"} ${hh}${WX.loc&&WX.loc.how==="ip"?(en?" (approx. location)":"（大約位置）"):""}`].filter(Boolean).join("\n");
+    wx.innerHTML=`<div class="p-sq">${icon(k,c.is_day!==0)}</div>
+      <div class="p-txt"><div class="p-l1"><span class="wx-temp">${Math.round(c.temperature_2m)}°</span><span class="c">${esc(cond)}</span></div>
+        <div class="p-l2"><span>${esc(name)}${name?" · ":""}${Math.round(d.max)}° / ${Math.round(d.min)}°</span></div></div>
+      <div class="wx-rain"><b>☂ ${d.rain??"?"}%</b><div class="wx-bars">${(WX.hrs||[]).map((x,i)=>`<i style="height:${Math.max(8,x.p)}%;animation-delay:${i*.04}s"></i>`).join("")}</div></div>`;
+    fit()}
+  wx.addEventListener("click",()=>{if(!WX||!WX.c){loadWx(true);return}sayLine(wxLine(true))});
+  function wxLine(full){if(!WX||!WX.c)return"";const en=E(),c=WX.c,d=WX.d,cond=(en?WMO_EN:WMO_ZH)[c.weather_code]||"",tip=wxTip(en),n=WX.loc&&WX.loc.name||"";
+    if(en)return`${n?n+": ":""}${cond}, ${Math.round(c.temperature_2m)}°C, ${d.rain}% chance of rain today.${tip?" "+tip:""}${full?" …Not that I was worried about you.":""}`;
+    return`${n?n+"現在":"現在"}${cond}，${Math.round(c.temperature_2m)} 度，今天降雨機率 ${d.rain}%。${tip}${full?"……才、才不是在擔心你喔。":""}`}
+  function maybeMorningLine(){const k="m01.wxSaid",day=new Date().toDateString();let last="";try{last=localStorage.getItem(k)||""}catch(e){}
+    if(last===day||!WX||!WX.c)return;const tip=wxTip(E());if(!tip)return;try{localStorage.setItem(k,day)}catch(e){}
+    setTimeout(()=>{try{if(S.busy||S.streaming)return}catch(e){}sayLine(wxLine(false))},2500)}
+  window.__wxLine=()=>{if(!W().wx||!WX||!WX.c||Date.now()-WX.t>3*3600e3)return"";const en=E(),c=WX.c,d=WX.d,n=WX.loc&&WX.loc.name||"";
+    return en?`\nWeather where they are${n?" ("+n+")":""}: ${WMO_EN[c.weather_code]||""}, ${Math.round(c.temperature_2m)}°C (feels ${Math.round(c.apparent_temperature)}°C), today ${Math.round(d.min)}–${Math.round(d.max)}°C, ${d.rain}% chance of rain.`
+      :`\n對方所在地天氣${n?"（"+n+"）":""}：${WMO_ZH[c.weather_code]||""}，${Math.round(c.temperature_2m)}°C（體感 ${Math.round(c.apparent_temperature)}°C），今天 ${Math.round(d.min)}～${Math.round(d.max)}°C，降雨機率 ${d.rain}%。`};
+
+  /* ---------- she sleeps with "Zzz…" in her speech bubble ---------- */
+  setInterval(()=>{const th=document.querySelector("#heroWrap .thought");if(!th)return;let asleep=false;try{asleep=moodBase==="sleep"}catch(e){}
+    if(asleep&&!th.classList.contains("say")){if(!th.classList.contains("zzz")){th.classList.add("zzz");th.textContent="Zzz…"}}
+    else if(th.classList.contains("zzz")){th.classList.remove("zzz");if(!th.classList.contains("say"))th.textContent="···"}},800);
+
+  /* ---------- while awake she speaks up now and then: the weather, the song you're playing, what you talked about ---------- */
+  let chatPool=[],chatAt=0,chatSig="",chatBusy=false,nextChat=Date.now()+rnd(150,300)*1000,typedAt=0;
+  function rnd(a,b){return a+Math.random()*(b-a)}
+  document.addEventListener("input",e=>{if(e.target&&e.target.id==="input")typedAt=Date.now()},true);
+  function ctxSig(){return [M.running&&M.state==="playing"?M.id||M.title:"",WX&&WX.c?WX.c.weather_code+"/"+Math.round(WX.c.temperature_2m):"",(()=>{try{return S.logs.reduce((n,l)=>n+l.items.length,0)}catch(e){return 0}})()].join("|")}
+  function fallbackChat(){const en=E(),out=[];
+    if(WX&&WX.c){const c=WX.c,d=WX.d,t=Math.round(c.temperature_2m),k=kind(c.weather_code);
+      if(t<=17||d.min<=14)out.push(en?`It’s only ${t}° out… are you keeping warm?`:`現在才 ${t} 度……你有穿暖一點嗎？別感冒了。`);
+      if(k==="rain"||k==="storm"||c.precipitation>0)out.push(en?"It’s raining out there. You’re not going out without an umbrella, are you?":"外面在下雨耶，你該不會想不帶傘就出門吧？");
+      if(d.max>=31)out.push(en?"It’s so hot today. Drink some water, okay?":"今天好熱……記得喝水喔。")}
+    if(M.running&&M.title&&M.state==="playing"){const t=M.title.length>22?M.title.slice(0,22)+"…":M.title;
+      out.push(en?`“${t}”… do you listen to this a lot?`:`〈${t}〉……你最近常聽這首嗎？`,en?`Is “${t}” your kind of song? …It’s not bad.`:`你喜歡〈${t}〉這種歌喔？……還、還不錯啦。`)}
+    try{const u=S.logs.flatMap(l=>l.items).filter(m=>m.role==="user").slice(-1)[0];if(u&&!S.incog){const s=String(u.text||"").replace(/\s+/g," ").trim();if(s.length>=4){const q=s.length>16?s.slice(0,16)+"…":s;out.push(en?`About “${q}” earlier… how did that go?`:`剛剛說的「${q}」，後來怎麼樣了？`)}}}catch(e){}
+    out.push(...(en?["What are you up to right now?","Busy? …Not that I care.","You’ve gone quiet. Everything okay?"]:["你現在在做什麼？","在忙嗎？……我只是隨便問問。","突然好安靜……你還好嗎？"]));
+    return out}
+  async function refillChat(){if(chatBusy)return;chatBusy=true;const sig=ctxSig();
+    try{if(!S.sample||S.incog)throw 0;const E2=E(),name=S.settings.botName||"Claude";
+      const items=S.logs.flatMap(l=>l.items).slice(-8).map(m=>(m.role==="user"?(E2?"Them":"對方"):(E2?"You":"你"))+"："+String(m.text||"").replace(/\s+/g," ").slice(0,160)).join("\n");
+      const ctx=[(window.__wxLine&&window.__wxLine())||"",(window.__musicLine&&window.__musicLine())||""].join("").trim();
+      const now=new Date();const prompt=E2
+        ?`You are ${name}. Your personality: ${String(S.settings.persona||"").slice(0,500)}\n\nTime now: ${now.toLocaleString("en")}\n${ctx||"(no weather or music info)"}\n\nRecent chat:\n${items||"(nothing yet)"}\n\nThey haven't said anything for a while. Write 5 different short things you'd say to start talking to them again, in character, each under 30 words: ask what they're doing, care about them because of the weather (cold, rain, heat) if it fits, follow up on something you talked about, or say what you think of the song they're playing if there is one. Reply with a JSON array of strings only.`
+        :`你是${name}。你的個性：${String(S.settings.persona||"").slice(0,500)}\n\n現在時間：${now.toLocaleString("zh-TW")}\n${ctx||"（沒有天氣或音樂資料）"}\n\n最近的對話：\n${items||"（還沒聊什麼）"}\n\n對方有一陣子沒說話了。用你的個性寫 5 句不一樣、主動找對方說話的短句，每句 30 字以內：可以問對方在做什麼、依天氣關心對方（冷、下雨、熱，有資料才用）、接續剛剛聊的事、或說說你對對方正在聽的歌的看法（有在聽歌才用）。只回傳 JSON 字串陣列，用繁體中文。`;
+      const r=await Promise.race([S.sample.json(prompt,{modelTier:"quick"}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),30000))]);
+      const arr=(Array.isArray(r)?r:[]).map(v=>(window.__toTrad&&!E2?window.__toTrad(String(v)):String(v)).trim()).filter(v=>v&&v.length<=80&&!/^\[|^\{/.test(v));
+      if(arr.length>=2){chatPool=arr.sort(()=>Math.random()-.5);chatAt=Date.now();chatSig=sig}else throw 0}
+    catch(e){chatPool=fallbackChat().sort(()=>Math.random()-.5);chatAt=Date.now();chatSig=sig}
+    finally{chatBusy=false}}
+  function canChat(){if(!W().chat||document.hidden||!document.body.classList.contains("booted"))return false;
+    try{if(moodBase!=="idle"||S.busy||S.streaming)return false}catch(e){return false}
+    const th=document.querySelector("#heroWrap .thought");if(!th||th.classList.contains("say"))return false;
+    if(Date.now()-typedAt<45e3||(($("input")||{}).value||"").trim())return false;
+    let last=0;try{last=lastActive}catch(e){}return Date.now()-last>60e3}
+  async function speakUp(force){
+    if(!force&&!canChat())return false;
+    if(!chatPool.length||Date.now()-chatAt>20*60e3||ctxSig()!==chatSig)await refillChat();
+    if(!force&&!canChat())return false;const line=chatPool.shift();if(!line)return false;
+    try{window.__say(line)}catch(e){return false}try{setExpr(["shy","happy","smug","worried"][Math.floor(Math.random()*4)],3000)}catch(e){}try{playSfx("hover",.25)}catch(e){}
+    return line}
+  setInterval(async()=>{if(Date.now()<nextChat)return;nextChat=Date.now()+rnd(180,420)*1000;await speakUp(false)},15000);
+  window.__speakUp=speakUp;
+
+  /* ---------- settings groups close by themselves after a while untouched ---------- */
+  const IDLE_MS=90e3;let setTouched=Date.now();
+  ["pointerdown","keydown","wheel","focusin","input"].forEach(ev=>document.addEventListener(ev,e=>{if(e.target&&e.target.closest&&e.target.closest("#pSet"))setTouched=Date.now()},true));
+  setInterval(()=>{if(Date.now()-setTouched<IDLE_MS)return;const a=document.activeElement;
+    document.querySelectorAll("#pSet details.sgrp").forEach(d=>{if(!d.open)return;if(a&&d.contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;d.open=false})},10e3);
+  window.__setIdle=ms=>{setTouched=Date.now()-IDLE_MS+(ms||0)};
+
+  /* ---------- 7. settings: a "Widgets" group ---------- */
+  const look=$("g_look");
+  const g=document.createElement("details");g.className="sgrp";g.id="g_widget";g.dataset.i18n="none";
+  if(look&&look.parentNode)look.parentNode.insertBefore(g,look.nextSibling);
+  g.addEventListener("toggle",()=>{if(DD.get.call(g))document.querySelectorAll("#pSet details.sgrp").forEach(o=>{if(o!==g&&o.open)o.open=false});try{localStorage.setItem("m01.sgOpen",JSON.stringify(DD.get.call(g)?["g_widget"]:[...document.querySelectorAll("#pSet details.sgrp")].filter(x=>x.open).map(x=>x.id)))}catch(e){}});
+  document.querySelectorAll("#pSet details.sgrp").forEach(o=>{if(o!==g)o.addEventListener("toggle",()=>{if(DD.get.call(o)&&g.open)g.open=false})});
+  function paintSet(){const en=E(),w=W(),d=desk();const wasOpen=DD.get.call(g);
+    g.innerHTML=`<summary><span class="sg-t"><b>${en?"Widgets":"小工具"}</b><small>${en?"Music, weather, and her speaking up":"音樂、天氣、她主動說話"}</small></span><i class="sg-chev" aria-hidden="true"></i></summary>
+      <div class="sgb">
+        <label class="toggle" for="wgMusic">${en?"Show what’s playing in Spotify":"顯示正在播放的音樂（Spotify）"}<input type="checkbox" id="wgMusic" ${w.music?"checked":""} ${d?"":"disabled"}></label>
+        <p class="note" style="margin:0">${d?(en?"Shows the song playing in the Spotify app on this computer in the top bar, with play/pause, previous/next and the progress bar. A free Spotify account works. On a Mac, click “OK” the first time it asks to control Spotify.":"顯示這台電腦 Spotify App 正在播的歌（在上方橫條），可以暫停、上下首、拖進度條。免費帳號也能用。Mac 第一次會問要不要讓 M-01 控制 Spotify，按「好」就可以。"):(en?"Only in the desktop app — the web version can’t see the Spotify app on your computer.":"只有 App 版能用：網頁版看不到你電腦上的 Spotify。")}</p>
+        <label class="toggle" for="wgChat">${en?"She starts talking to you now and then":"她會主動找你說話"}<input type="checkbox" id="wgChat" ${w.chat?"checked":""}></label>
+        <p class="note" style="margin:0">${en?"While she’s awake and you’ve been quiet for a while, she sometimes says something in her bubble — about the weather, the song you’re playing or what you talked about. She falls asleep after 10 minutes without anything happening.":"她醒著、你一陣子沒說話時，偶爾會在泡泡裡主動說點什麼：天氣、你在聽的歌、剛剛聊的事。10 分鐘沒動靜她會睡著。"}</p>
+        <label class="toggle" for="wgWx">${en?"Show the weather":"顯示天氣"}<input type="checkbox" id="wgWx" ${w.wx?"checked":""}></label>
+        <label class="field" for="wgCity">${en?"Weather location":"天氣地點"}<input type="text" id="wgCity" maxlength="40" placeholder="${en?"Automatic (from your internet location)":"自動（依你的網路位置）"}" value="${esc(w.city)}"></label>
+        <label class="toggle" for="wgPrecise">${en?"Use my precise location":"使用精確位置"}<input type="checkbox" id="wgPrecise" ${w.precise?"checked":""}></label>
+        <p class="note" style="margin:0">${en?"Leave the location empty to find it automatically from your internet connection (city level). “Precise location” asks your browser or computer for permission first. Weather from Open-Meteo.":"地點留空會依網路自動判斷（大約到城市）。「精確位置」會先問你允不允許。天氣資料來自 Open-Meteo。"}</p>
+      </div>`;
+    if(wasOpen)DD.set.call(g,true);
+    $("wgMusic").onchange=e=>{W().music=e.target.checked;saveSettingsQuiet();poll();paintMusic()};
+    $("wgChat").onchange=e=>{W().chat=e.target.checked;saveSettingsQuiet()};
+    $("wgWx").onchange=e=>{W().wx=e.target.checked;saveSettingsQuiet();if(e.target.checked)loadWx(true);else paintWx()};
+    $("wgPrecise").onchange=e=>{W().precise=e.target.checked;saveSettingsQuiet();loadWx(true)};
+    const city=$("wgCity");let ct=null;city.oninput=()=>{clearTimeout(ct);ct=setTimeout(()=>{W().city=city.value.trim();saveSettingsQuiet();loadWx(true)},900)};
+    city.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();clearTimeout(ct);W().city=city.value.trim();saveSettingsQuiet();loadWx(true);city.blur()}}}
+
+  /* ---------- 8. automatic clean-up of leftovers from older versions ---------- */
+  // Older versions also wrote readable copies (對話/, 記憶重點.md, 檔案/) into the data folder; the real data lives in
+  // "_資料（請勿修改）" and in Google Drive, so the copies are no longer made and the old ones are removed. Chats and memory are never touched.
+  // and the hand-edited 記憶重點.md is no longer read back: with no fresh copies it would bring back old notes over the real memory
+  try{window.fsFlush=function(){};window.fsMark=function(){};window.readFactsFile=async function(){}}catch(e){}
+  async function cleanUp(){
+    let n=0;const day=new Date().toDateString();let last={};try{last=JSON.parse(localStorage.getItem("m01.clean")||"{}")}catch(e){}
+    if(last.day===day&&last.v===APP_VER)return;
+    try{const c=JSON.parse(localStorage.getItem("m01.update")||"null");if(c&&c.version&&cmpVer(c.version,APP_VER)<=0){localStorage.removeItem("m01.update");n++}}catch(e){}
+    if(desk()&&window.serverFS&&FS&&FS.dir&&FS.dir.server){
+      try{const root=await serverFS.ls([]);const names=new Set(root.map(x=>x.name));
+        if(names.has("對話")){const items=await serverFS.ls(["對話"]);for(const x of items)if(!x.dir&&/^\d{4}-\d{2}-\d{2}\.md$/.test(x.name)){await serverFS.del(["對話",x.name]);n++}
+          if(!(await serverFS.ls(["對話"])).length)await serverFS.del(["對話"])}
+        if(names.has("記憶重點.md")){await serverFS.del(["記憶重點.md"]);n++}
+        if(names.has("檔案")){const items=await serverFS.ls(["檔案"]);for(const x of items)if(!x.dir&&/\.md$/i.test(x.name)){await serverFS.del(["檔案",x.name]);n++}
+          if(!(await serverFS.ls(["檔案"])).length)await serverFS.del(["檔案"])}
+      }catch(e){console.warn("clean-up",e)}}
+    try{if(window.localKV){const b=await localKV.get("backupDir").catch(()=>null);if(b){await localKV.set("backupDir",null);n++}}}catch(e){}
+    const tot=(last.total||0)+n;try{localStorage.setItem("m01.clean",JSON.stringify({day,v:APP_VER,n,total:tot,t:Date.now()}))}catch(e){}
+    paintClean()}
+  function paintClean(){const host=$("g_data")&&$("g_data").querySelector(".sgb");if(!host)return;let el=$("cleanNote");
+    if(!el){el=document.createElement("p");el.className="note";el.id="cleanNote";el.dataset.i18n="none";host.appendChild(el)}
+    let c={};try{c=JSON.parse(localStorage.getItem("m01.clean")||"{}")}catch(e){}const en=E();
+    el.textContent=en?`Automatic clean-up: each day the app removes leftovers from older versions (old readable copies, old update files). Your chats and memory are never deleted.${c.total?` Removed so far: ${c.total}.`:""}`
+      :`自動清理：每天會自動清掉舊版本留下、已經用不到的東西（舊的對話副本、舊的更新檔）。聊天紀錄和記憶不會被刪。${c.total?`目前已清掉 ${c.total} 個。`:""}`}
+
+  /* ---------- chat area see-through: five levels, the middle one by default ---------- */
+  const CA=[[1,0],[.9,4],[.78,6],[.62,8],[.45,10]];
+  function applyCA(n){n=Math.max(1,Math.min(5,+n||3));const r=document.documentElement;r.style.setProperty("--chat-a",CA[n-1][0]);r.style.setProperty("--chat-blur",CA[n-1][1]+"px");r.setAttribute("data-chat-a",n);
+    try{localStorage.setItem("m01.chatA",n)}catch(e){}document.querySelectorAll("#caSeg button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.n===n)))}
+  try{applyCA(localStorage.getItem("m01.chatA")||3)}catch(e){applyCA(3)}
+  function paintCA(){const host=$("g_look")&&$("g_look").querySelector(".sgb");if(!host)return;const en=E();let box=$("caBox");
+    if(!box){box=document.createElement("div");box.className="field";box.id="caBox";box.dataset.i18n="none";const after=$("themeSel")&&$("themeSel").closest("label");if(after&&after.parentNode===host)host.insertBefore(box,after.nextSibling);else host.prepend(box)}
+    const labels=en?["Solid","","Medium","","Clear"]:["不透明","","中間","","最透明"];
+    box.innerHTML=`<span>${en?"Chat area see-through":"聊天區背景透明度"}</span><div class="ca-seg" id="caSeg" role="group">${[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" aria-label="${n}"><i style="opacity:${CA[n-1][0]}"></i>${labels[n-1]||n}</button>`).join("")}</div>`;
+    box.querySelectorAll("button").forEach(b=>b.onclick=()=>{const n=+b.dataset.n;S.settings.chatA=n;applyCA(n);saveSettingsQuiet();try{playSfx("press",.35)}catch(e){}});
+    applyCA(S.settings.chatA||localStorage.getItem("m01.chatA")||3)}
+
+  /* ---------- start once the app is ready ---------- */
+  function paintAll(){paintCA();paintSet();paintMusic();paintWx();paintClean();fit()}
+  if(typeof window.applyLang==="function"){const o=window.applyLang;window.applyLang=function(){const r=o.apply(this,arguments);try{paintAll()}catch(e){}return r}}
+  let started=false;
+  (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);return}setTimeout(wait,400)})();
+  window.__x27={poll,loadWx,paintAll,cleanUp,fit,state:()=>({M,WX,needHelper})};
+})();
+</script>
+<!--/x27-->
 <script>
 /* ===== GitHub edition: page pieces ===== */
 (function(){
@@ -3899,7 +4631,7 @@ paintSnd();
     const gb=$("geminiBox");const p=gb&&gb.querySelector("p.note");
     if(p)p.innerHTML=en()?'Get a free key at <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> with a Google account and paste it below — it saves and tests automatically. The free tier has per-minute and per-day limits. The key stays only in this browser and is sent only to Google; on the free tier Google may use chats to improve its products.'
       :'用 Google 帳號到 <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> 免費建立金鑰，貼到下面就會自動儲存並測試。免費額度每分鐘、每天有次數上限，用完等一下就會恢復。金鑰只存在這個瀏覽器裡，只會送到 Google；免費方案的對話內容 Google 可能會拿去改進產品。';
-    const dn=[...document.querySelectorAll("#pSet .note")].find(x=>/記憶資料夾裡|memory folder above/i.test(x.textContent)||x.dataset.ghData);
+    const dn=[...document.querySelectorAll("#pSet .note")].find(x=>/記憶資料夾裡|存在這台裝置裡|memory folder above|saved on this device/i.test(x.textContent)||x.dataset.ghData);
     if(dn){dn.dataset.ghData="1";dn.textContent=en()?"Chats, memory and character images are saved in this browser only. Download a backup now and then — clearing browser data or switching phones starts empty. A backup can be imported into the desktop app too.":"對話、記憶和角色圖只存在這個瀏覽器裡。記得偶爾下載備份：清除瀏覽器資料或換手機，就會是空的。備份檔也可以匯入電腦版 App。"}
   };
   // download page

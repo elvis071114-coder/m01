@@ -1,7 +1,7 @@
 {
- "version": "0.9.23",
- "notes": "Beta：點她會有反應、設定分類、五種風格和音效、左右換邊和拖曳版面、分享按鈕、一鍵更新",
- "notes_en": "Beta: tap her for a reaction, grouped settings, five styles and sound sets, swap/resize layout, share button, one-click updates",
+ "version": "0.10.29",
+ "notes": "她會主動找你說話（天氣、音樂、剛剛的話題），10 分鐘才睡著並顯示 Zzz；聊天區背景透明度五段；Windows 封面改用 iTunes 補；新手教學補完整",
+ "notes_en": "She speaks up on her own (weather, music, what you talked about), sleeps after 10 minutes with Zzz; five chat see-through levels; Windows covers from iTunes; complete guided tour",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
