@@ -2806,7 +2806,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="0.10.29",APP_STAGE="Beta",APP_BUILD="2026-11-06 01:35";
+const APP_VER="0.10.32",APP_STAGE="Beta",APP_BUILD="2026-11-06 02:30";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -2816,6 +2816,9 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"0.10.32",d:"11/06 02:30",add:[],fix:[["Mac 和 Windows 不一樣：舊版本地 AI（qwen2.5，要另外裝看圖片工具）的電腦，安裝程式現在會建議升級成 Qwen 3.5，升級後自動刪掉舊模型和看圖片工具；App 也會提醒一次","Mac and Windows differed: computers on the old local AI (qwen2.5 with a separate picture tool) are now offered the Qwen 3.5 upgrade by the installer, which removes the old model and the picture tool; the app reminds you once too"],["安裝程式升級模型後，App 會自動改用新模型","After the installer upgrades the model, the app switches to it automatically"]]},
+ {v:"0.10.31",d:"11/06 02:10",add:[],fix:[["天氣沒顯示：改成由 App 直接抓天氣資料，不必經過背景程序；網路位置判斷不到時，用電腦的時區先抓大概的城市","Weather not showing: the app now fetches weather itself without the background helper; if your internet location can’t be found, it uses your computer’s time zone for a rough city"]]},
+ {v:"0.10.30",d:"11/06 02:05",add:[],fix:[["重新安裝後音樂還是說要重新安裝：舊的背景程序沒被關掉，現在打開 App 時會自動換成新的","After reinstalling, music still asked for a reinstall: the old background helper kept running; the app now replaces it automatically when it opens"]]},
  {v:"0.10.29",d:"11/06 01:35",add:[["她醒著的時候會主動找你說話：依天氣關心你、問你在做什麼、接續剛剛聊的事、說說你在聽的歌（設定 → 小工具可以關掉）","While awake she speaks up now and then: caring about you because of the weather, asking what you’re doing, following up on what you talked about, or commenting on your song (turn it off in Settings → Widgets)"],["睡著時，她說話的泡泡會顯示 Zzz…","While she sleeps, her speech bubble shows Zzz…"],["10 分鐘沒動靜才會睡著（原本 5 分鐘）","She now falls asleep after 10 quiet minutes (was 5)"],["設定 → 外觀與音效：聊天區背景透明度五段，預設中間","Settings → Look & sound: five levels of chat-area see-through, the middle one by default"],["新手教學補完整：天氣、音樂、語音輸入、語音、記憶與資料、離開都有介紹","The guided tour now covers everything: weather, music, voice input, voice, memory & data and leaving"]],fix:[["Windows 的 Spotify 封面：電腦給不出封面時，改用歌名和歌手到 iTunes 找","Spotify cover on Windows: when the computer gives none, it’s found on iTunes by song and artist"]]},
  {v:"0.10.28",d:"11/06 01:20",add:[["天氣和 Spotify 移到上方橫條，在時鐘兩邊左右對稱；橫條加寬一點","Weather and Spotify moved to the top bar, mirrored on both sides of the clock; the bar is a little taller"],["設定分類打開後放著不動，一陣子會自己收起來（正在打字時不會）","Settings groups close by themselves after a while untouched (not while you’re typing)"],["更新紀錄可以折疊：只展開最新一版，較早的版本收在一起","The update log folds: only the newest version is open, older ones are tucked away"],["本地 AI 的思考秒數改成依你的電腦實測：量出這台電腦寫回答要多久，剩下的時間才拿來思考","Local AI thinking time now adapts to your computer: it measures how long this computer takes to write an answer and uses the rest to think"]],fix:[["Spotify 封面不顯示：Mac 改用安全連線載入封面，Windows 讀不到時會換方法再試幾次，還是沒有就到 Spotify 找","Spotify cover not showing: on Mac it now loads over a secure link; on Windows it retries another way, and falls back to Spotify’s page"],["拿掉音樂的音量調整和天氣、音樂的收合按鈕","Removed the music volume control and the fold buttons on weather and music"]]},
  {v:"0.10.27",d:"11/06 01:40",add:[["全介面加上流暢動畫：設定分類展開收合、彈出選單、開關、提示、送出和收到訊息、換邊、切換主題","Smooth animation everywhere: settings groups, pop-ups, switches, notices, sending and receiving messages, swapping sides and changing themes"],["角色旁邊顯示 Spotify 正在播的歌：方形封面、暫停、上下首、拖進度條、調音量，還有跟著節奏跳動的音樂條（App 版，免費帳號也能用）","What Spotify is playing, next to her: square cover, pause, previous/next, a draggable progress bar, volume and bars that move to the beat (desktop app; free accounts work)"],["對面顯示你所在地的天氣：溫度、體感、接下來幾小時的降雨機率，會提醒你帶傘；點一下她會跟你說","The weather where you are on the other side: temperature, feels-like and the next hours’ chance of rain, with an umbrella reminder — tap it and she tells you"],["她聊天時也知道現在的天氣和你在聽的歌","She now knows the weather and the song you’re playing when you chat"],["設定新增「小工具」：開關音樂和天氣、設定天氣地點","New Settings → Widgets: turn music and weather on or off and set the weather location"],["自動清理舊版本留下、用不到的檔案（不會動到聊天和記憶）","Automatically removes leftovers from older versions (chats and memory are never touched)"]],fix:[["不再在資料夾裡另外寫一份對話副本","No more extra copies of chats written into the folder"]]},
@@ -4357,19 +4360,27 @@ details.cl>summary{cursor:pointer}
     const drops=[15,24,33].map(x=>`<line class="drop" x1="${x}" y1="28" x2="${x-2}" y2="34" stroke="#5AA9FF" stroke-width="2.4" stroke-linecap="round"/>`).join("");
     if(k==="storm")return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(5,3,"#7E8796")}<path class="bolt" d="M25 24l-6 10h5l-3 9 9-12h-5l3-7z" fill="#FFD23D"/>${drops}</svg>`;
     return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(5,3,"#AEB6C3")}${drops}</svg>`}
+  /* weather data straight from the page first (works even with an older background helper), then through the helper */
+  async function wxJSON(u){
+    try{const ac=new AbortController();const t=setTimeout(()=>ac.abort(),7000);const r=await fetch(u,{signal:ac.signal,cache:"no-store"});clearTimeout(t);if(r.ok){const j=await r.json();if(j&&!j.error)return j}}catch(e){}
+    try{const j=await getJSON(u);if(j&&!j.error)return j}catch(e){}
+    return null}
   let WX=null,wxBusy=false,wxTimer=null;
   try{WX=JSON.parse(localStorage.getItem("m01.wx")||"null")}catch(e){}
   async function locate(){
     const w=W();
     if(w.city){const name=w.city.trim().replace(/臺/g,"台");const k=Object.keys(TW_CITIES).find(c=>name.includes(c));if(k)return{lat:TW_CITIES[k][0],lon:TW_CITIES[k][1],name:k,how:"city"};
-      const g=await getJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=${E()?"en":"zh"}&format=json`).catch(()=>null);
+      const g=await wxJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=${E()?"en":"zh"}&format=json`).catch(()=>null);
       if(g&&g.results&&g.results[0]){const x=g.results[0];return{lat:x.latitude,lon:x.longitude,name:x.name,how:"city"}}return{error:"city"}}
     if(w.precise&&navigator.geolocation){const p=await new Promise(ok=>{try{navigator.geolocation.getCurrentPosition(x=>ok(x),()=>ok(null),{timeout:9000,maximumAge:30*60e3})}catch(e){ok(null)}});
       if(p){const lat=+p.coords.latitude.toFixed(3),lon=+p.coords.longitude.toFixed(3);let name="";
-        const r=await getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${E()?"en":"zh"}`).catch(()=>null);
+        const r=await wxJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${E()?"en":"zh"}`).catch(()=>null);
         if(r)name=r.city||r.locality||r.principalSubdivision||"";return{lat,lon,name:window.__toTrad&&!E()?window.__toTrad(name):name,how:"gps"}}}
-    const ip=await getJSON("https://get.geojs.io/v1/ip/geo.json").catch(()=>null);
+    const ip=await wxJSON("https://get.geojs.io/v1/ip/geo.json").catch(()=>null);
     if(ip&&ip.latitude){return{lat:+(+ip.latitude).toFixed(3),lon:+(+ip.longitude).toFixed(3),name:ip.city||ip.region||ip.country||"",how:"ip"}}
+    let tz="";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}
+    const TZ={"Asia/Taipei":[25.033,121.5654,"台北","Taipei"],"Asia/Tokyo":[35.68,139.69,"東京","Tokyo"],"Asia/Hong_Kong":[22.32,114.17,"香港","Hong Kong"],"Asia/Shanghai":[31.23,121.47,"上海","Shanghai"],"Asia/Singapore":[1.35,103.82,"新加坡","Singapore"],"Asia/Seoul":[37.57,126.98,"首爾","Seoul"],"America/Los_Angeles":[34.05,-118.24,"洛杉磯","Los Angeles"],"America/New_York":[40.71,-74.01,"紐約","New York"],"Europe/London":[51.51,-0.13,"倫敦","London"]};
+    if(TZ[tz])return{lat:TZ[tz][0],lon:TZ[tz][1],name:E()?TZ[tz][3]:TZ[tz][2],how:"ip"};
     return{error:"loc"}}
   async function loadWx(force){
     clearTimeout(wxTimer);if(!W().wx){paintWx();return}
@@ -4377,7 +4388,7 @@ details.cl>summary{cursor:pointer}
     if(wxBusy)return;wxBusy=true;
     try{const L=await locate();
       if(L.error){WX=Object.assign(WX||{},{err:L.error});}
-      else{const f=await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`).catch(()=>null);
+      else{const f=await wxJSON(`https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`).catch(()=>null);
         if(f&&f.current&&f.daily){const hrs=[];const ht=f.hourly&&f.hourly.time||[];
           const i0=Math.max(0,ht.findIndex(t=>new Date(t)>=new Date(f.current.time.slice(0,13)+":00")));
           for(let i=i0;i<i0+8&&i<ht.length;i++)hrs.push({h:+ht[i].slice(11,13),p:f.hourly.precipitation_probability[i]||0});
@@ -4536,11 +4547,32 @@ details.cl>summary{cursor:pointer}
     box.querySelectorAll("button").forEach(b=>b.onclick=()=>{const n=+b.dataset.n;S.settings.chatA=n;applyCA(n);saveSettingsQuiet();try{playSfx("press",.35)}catch(e){}});
     applyCA(S.settings.chatA||localStorage.getItem("m01.chatA")||3)}
 
+  /* ---------- local AI: keep Mac and Windows the same ----------
+     If the chosen model is gone but a Qwen 3.5 model is installed (for example the installer just upgraded it), use that one.
+     When the chat model sees pictures by itself, an old separate picture tool is no longer needed and is removed.
+     Still on an old model? Suggest the upgrade once per version. */
+  async function tidyLocalAI(){
+    try{if(!desk()||typeof LOCAL_CFG==="undefined"||(LOCAL_CFG.backend||"ollama")!=="ollama"||typeof ollamaCheck!=="function")return;
+      const c=await ollamaCheck();if(!c||!c.ok)return;const names=c.names||[],en=E();
+      const q35=names.filter(n=>/^qwen3\.5:(4b|9b|27b)$/.test(n));
+      if(!c.hasModel&&q35.length){let rec="";try{const d=await deviceInfo();const r=recommendModel(d);rec=r&&r.model||""}catch(e){}
+        const pick=q35.includes(rec)?rec:["qwen3.5:9b","qwen3.5:4b","qwen3.5:27b"].find(x=>q35.includes(x));
+        LOCAL_CFG.model=pick;saveLocalCfg();try{paintModelChip()}catch(e){}toast(en?`Local AI is now ${pick}.`:`本地 AI 已改用 ${pick}。`,4000)}
+      if(typeof chatSeesPictures==="function"&&chatSeesPictures(LOCAL_CFG.model)){
+        const tools=names.filter(n=>typeof isVisionModel==="function"&&isVisionModel(n));
+        for(const t of tools){try{await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:t})})}catch(e){}}
+        if(LOCAL_CFG.vision){LOCAL_CFG.vision="";saveLocalCfg()}}
+      else if(!q35.length&&/^qwen2\.5/i.test(LOCAL_CFG.model||"")){
+        const k="m01.upgradeHint";let last="";try{last=localStorage.getItem(k)||""}catch(e){}
+        if(last!==APP_VER){try{localStorage.setItem(k,APP_VER)}catch(e){}
+          setTimeout(()=>toast(en?`Your local AI (${LOCAL_CFG.model}) is the old one and can’t see pictures by itself. Settings → AI model: switch to Qwen 3.5 (the old one is removed for you).`:`你的本地 AI（${LOCAL_CFG.model}）是舊版，自己看不懂圖片。建議到「設定 → AI 模型」換成 Qwen 3.5，舊的會自動刪掉。`,9000),3500)}}
+    }catch(e){console.warn("tidy local AI",e)}}
+
   /* ---------- start once the app is ready ---------- */
   function paintAll(){paintCA();paintSet();paintMusic();paintWx();paintClean();fit()}
   if(typeof window.applyLang==="function"){const o=window.applyLang;window.applyLang=function(){const r=o.apply(this,arguments);try{paintAll()}catch(e){}return r}}
   let started=false;
-  (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);return}setTimeout(wait,400)})();
+  (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);setTimeout(tidyLocalAI,4000);return}setTimeout(wait,400)})();
   window.__x27={poll,loadWx,paintAll,cleanUp,fit,state:()=>({M,WX,needHelper})};
 })();
 </script>
