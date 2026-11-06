@@ -675,6 +675,10 @@ html[data-gfx="ultra"] .hdust{opacity:1}html[data-gfx="ultra"] .hdust i{animatio
 /* never move while the window rests, and honour "reduce motion" */
 html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust i,html.fx-sleep .rig{animation-play-state:paused!important}
 @media (prefers-reduced-motion:reduce){.rig,.hshadow,.hlight,.hdust i{animation:none!important}}
+.fu-tag{color:var(--accent);font-weight:600}.fu-row{border-left:2px solid var(--accent)}
+#factSearch{flex:1;min-width:0}
+.qsug{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:2px 0 4px}.qsug b{font-size:12.5px;color:var(--muted);font-weight:600;margin-right:2px}
+.qsug button{padding:5px 11px;font-size:13px;background:var(--panel2);border:1px solid var(--line2);color:var(--ink);border-radius:999px}.qsug button:hover{border-color:var(--accent);color:var(--accent)}
 
 /* GitHub edition */
 #folderBtn,#unSec{display:none!important}
@@ -781,10 +785,8 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
             <div class="sec">MEMORY LOG<button class="help" data-help="memlog" aria-label="說明">?</button></div>
             <p class="note">每一句對話都完整保存；這裡是夥伴特別記下的重點，你也可以自己加。</p>
             <div class="inline"><input id="factInput" placeholder="例如：喜歡喝珍珠奶茶、對花生過敏"><button class="pbtn" id="addFact">記下</button></div>
+            <div class="inline"><input id="factSearch" type="search" placeholder="搜尋記下的重點" aria-label="搜尋記下的重點"></div>
             <div id="factList" style="display:flex;flex-direction:column;gap:6px"></div>
-            <div class="sec" data-i18n="none">FOLLOW-UP</div>
-            <p class="note" id="followNote">她之後會主動問你的事。不想被問的可以刪掉。</p>
-            <div id="followList" style="display:flex;flex-direction:column;gap:6px"></div>
           </div>
           <div class="pane" id="pFiles" hidden>
             <div class="sec">ARCHIVE<button class="help" data-help="files" aria-label="說明">?</button></div>
@@ -794,6 +796,7 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
           <div class="pane" id="pSearch" hidden>
             <div class="sec">SEARCH<button class="help" data-help="search" aria-label="說明">?</button></div>
             <div class="inline"><input id="q" placeholder="搜尋所有對話與檔案"><button class="pbtn" id="qBtn">搜尋</button></div>
+            <div id="qSug" class="qsug" hidden></div>
             <div id="qOut" style="display:flex;flex-direction:column;gap:6px"></div>
           </div>
           <div class="pane" id="pDl" hidden data-i18n="none"></div>
@@ -1728,7 +1731,7 @@ function msgEl(m){
   }
   const SP=m.role==="assistant"&&m.text?splitSources(visible(m.text)):{body:m.text,urls:[]};
   if(m.text){const b=document.createElement("div");b.className="bubble";if(m.role==="user")b.textContent=m.text;else b.innerHTML=md(SP.body);w.appendChild(b)}
-  if(m.saved&&m.saved.length){for(const f of m.saved){const n=document.createElement("div");n.className="memnote";n.textContent="已記下："+f;w.appendChild(n)}}
+  if(m.saved&&m.saved.length)memNotes(w,m.saved);
   if(m.role==="assistant"&&m.slip){const n=document.createElement("div");n.className="slipnote";n.dataset.i18n="none";const en=isEN();
     n.innerHTML=m.slip==="pic"?`<span>${en?"Her first try talked about a picture you never sent, so it was rewritten automatically.":"她第一次提到你沒傳的圖片，已經自動重寫。"}</span><button class="mact sliprg">${en?"Say it again":"不滿意可以重說"}</button>`:m.slip==="fallback"?`<span>${en?"Gemini’s free quota was used up, so the local AI answered this one.":"Gemini 今天的免費額度用完了，這則由本地 AI 回答。"}</span><button class="mact sliprg">${en?"Say it again":"重說"}</button>`:m.slip==="cut"?`<span>${en?"She started rambling and was cut off here.":"她剛剛講到失控，後面已經截掉。"}</span><button class="mact sliprg">${en?"Say it again":"建議重說"}</button>`
       :`<span>${en?"Her first try ran away, so it was rewritten automatically.":"她第一次講到失控，已經自動重寫。"}</span><button class="mact sliprg">${en?"Say it again":"不滿意可以重說"}</button>`;
@@ -1837,17 +1840,9 @@ async function addFollowsFrom(reply){
   if(added.length){saveFollows();renderFollows()}
   return added;
 }
-function renderFollows(){
-  const el=$("followList");if(!el)return;const en=isEN();el.innerHTML="";
-  const list=(S.follows||[]).filter(f=>!f.asked).sort((a,b)=>a.date<b.date?-1:1);
-  if(!list.length){el.innerHTML=`<p class="note">${en?"Nothing yet. Mention something coming up (a test, a trip, an appointment) and she'll ask how it went.":"目前沒有。聊天時提到之後要發生的事（考試、出遊、看醫生…），她之後會主動問你結果。"}</p>`;return}
-  for(const f of list){
-    const r=document.createElement("div");r.className="row";
-    r.innerHTML=`<div class="t">${esc(f.text)}<div class="d">${esc(f.date)}</div></div><button aria-label="${en?"Delete":"刪除"}">${en?"Delete":"刪除"}</button>`;
-    r.querySelector("button").onclick=()=>{S.follows=S.follows.filter(x=>x.id!==f.id);saveFollows();renderFollows()};
-    el.appendChild(r);
-  }
-}
+// things she'll ask about later are shown inside the memory list (renderFacts); once asked they become normal memories
+function renderFollows(){renderFacts()}
+function followToFact(f){const t=`${f.date}：${f.text}`;if(!memHas(f.text)&&!memHas(t)){S.facts.push({id:rid(),text:t.slice(0,300),t:Date.now()});return true}return false}
 function followRules(){
   const now=new Date(),tm=new Date(now.getTime()+864e5);
   const list=(S.follows||[]).filter(f=>!f.asked).map(f=>`- ${f.date}｜${f.text}`).join("\n")||"（目前沒有）";
@@ -1866,10 +1861,11 @@ async function maybeFollowUp(){
     if(S.settings.lastFollowDay===today)return;
     // drop ones that are long past
     const old=isoDay(new Date(now.getTime()-14*864e5));let changed=false;
-    for(const f of S.follows)if(!f.asked&&f.date<old){f.asked=true;changed=true}
+    let fx=false;for(const f of S.follows)if(!f.asked&&f.date<old){f.asked=true;changed=true;if(followToFact(f))fx=true}
+    if(fx)saveFacts();
     if(changed){saveFollows();renderFollows()}
     const due=S.follows.filter(f=>!f.asked&&(f.date<today||(f.date===today&&now.getHours()>=18)));
-    if(!due.length)return;
+    if(!due.length){await maybeAsk();return}
     const pick=due.sort((a,b)=>a.date<b.date?1:-1).slice(0,2);
     S.followBusy=true;
     const en=isEN();S.replyLang=en?"en":"zh";
@@ -1879,7 +1875,7 @@ async function maybeFollowUp(){
     const emx=t.match(EXP_RE),ex=emx?EXPR[emx[1].trim()]:null;
     const shown=visible(t).replace(MEM_RE,"").replace(FOLLOW_RE,"").trim();
     if(!shown)return;
-    for(const f of pick)f.asked=true;saveFollows();renderFollows();
+    let fx2=false;for(const f of pick){f.asked=true;if(followToFact(f))fx2=true}if(fx2){saveFacts();updateStats()}saveFollows();renderFollows();
     S.settings.lastFollowDay=today;saveSettingsQuiet();
     const am={id:rid(),role:"assistant",text:shown,t:Date.now(),expr:ex||undefined,follow:true};
     addMsg(am);renderThread();scrollEnd();
@@ -1887,6 +1883,36 @@ async function maybeFollowUp(){
     if(typeof speak==="function")speak(am.text,ex);
     updateStats();
   }catch(e){console.warn("follow-up",e)}
+  finally{S.followBusy=false}
+}
+/* now and then (at most once a day, after a quiet stretch) she sends a real message: a question about them built on
+   what she remembers, or her own view on something. Her answer-worthy question stays in the chat, and whatever
+   they answer goes through the memory pass like everything else. */
+async function maybeAsk(){
+  if(S.followBusy||S.busy||S.incog||!S.sample)return;
+  const now=new Date(),today=isoDay(now),h=now.getHours();
+  if(S.settings.lastAskDay===today||h<9||h>=23)return;
+  const all=allMsgs(),users=all.filter(m=>m.role==="user");
+  if(users.length<8)return;
+  const last=all[all.length-1];if(last&&Date.now()-last.t<2*3600e3)return;
+  if(Math.random()<.5){S.settings.lastAskDay=today;saveSettingsQuiet();return}   // not every day
+  S.followBusy=true;
+  try{
+    const en=isEN();S.replyLang=en?"en":"zh";
+    const recentAsks=all.filter(m=>m.ask).slice(-5).map(m=>"- "+visible(m.text||"").slice(0,80)).join("\n");
+    const ask=`\n\n（這段是 App 自動送出的，不是對方說的話）對方有一陣子沒說話了。請用你的個性主動傳一則訊息（一到三句，像朋友傳訊息那樣），二選一：\n1. 從【重點記憶】裡的事延伸，問一個跟對方有關的問題（喜好、計畫、生活、某件事後來怎麼樣）。\n2. 分享你自己對某件事的看法或心情（可以跟對方的興趣有關），再問對方覺得呢。\n不要編造對方沒說過的事，不要說「系統提醒我」或提到這是自動的。${recentAsks?"\n最近已經問過這些，不要重複：\n"+recentAsks:""}\n第一行照樣寫 [[表情：X]]，不要加 [[記住]] 或 [[追蹤]] 標記。${en?"\n(Write this message in natural English.)":""}`;
+    const r=await S.sample([{role:"user",content:rulesTurn("")+ask}],{modelTier:"quick",cache:false});
+    let t=String(r&&r.text||"");if(!en)t=toTraditional(t);
+    const emx=t.match(EXP_RE),ex=emx?EXPR[emx[1].trim()]:null;
+    const shown=visible(t).replace(MEM_RE,"").replace(FOLLOW_RE,"").trim();
+    S.settings.lastAskDay=today;saveSettingsQuiet();
+    if(!shown||S.busy)return;
+    const am={id:rid(),role:"assistant",text:shown,t:Date.now(),expr:ex||undefined,ask:true};
+    addMsg(am);renderThread();scrollEnd();
+    if(ex&&typeof setExpr==="function")setExpr(ex);
+    if(typeof speak==="function")speak(am.text,ex);
+    updateStats();
+  }catch(e){console.warn("ask",e)}
   finally{S.followBusy=false}
 }
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(maybeFollowUp,1500)});
@@ -1900,28 +1926,33 @@ function renderFacts(){
   const el=$("factList");if(!el)return;el.innerHTML="";const en=isEN();
   const tools=document.createElement("div");tools.className="inline mem-tools";
   const last=S.settings.memTidy&&S.settings.memTidy.t;
-  tools.innerHTML=`<button class="sbtn" id="memTidyBtn"${S.facts.length<4?" disabled":""}>${en?"Tidy up memories":"整理記憶"}</button>${memPrev?`<button class="sbtn" id="memUndo">${en?"Undo last tidy-up":"復原上次整理"}</button>`:""}<span class="note" style="margin:0">${last?(en?"Last tidied ":"上次整理：")+stamp(last):(en?"She tidies them by herself about once a week.":"她大約每週會自己整理一次：合併重複的、刪掉過時的，並分類。")}</span>`;
+  tools.innerHTML=`<button class="sbtn" id="memTidyBtn"${S.facts.length<4?" disabled":""}>${en?"Tidy up memories":"整理記憶"}</button>${memPrev?`<button class="sbtn" id="memUndo">${en?"Undo last tidy-up":"復原上次整理"}</button>`:""}<span class="note" style="margin:0">${last?(en?"Last tidied ":"上次整理：")+stamp(last):(en?"She tidies them by herself about once a week.":"她大約每週會自己整理一次：合併重複的、刪掉過時的。")}</span>`;
   el.appendChild(tools);
-  if(!S.facts.length){const p=document.createElement("p");p.className="note";p.textContent=en?"Nothing yet. When you mention something important while chatting, she notes it down.":"還沒有重點。聊天時提到重要的事，夥伴會自動記下。";el.appendChild(p)}
-  const groups=new Map();for(const f of S.facts){const c=MEM_CATS.some(x=>x[0]===f.cat)?f.cat:"";if(!groups.has(c))groups.set(c,[]);groups.get(c).push(f)}
-  const order=[...MEM_CATS.map(x=>x[0]),""].filter(c=>groups.has(c));
-  for(const c of order){
-    const list=groups.get(c).slice().sort((a,b)=>b.t-a.t);
-    const h=document.createElement("div");h.className="mem-cat";h.textContent=`${catLabel(c,en)}（${list.length}）`;el.appendChild(h);
-    for(const f of list){
-      const r=document.createElement("div");r.className="row";
-      r.innerHTML=`<div class="t"><span class="ft">${esc(f.text)}</span><div class="d">${stamp(f.t)}</div></div><button class="fe" aria-label="${en?"Edit":"修改"}">${en?"Edit":"修改"}</button><button class="fd" aria-label="${en?"Delete":"刪除這條"}">${en?"Delete":"刪除"}</button>`;
-      r.querySelector(".fd").onclick=()=>{S.facts=S.facts.filter(x=>x.id!==f.id);saveFacts();renderFacts();updateStats()};
-      r.querySelector(".fe").onclick=()=>{const t=r.querySelector(".t");t.innerHTML=`<input class="fedit" value="${esc(f.text)}"><select class="fcat">${MEM_CATS.map(x=>`<option value="${x[0]}"${x[0]===f.cat?" selected":""}>${en?x[1]:x[0]}</option>`).join("")}</select>`;
-        const inp=t.querySelector(".fedit");inp.focus();const b=r.querySelector(".fe");b.textContent=en?"Save":"儲存";
-        const save=()=>{const v=inp.value.trim();if(v){f.text=v.slice(0,300);f.cat=t.querySelector(".fcat").value;f.t=Date.now()}saveFacts();renderFacts()};
-        b.onclick=save;inp.onkeydown=e=>{if(e.key==="Enter")save();if(e.key==="Escape")renderFacts()}};
-      el.appendChild(r);
-    }
-  }
+  const q=String(($("factSearch")||{}).value||"").trim().toLowerCase(),hit=t=>!q||String(t).toLowerCase().includes(q);
+  const ups=(S.follows||[]).filter(f=>!f.asked&&hit(f.text+" "+f.date)).sort((a,b)=>a.date<b.date?-1:1);
+  const facts=S.facts.filter(f=>hit(f.text)).sort((a,b)=>b.t-a.t);
+  if(!ups.length&&!facts.length){const p=document.createElement("p");p.className="note";
+    p.textContent=q?(en?`Nothing matches “${q}”.`:`找不到「${q}」。`):(en?"Nothing yet. When you mention something important while chatting, she notes it down. Mention something coming up (a test, a trip) and she'll ask how it went.":"還沒有重點。聊天時提到重要的事，她會自動記下；提到之後要發生的事（考試、出遊、看醫生…），她之後會主動問你結果。");
+    el.appendChild(p)}
+  const mark=t=>{let h=esc(t);if(q){const i=String(t).toLowerCase().indexOf(q);if(i>=0)h=esc(String(t).slice(0,i))+"<mark>"+esc(String(t).slice(i,i+q.length))+"</mark>"+esc(String(t).slice(i+q.length))}return h};
+  for(const f of ups){
+    const r=document.createElement("div");r.className="row fu-row";
+    r.innerHTML=`<div class="t"><span class="ft">${mark(f.text)}</span><div class="d"><span class="fu-tag">${en?"She’ll ask how it went":"之後會問你結果"}</span> · ${esc(f.date)}</div></div><button class="fd" aria-label="${en?"Delete":"刪除這條"}">${en?"Delete":"刪除"}</button>`;
+    r.querySelector(".fd").onclick=()=>{S.follows=S.follows.filter(x=>x.id!==f.id);saveFollows();renderFacts()};
+    el.appendChild(r)}
+  for(const f of facts){
+    const r=document.createElement("div");r.className="row";
+    r.innerHTML=`<div class="t"><span class="ft">${mark(f.text)}</span><div class="d">${stamp(f.t)}</div></div><button class="fe" aria-label="${en?"Edit":"修改"}">${en?"Edit":"修改"}</button><button class="fd" aria-label="${en?"Delete":"刪除這條"}">${en?"Delete":"刪除"}</button>`;
+    r.querySelector(".fd").onclick=()=>{S.facts=S.facts.filter(x=>x.id!==f.id);saveFacts();renderFacts();updateStats()};
+    r.querySelector(".fe").onclick=()=>{const t=r.querySelector(".t");t.innerHTML=`<input class="fedit" value="${esc(f.text)}">`;
+      const inp=t.querySelector(".fedit");inp.focus();const b=r.querySelector(".fe");b.textContent=en?"Save":"儲存";
+      const save=()=>{const v=inp.value.trim();if(v){f.text=v.slice(0,300);f.t=Date.now()}saveFacts();renderFacts()};
+      b.onclick=save;inp.onkeydown=e=>{if(e.key==="Enter")save();if(e.key==="Escape")renderFacts()}};
+    el.appendChild(r)}
   const tb=$("memTidyBtn");if(tb)tb.onclick=()=>tidyMemory(true);
   const ub=$("memUndo");if(ub)ub.onclick=()=>{if(!memPrev)return;S.facts=memPrev;memPrev=null;saveFacts();renderFacts();updateStats();toast(en?"Back to how it was before.":"已經復原成整理前的樣子。")};
 }
+{const fs=$("factSearch");if(fs)fs.addEventListener("input",()=>renderFacts())}
 let memTidying=false;
 async function tidyMemory(manual){
   const en=isEN();if(memTidying||S.incog||!S.sample)return;
@@ -2322,7 +2353,7 @@ function rulesDyn0(userText){
   const hits=search(userText,5,16).map(r=>`- [${r.d.label}] ${r.d.text.slice(0,260)}`).join("\n")||"（沒有找到明顯相關的舊內容）";
   return `【現在的狀況】
 現在時間：${stamp(now.getTime())}（星期${"日一二三四五六"[now.getDay()]}）${window.__wxLine?window.__wxLine():""}${window.__musicLine?window.__musicLine():""}${window.__convSummary?window.__convSummary():""}
-你們從 ${first?dayOf(first.t):"今天"} 開始聊天，至今共 ${allMsgs().length} 則訊息。
+你們從 ${first?dayOf(first.t):"今天"} 開始聊天，至今共 ${allMsgs().length} 則訊息。${window.__lastSay&&Date.now()-window.__lastSay.t<15*60e3?`\n你 ${Math.max(1,Math.round((Date.now()-window.__lastSay.t)/60e3))} 分鐘內在畫面上主動對對方說過：「${String(window.__lastSay.text).slice(0,120)}」（對方這句可能是在回這個）。`:""}
 
 【可能相關的過去內容（自動檢索）】
 ${hits}`;
@@ -2404,6 +2435,15 @@ async function sendCore(ov){
   w.append(toolEl,bub);th.appendChild(w);scrollEnd();
   S.busy=true;setBusyUI();refreshMood();
   window.__turnUrls=new Set();
+  // first, a few seconds to note anything new about them, so this answer already knows it
+  let preSaved=[],memLate=null;
+  if(!S.incog&&memWorth(text)){
+    const prevBot=(()=>{const ms=curMsgs();for(let j=ms.length-2;j>=0;j--)if(ms[j]&&ms[j].role==="assistant")return visible(ms[j].text||"");return ""})();
+    S.ctl=new AbortController();const sig=S.ctl.signal;const p=memExtract(text,prevBot);
+    const r=await Promise.race([p,new Promise(ok=>setTimeout(()=>ok(null),12000)),new Promise(ok=>sig.addEventListener("abort",()=>ok("stop"),{once:true}))]);
+    if(r==="stop"){w.remove();S.busy=false;S.streaming=false;S.ctl=null;setBusyUI();refreshMood();return}
+    if(r===null)memLate=p;else preSaved=r||[];
+  }
   if(typeof autoResearch==="function"){try{ctx+=await autoResearch(text)}catch(e){console.warn("research",e)}}
   um._ctx=ctx;
   S.replyLang=detectLang(text);
@@ -2440,9 +2480,9 @@ async function sendCore(ov){
   reply=fixMarks(dropRepeats(toTraditional(filterSources(reply))));
   if(typeof LOCAL_CFG!=="undefined"&&(!LOCAL_CFG.backend||LOCAL_CFG.backend==="ollama"))reply=reply.replace(/\p{Extended_Pictographic}\uFE0F?/gu,"");
   // memory markers
-  const saved=[];let mm;MEM_RE.lastIndex=0;if(S.incog)reply=reply.replace(MEM_RE,"");
+  const saved=[...preSaved];let mm;MEM_RE.lastIndex=0;if(S.incog)reply=reply.replace(MEM_RE,"");
   if(S.incog)reply=reply.replace(FOLLOW_RE0,"");else if(typeof addFollowsFrom==="function")addFollowsFrom(reply);
-  while((mm=MEM_RE.exec(reply))){mm[1].split("\n").map(s=>isEN()?s.trim():toTraditional(s.trim())).filter(Boolean).forEach(s=>{if(!S.facts.some(f=>f.text===s)){S.facts.push({id:rid(),text:s.slice(0,300),t:Date.now()});saved.push(s)}})}
+  while((mm=MEM_RE.exec(reply))){mm[1].split("\n").map(s=>isEN()?s.trim():toTraditional(s.trim())).filter(Boolean).forEach(s=>{if(!memHas(s)){S.facts.push({id:rid(),text:s.slice(0,300),t:Date.now()});saved.push(s)}})}
   if(saved.length){saveFacts();renderFacts()}
   const finalText=visible(reply)+(note?(reply?"\n\n":"")+"（"+note+"）":"");
   w.remove();
@@ -2452,55 +2492,59 @@ async function sendCore(ov){
     let amLog=null;if(reply||note)amLog=addMsg(am);
     const amEl=msgEl(am);th.appendChild(amEl);scrollEnd();trimThread();
     speak(am.text,am.expr);
-    if(reply&&!note&&!S.incog&&typeof memCatch==="function")setTimeout(()=>memCatch(text,am,amLog,amEl),300);
+    if(memLate)memLate.then(add=>{if(!add||!add.length)return;am.saved=[...(am.saved||[]),...add];if(amLog)persistLog(amLog);memNotes(amEl,add)});
   }
   S.busy=false;S.streaming=false;S.ctl=null;setBusyUI();updateStats();refreshMood();if(saved.length)flashMood("happy",1800);
   // file summaries after reply (one at a time)
   for(const a of att){const f=S.files.find(x=>x.id===a.fileId);if(f&&!f.summary&&(f.kind!=="image"||a.blob)&&!a.dupOf)await summarizeFile(f,a.preview||"",a.blob)}
 }
-/* ---------- memory safety net ----------
-   The chat model is asked to mark new facts with [[記住：…]], but it sometimes forgets (it once answered "I was born in
-   the US" without saving it). After each reply a quick second pass reads what the person said and saves anything new
-   about them that wasn't marked, so remembering never depends on the chat model alone. */
-const MEMCATCH_HINT=/[我咱俺]|\b(i|i'm|im|i've|i'd|my|me|mine|we|our|us)\b|生日|住在|喜歡|討厭|過敏|學校|上班|工作|家人|爸|媽|哥|姊|姐|弟|妹|朋友|男友|女友|老婆|老公|寵物|養/i;
-const memNorm=t=>String(t).toLowerCase().replace(/^(對方|他|她|they|the user)\s*/i,"").replace(/[\s，。、,.!！?？:：;；「」『』"'()（）\-]/g,"");
-let memCatchBusy=false;
-async function memCatch(userText,am,log,el){
+/* ---------- memory pass before every reply ----------
+   Before she answers, a quick separate request reads what the person just said (plus her last line, for context)
+   and saves anything new about them, so this reply already knows it and nothing depends on the chat model
+   remembering to write [[記住：…]]. It also catches answers to her questions ("考了 80 分" after "考試考得怎樣？"). */
+const memNorm=t=>String(t).toLowerCase().replace(/^(對方|他|她|they|the user)\s*/i,"").replace(/[\s，。、,.!！?？:：;；「」『』"'()（）\-~～]/g,"");
+const MEM_SKIP=/^(hi|hey|hello|yo|ok|okay|k|thx|thanks|thank you|bye|lol|haha+|嗨|哈囉|你好|早安|午安|晚安|早|好|好的|好喔|好啊|嗯+|喔+|哦+|恩+|對|對啊|是喔|真的嗎|哈+|呵+|謝謝|謝啦|掰掰|拜拜|886|晚點聊)[\s!！~～。.?？]*$/i;
+function memWorth(t){t=String(t||"").trim();return t.length>=2&&!MEM_SKIP.test(t)&&!/^[\p{P}\p{S}\s]+$/u.test(t)}
+function memHas(t){const n=memNorm(t);return !n||S.facts.some(f=>{const h=memNorm(f.text);return h&&(h===n||h.includes(n)||n.includes(h))})}
+let memBusy=false;
+async function memExtract(userText,prevBot){
   userText=String(userText||"").trim();
-  if(memCatchBusy||!S.sample||S.incog||userText.length<3||!MEMCATCH_HINT.test(userText))return;
-  memCatchBusy=true;
+  if(memBusy||!S.sample||S.incog||!memWorth(userText))return [];
+  memBusy=true;
   try{
-    const en=isEN(),ms=curMsgs(),at=ms.indexOf(am);let prev="";
-    for(let j=(at<0?ms.length:at)-2;j>=0;j--)if(ms[j]&&ms[j].role==="assistant"){prev=visible(ms[j].text||"").slice(0,300);break}
+    const en=isEN(),now=new Date();
     const known=S.facts.slice(-120).map(f=>"- "+f.text).join("\n")||"（目前沒有）";
-    const now=(am.saved||[]).map(x=>"- "+x).join("\n");
     const prompt=`你是記憶整理員，不是聊天對象，不要用角色的語氣。判斷「對方剛說的話」裡，有沒有值得長期記住、而且還沒記下來的新資訊。
-值得記：對方的背景（出生地、住哪、年紀、學校、工作）、喜好與厭惡、重要的人、寵物、計畫與約定、重要事件、健康或生活上的注意事項。
-不要記：問句、打招呼、閒聊、一時的狀態（要去睡、肚子餓、現在很累）、已經記住或意思相同的事、AI 說的話、你自己推測的事。
+今天是 ${isoDay(now)}（星期${"日一二三四五六"[now.getDay()]}）。提到「明天、下禮拜」這種時間時，換成實際日期寫進去。
+值得記：對方的背景（出生地、住哪、年紀、學校、工作）、喜好與厭惡、重要的人、寵物、計畫與約定、之後要發生的事、重要事件與結果、健康或生活上的注意事項。
+如果對方是在回答她的問題（例如她問考試考得怎樣，對方說考了 80 分），就把答案連同那件事寫成一條完整的事實。
+不要記：單純的問句、打招呼、閒聊、一時的狀態（要去睡、肚子餓、現在很累）、已經記住或意思相同的事、AI 說的話、你自己推測的事。
 只記對方明確說出的。每條寫成一句簡短的事實，用「對方」當主詞，${en?"用英文寫（主詞用 They）":"用繁體中文"}。
 
 已經記住的：
-${known}${now?"\n這次已經記下：\n"+now:""}
+${known}
 
-${prev?"她上一句說："+prev+"\n":""}對方剛說的話：${userText.slice(0,1500)}
+${prevBot?"她上一句說："+String(prevBot).slice(0,300)+"\n":""}對方剛說的話：${userText.slice(0,1500)}
 
 有新的就一行一條（最多 3 條），前面不要加任何符號；沒有就只回「無」。`;
-    const r=await Promise.race([S.sample([{role:"user",content:prompt}],{modelTier:"quick",cache:false}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),40000))]);
-    const have=S.facts.map(f=>memNorm(f.text)).concat((am.saved||[]).map(memNorm));
+    const r=await Promise.race([S.sample([{role:"user",content:prompt}],{modelTier:"quick",cache:false}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),45000))]);
     const added=[];
     for(let line of visible(String(r&&r.text||"")).split("\n")){
       line=line.replace(/^[\s\-*•·>\d.、)）]+/,"").trim();if(!en)line=toTraditional(line);
       if(!line||/^(無|没有|沒有|none|no)\b|^無[。.]?$/i.test(line)||/[?？]$/.test(line)||line.length<4||line.length>160)continue;
-      const n=memNorm(line);if(!n||have.some(h=>h&&(h===n||h.includes(n)||n.includes(h))))continue;
-      have.push(n);added.push(line);if(added.length>=3)break}
-    if(!added.length||S.incog)return;
+      const who=String(S.settings.userName||"").trim().toLowerCase();
+      if(!/對方|^(they|the user|user)\b/i.test(line)&&!(who&&line.toLowerCase().includes(who)))continue;   // only real notes about them, never chat lines
+      if(/\[\[|\]\]|哼|才不是|才沒有/.test(line))continue;
+      if(memHas(line)||added.some(x=>memNorm(x)===memNorm(line)))continue;
+      added.push(line);if(added.length>=3)break}
+    if(!added.length||S.incog)return [];
     for(const f of added)S.facts.push({id:rid(),text:f.slice(0,300),t:Date.now()});
     saveFacts();renderFacts();updateStats();
-    am.saved=[...(am.saved||[]),...added];if(log)persistLog(log);
-    if(el&&el.isConnected)for(const f of added){const n=document.createElement("div");n.className="memnote";n.textContent="已記下："+f;el.appendChild(n)}
-  }catch(e){console.warn("memory catch",e)}
-  finally{memCatchBusy=false}
+    return added;
+  }catch(e){console.warn("memory pass",e);return []}
+  finally{memBusy=false}
 }
+function memNotes(el,list){if(el)for(const f of list){const n=document.createElement("div");n.className="memnote";n.textContent=(isEN()?"Noted: ":"已記下：")+f;el.appendChild(n)}}
 function setBusyUI(){
   if(S.busy&&!S.busySince)S.busySince=Date.now();if(!S.busy)S.busySince=0;
   document.body.classList.toggle("ai-busy",!!S.busy);if(S.busy){const mp=$("modelPop");if(mp&&!mp.hidden)mp.hidden=true}
@@ -2566,7 +2610,7 @@ async function playVoice(text,btn,manual,expr){
   }
   const blob=await res.blob();if(my!==FISH.seq)return false;
   const url=URL.createObjectURL(blob),a=new Audio(url);a.volume=Math.max(0,Math.min(1,volume()));
-  FISH.audio=a;FISH.url=url;
+  FISH.audio=a;FISH.url=url;lipPrep(blob,a);
   if(btn){btn.textContent=isEN()?"Stop":"停止"}
   a.onended=a.onerror=()=>{if(my===FISH.seq)stopVoice()};
   try{await a.play();S.speaking=true;refreshMood();return true}catch(e){stopVoice();if(manual)toast(isEN()?"Couldn't play the audio.":"沒辦法播放聲音。");return false}
@@ -2648,10 +2692,32 @@ function scheduleBlink(){
     scheduleBlink();
   },2600+Math.random()*3600);
 }
+/* lip-sync: while her voice plays, the mouth opens and closes with how loud the voice actually is.
+   The audio is decoded separately into a loudness curve (the voice itself plays untouched), then read at the
+   current playback time. Until the curve is ready, or when there is no voice, the mouth moves on its own. */
+const LIP={env:null,hop:.025,audio:null,ac:null};
+async function lipPrep(blob,a){
+  LIP.env=null;LIP.audio=a;
+  try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;LIP.ac=LIP.ac||new AC();
+    const ab=await blob.arrayBuffer();const buf=await new Promise((ok,no)=>{const p=LIP.ac.decodeAudioData(ab,ok,no);if(p&&p.then)p.then(ok,no)});
+    if(LIP.audio!==a)return;
+    const sr=buf.sampleRate,hop=Math.max(1,Math.round(sr*LIP.hop)),chs=[];for(let c=0;c<buf.numberOfChannels;c++)chs.push(buf.getChannelData(c));
+    const n=Math.ceil(buf.length/hop),env=new Float32Array(n);
+    for(let i=0;i<n;i++){let sum=0,cnt=0;const e=Math.min(buf.length,(i+1)*hop);for(let j=i*hop;j<e;j+=2){let v=0;for(const ch of chs)v+=ch[j];v/=chs.length;sum+=v*v;cnt++}env[i]=cnt?Math.sqrt(sum/cnt):0}
+    const sorted=Array.from(env).filter(v=>v>.002).sort((x,y)=>x-y),ref=sorted.length?sorted[Math.floor(sorted.length*.92)]:0;
+    if(!ref)return;for(let i=0;i<n;i++)env[i]=Math.min(1,env[i]/ref);
+    LIP.env=env}catch(e){console.warn("lip-sync",e)}}
 function startTalk(){
   if(talkTimer)return;const sp=sprites();if(!sp.talk||frameBase!=="idle")return;
-  let open=false;
-  const step=()=>{open=!open&&Math.random()>.15;showFrame(open?"talk":frameBase);talkTimer=setTimeout(step,open?90+Math.random()*90:70+Math.random()*110)};
+  let open=false,since=0;
+  const step=()=>{
+    const a=LIP.audio;
+    if(a&&LIP.env&&typeof FISH!=="undefined"&&FISH.audio===a&&!a.paused){
+      const i=Math.floor(a.currentTime/LIP.hop),v=LIP.env[Math.min(LIP.env.length-1,i)]||0,v2=LIP.env[Math.min(LIP.env.length-1,i+1)]||0,lv=Math.max(v,v2*.8);
+      const now=performance.now(),want=open?lv>.18:lv>.32;
+      if(want!==open&&now-since>60){open=want;since=now;showFrame(open?"talk":frameBase)}
+      talkTimer=setTimeout(step,30);return}
+    open=!open&&Math.random()>.15;showFrame(open?"talk":frameBase);talkTimer=setTimeout(step,open?90+Math.random()*90:70+Math.random()*110)};
   step();
 }
 function stopTalk(){clearTimeout(talkTimer);talkTimer=null;showFrame(frameBase)}
@@ -3004,6 +3070,33 @@ $("qBtn").onclick=()=>{
     const d=document.createElement("div");d.className="row";d.innerHTML=`<div class="t"><div class="d">${esc(x.d.label)}</div>${t}</div>`;out.appendChild(d)}
 };
 $("q").onkeydown=e=>{if(e.key==="Enter")$("qBtn").click()};
+/* "you might be looking for": a few searches suggested from what you've talked about; only ones that find something */
+let qSugBusy=false;
+function qSugPaint(list){const el=$("qSug");if(!el)return;const en=isEN();
+  list=(list||[]).filter(x=>x&&search(x,1).length).slice(0,8);
+  if(!list.length){el.hidden=true;return}
+  el.innerHTML=`<b>${en?"You might be looking for":"猜你想搜"}</b>`+list.map(x=>`<button type="button">${esc(x)}</button>`).join("");
+  el.querySelectorAll("button").forEach((b,i)=>b.onclick=()=>{$("q").value=list[i];$("qBtn").click()});el.hidden=false}
+function qSugQuick(){const out=[],seen=new Set(),add=x=>{x=String(x||"").trim();if(x&&x.length<=12&&!seen.has(x)){seen.add(x);out.push(x)}};
+  (S.files||[]).slice(-3).reverse().forEach(f=>add(String(f.name||"").replace(/\.[a-z0-9]+$/i,"").slice(0,12)));
+  for(const f of (S.follows||[]).filter(f=>!f.asked).slice(-3))add(f.text.replace(/^對方/,"").slice(0,8));
+  return out}
+async function qSuggest(){
+  const msgs=allMsgs().filter(m=>m.role==="user"),n=msgs.length;if(!n){qSugPaint(qSugQuick());return}
+  let c=null;try{c=JSON.parse(localStorage.getItem("m01.qsug")||"null")}catch(e){}
+  if(c&&Array.isArray(c.list)&&n-c.n<6&&Date.now()-c.t<12*3600e3&&c.en===isEN()){qSugPaint(c.list);return}
+  qSugPaint((c&&c.list||[]).concat(qSugQuick()));
+  if(qSugBusy||!S.sample||S.incog||(typeof LOCAL_CFG!=="undefined"&&!S.aiOK))return;qSugBusy=true;
+  try{const en=isEN();
+    const said=msgs.slice(-40).map(m=>"- "+String(m.text||"").replace(/\s+/g," ").slice(0,90)).join("\n").slice(-3000);
+    const prompt=`下面是對方最近在聊天裡說過的話。猜猜對方之後可能會想在聊天紀錄裡搜尋什麼，給 6 個搜尋關鍵字：每個 2 到 8 個字，是對話裡真的出現過的人名、地名、東西、事件或主題，不要整句話、不要重複。${en?"Use the language the words appear in.":"中文用繁體。"}只回傳 JSON 字串陣列，例如 ["考試","拉麵"]。\n\n${said}`;
+    const r=await Promise.race([S.sample(prompt,{modelTier:"quick",cache:false}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),30000))]);
+    const m=String(r&&r.text||"").match(/\[[\s\S]*\]/);const arr=m?JSON.parse(m[0]):[];
+    const list=(Array.isArray(arr)?arr:[]).map(x=>String(x).trim()).map(x=>en?x:toTraditional(x)).filter(x=>x&&x.length<=12&&search(x,1).length);
+    if(list.length){try{localStorage.setItem("m01.qsug",JSON.stringify({t:Date.now(),n,list,en}))}catch(e){}if(!$("pSearch").hidden)qSugPaint(list.concat(qSugQuick()))}
+  }catch(e){console.warn("search suggestions",e)}
+  finally{qSugBusy=false}}
+{const ps=$("pSearch");if(ps)new MutationObserver(()=>{if(!ps.hidden)qSuggest()}).observe(ps,{attributes:true,attributeFilter:["hidden"]})}
 $("exportBtn").onclick=()=>{
   const spr={};for(const [k,v] of Object.entries(S.spriteData||{}))if(typeof v==="string"&&v.startsWith("data:"))spr[k]=v;   // character pictures go in the backup too
   const data={exported:new Date().toISOString(),version:APP_VER,settings:S.settings,facts:S.facts,files:S.files.map(f=>({...f,text:(S.chunks.get(f.id)||[]).join("")})),messages:allMsgs(),sprites:spr};
@@ -3047,7 +3140,7 @@ const I18N={
 "點一下或按任意鍵開始":"Click or press any key to start","已離開・點一下或按任意鍵重新開始":"Exited · click or press any key to start again",
 "靜音":"Mute","取消靜音":"Unmute","音量":"Volume","放開以上傳檔案":"Drop to upload","電量":"Battery","介面音效":"Interface sounds","介面音效開關":"Interface sounds","離開":"Exit","夥伴":"Partner",
 "無痕模式":"Incognito mode","對話說明":"Chat help","上傳檔案或圖片":"Upload a file or image","輸入訊息，或問我之前講過的事":"Type a message, or ask about anything we talked about","語音輸入":"Voice input",
-"聊天說明":"Chat help","說明":"Help","例如：喜歡喝珍珠奶茶、對花生過敏":"e.g. loves bubble tea, allergic to peanuts","搜尋所有對話與檔案":"Search all chats and files","例如：Elvis":"e.g. Elvis","自訂顏色":"Custom colour","開始":"Start","關閉說明":"Close help","統計":"Stats",
+"聊天說明":"Chat help","說明":"Help","例如：喜歡喝珍珠奶茶、對花生過敏":"e.g. loves bubble tea, allergic to peanuts","搜尋所有對話與檔案":"Search all chats and files","例如：Elvis":"e.g. Elvis","搜尋記下的重點":"Search what she noted","猜你想搜":"You might be looking for","自訂顏色":"Custom colour","開始":"Start","關閉說明":"Close help","統計":"Stats",
 "語言 Language":"Language 語言","。":".","請從 M-01 App 打開":"Please open this from the M-01 app","測試你的金鑰可以用哪些模型…":"Checking which models your key can use…","想一下…":"Thinking…","平常切換模型和思考程度，用聊天輸入框上方的按鈕就好；這裡是設定金鑰的地方。":"Switch models and thinking level with the button above the chat input; this is where API keys are set.","Gemini 3.6 Flash：建議，聰明又穩定":"Gemini 3.6 Flash: recommended, smart and steady","Gemini 3.8 Flash：最聰明，但免費額度最少":"Gemini 3.8 Flash: smartest, smallest free quota","Gemini 3.5 Flash-Lite：最快、免費次數最多":"Gemini 3.5 Flash-Lite: fastest, most free usage","思考程度":"Thinking","Gemini 3.5 Flash-Lite：免費額度多、速度快（預設）":"Gemini 3.5 Flash-Lite: more free usage, fast (default)","Gemini 3.8 Flash：比較聰明（可能需要付費方案）":"Gemini 3.8 Flash: smarter (may need a paid plan)","仔細想一想…":"Thinking it through…","Gemini 3.8 Flash 現在不能用（可能需要付費方案），已自動改用 3.5 Flash-Lite":"Gemini 3.8 Flash isn't available (may need a paid plan) — switched to 3.5 Flash-Lite","簡短：一兩句，回得快":"Short: a sentence or two, fast","一般（建議）":"Normal (recommended)","詳細：想清楚再回答，比較長":"Detailed: thinks it through, longer","儲值、建立金鑰，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", top up, create a key and paste it below — it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","設定會自動儲存":"Settings save automatically","✓ 已自動儲存":"✓ Saved","已套用（未登入，不會保存）":"Applied (not signed in, won't be saved)","已套用「傲嬌 Claude」說話風格":"Applied the \"Tsundere Claude\" style","改完會自動儲存並測試連線":"Changes save and test automatically","Gemini（Google：有免費額度，比本地聰明）":"Gemini (Google: free tier, smarter than local)","Claude（最聰明：需要 API 金鑰，按用量付費）":"Claude (smartest: needs an API key, pay per use)","Gemini API 金鑰":"Gemini API key","Gemini 模型":"Gemini model","Gemini 3.8 Flash：比較聰明（建議）":"Gemini 3.8 Flash: smarter (recommended)","Gemini 3.5 Flash-Lite：更快、免費額度比較多":"Gemini 3.5 Flash-Lite: faster, more free usage","⚠️ 還沒貼上 Gemini API 金鑰。":"⚠️ No Gemini API key yet.","還沒設定 Gemini API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Gemini API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 API 金鑰，請到「設定 → AI」貼上金鑰。":"No API key yet — add one in Settings → AI.","連不到 Gemini，請確認電腦有網路。":"Can't reach Gemini — is this computer online?","到":"Get a free key at","用 Google 帳號免費建立金鑰（Google AI Plus／Pro 訂閱是給 Gemini App 用的，跟 API 金鑰分開計算），貼到下面就會自動儲存並測試。免費額度每分鐘、每天有次數上限，用完等一下就會恢復。注意：免費方案的對話內容 Google 可能會拿去改進他們的產品。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。":"with your Google account (Google AI Plus/Pro subscriptions are for the Gemini app and are separate from API keys) and paste it below — it saves and tests itself. The free tier has per-minute and per-day limits that reset after a while. Note: on the free tier Google may use your conversations to improve its products. The key is stored only in this computer's app settings — never in the memory folder or backups.","，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", paste it below and it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","來源 ▸":"Sources ▸","來源 ▾":"Sources ▾","AI 來源":"AI source","本地 AI（Ollama：免費、資料不出電腦）":"Local AI (Ollama: free, data stays on this computer)","Claude（比較聰明：需要 API 金鑰，按用量付費）":"Claude (smarter: needs an API key, pay per use)","API 金鑰":"API key","Claude 模型":"Claude model","Haiku 5.5：快又便宜（估計每則不到 NT$0.1）":"Haiku 5.5: fast and cheap (est. under NT$0.1 per message)","Sonnet 5.5：比較聰明（估計每則 NT$0.5～1）":"Sonnet 5.5: smarter (est. NT$0.5–1 per message)","儲存並測試":"Save & test","刪除金鑰":"Delete key","測試中…":"Testing…","Claude 連線成功":"Connected to Claude","已刪除金鑰":"Key deleted","⚠️ 還沒貼上 Claude API 金鑰。":"⚠️ No Claude API key yet.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Claude API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰。":"No Claude API key yet — add one in Settings → AI.","連不到 Claude，請確認電腦有網路。":"Can't reach Claude — is this computer online?","把 M-01 App 從這台電腦移除。Ollama 本身不會被移除。":"Remove the M-01 app from this computer. Ollama itself is not removed.","一併刪除記憶資料（會移到垃圾桶，後悔還救得回來）":"Also delete memory data (moved to the Trash, so you can still get it back)","一併刪除記憶資料（會移到資源回收筒，後悔還救得回來）":"Also delete memory data (moved to the Recycle Bin, so you can still get it back)","一併刪除聊天模型（可以騰出 2～5GB）":"Also delete the chat model (frees 2–5GB)","解除安裝 App…":"Uninstall app…","需要 Anthropic 的 API 金鑰。它跟 claude.ai 的訂閱是分開計費的：到":"You need an Anthropic API key. It's billed separately from a claude.ai subscription: top up and create a key at","儲值、建立金鑰，再貼到下面。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", then paste it below. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","記憶資料夾":"Memory folder","版本資訊與注意事項":"Version & notes","新手教學":"Guided tour","下載 App":"Get App","一次放多張圖片或 zip":"Add many pictures or a zip","套用範例角色":"Use the sample character","可以一次選好幾張，或直接選整個 zip：檔名有表情名稱就會自動放到對的格子（例如 Eyes_open、Mouth_open、Happy，或 張眼、張嘴、開心）。也可以把一整批圖片拖到下面的格子區。":"Pick several pictures at once, or a whole zip: files named after an expression go into the right slot automatically (e.g. Eyes_open, Mouth_open, Happy). You can also drop a batch of pictures onto the slots below.","範例角色：角色靈感來自社群的 Claude娘 二創形象，圖片是用 AI 製作的。":"Sample character: inspired by the community’s “Claude-chan” fan personification; the images were made with AI.","她之後會主動問你的事。不想被問的可以刪掉。":"Things she’ll ask you about later. Delete any you don’t want her to bring up.","朗讀":"Read aloud","語音還沒設定。":"Voice isn't set up yet.","Fish Audio API 金鑰":"Fish Audio API key","貼上金鑰":"Paste your key","口音":"Accent","自動（中文回覆用中文聲音，英文回覆用英文聲音）":"Auto (Chinese voice for Chinese replies, English voice for English replies)","中文（一律用中文聲音）":"Chinese (always the Chinese voice)","英文（一律用英文聲音）":"English (always the English voice)","中文聲音（fish.audio 聲音網址或 ID）":"Chinese voice (fish.audio voice link or ID)","英文聲音（fish.audio 聲音網址或 ID）":"English voice (fish.audio voice link or ID)","口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，英文的聲音就是英文口音。所以下面可以各選一個。到 fish.audio 打開聲音的頁面，複製網址貼上；留空的話會用另一個欄位的聲音，兩個都空就用預設聲音。":"The accent comes from the voice: a Chinese voice sounds Chinese, an English voice sounds English — so you can pick one of each below. Open a voice page on fish.audio and paste its link; if one is empty the other is used, and if both are empty the default voice is used.","例如 https://fish.audio/m/…":"e.g. https://fish.audio/m/…","請用你自己建立、或主人明確允許使用的聲音。不要用模仿真實人物（聲優、藝人、網紅等）的聲音模型。":"Only use voices you made yourself or that the owner clearly allows. Don't use voice models that imitate real people (voice actors, celebrities, streamers…).","語音模型":"Voice model","S2.1 Pro Free：免費（有合理使用限制）":"S2.1 Pro Free: free (fair-use limits)","S2.1 Pro：付費，比較穩定（要先到 Fish Audio 儲值 API 額度）":"S2.1 Pro: paid, more reliable (needs Fish Audio API credit)","回覆完自動唸出來":"Read replies aloud automatically","語氣跟著表情變（開心、害羞、生氣…）":"Tone follows her expression (happy, shy, annoyed…)","試聽":"Test voice","打開資料夾":"Open folder","更換位置…":"Move…","Google 雲端硬碟備份教學":"Google Drive backup guide","編輯":"Edit","取消":"Cancel","更新":"Update","確定刪除？":"Delete?","編輯訊息":"Edit message","已刪除這則訊息和她的回覆":"Deleted this message and her reply","等她回完再編輯，或先按「停止」":"Wait until she finishes, or press Stop first","內容不能是空的":"The message can't be empty","她還在回覆中…按 Esc 或「停止」可以中斷":"She's still replying… press Esc or Stop to interrupt","上一則卡住了，已經重置，請再傳一次":"The last message got stuck and was reset — please send again","最初的對話":"First chat","無痕對話（不會保存）":"Incognito chat (not saved)","無痕模式：這段對話不會被保存，她也不會記住，也不會讀取你過去的記憶。關掉無痕就會回到一般對話。":"Incognito: this chat isn't saved, she won't remember it, and she won't read your past memories. Turn incognito off to go back.","橘":"Orange","藍":"Blue","綠":"Green","粉":"Pink","紫":"Purple","紅":"Red","黃":"Yellow","還沒有重點。聊天時提到重要的事，夥伴會自動記下。":"No notes yet. When something important comes up, your partner saves it automatically.",
 "檢查中…":"Checking…","聊天模型（Ollama 模型名稱）":"Chat model (Ollama model name)","看圖模型（選填，留空就不看圖）":"Vision model (optional — leave empty to skip images)","Ollama 位址":"Ollama address","儲存並測試連線":"Save & test connection",
 "例如 gemma3:4b":"e.g. gemma3:4b",
@@ -3133,9 +3226,9 @@ const HELP_EN={
   chat:["How to chat","<ul><li>Type and press <code>Enter</code> to send, <code>Shift + Enter</code> for a new line.</li><li>Use the paperclip to send images or files (PDF, Word, Excel, text) — she remembers the full content.</li><li>Send a picture and say “this is you” and she’ll remember that’s how she looks.</li><li>The mic button starts voice input where the system allows it.</li><li>While she’s replying, press “Stop” or <code>Esc</code> to interrupt.</li><li>Hover your own message for “Edit” and “Delete”: editing makes her answer again (everything after it in this chat is replaced); deleting removes it with her reply, plus attached files that aren’t used anywhere else.</li></ul>"],
   convs:["Chats & incognito","<ul><li>Click the chat name to switch, rename or delete past chats.</li><li>“＋ New chat” starts a fresh one anytime; she still remembers everything from every chat.</li><li>“Incognito”: this chat isn’t saved, leaves no memory, and she won’t read your past memories. Press again to leave.</li><li>Deleting a chat doesn’t delete her saved notes — remove those in Memory.</li></ul>"],
   status:["What the numbers mean","<ul><li>MESSAGES: total messages you’ve exchanged.</li><li>FILES: files she can look through.</li><li>MEMORIES: key points she has saved.</li></ul>"],
-  memlog:["Memory notes","<ul><li>Every message is saved in full; these are the extra “key points” she keeps, like your likes, important people and plans.</li><li>Type your own and press “Save”, or press “Delete” to remove a wrong one.</li><li>She checks these first when answering — fixing a mistake here is the fastest way.</li></ul>"],
+  memlog:["Memory notes","<ul><li>Every message is saved in full; these are the extra “key points” she keeps, like your likes, important people and plans.</li><li>Type your own and press “Save”, or press “Delete” to remove a wrong one.</li><li>She checks these first when answering — fixing a mistake here is the fastest way.</li><li>Before every reply she takes a few seconds to note anything new about you.</li><li>Things coming up (a test, a trip) show here as “She’ll ask how it went”; once she has asked, they become normal notes.</li><li>Use the search box to find a note quickly.</li></ul>"],
   files:["Files","<ul><li>Upload with the paperclip in Chat. The full text is saved and she’ll look it up when you ask.</li><li>“Delete” removes the file and its contents, and she won’t remember it any more.</li></ul>"],
-  search:["Search","<ul><li>Search everything you’ve said and every file’s contents by keyword.</li><li>For Chinese, use words of two or more characters.</li></ul>"],
+  search:["Search","<ul><li>Search everything you’ve said and every file’s contents by keyword.</li><li>For Chinese, use words of two or more characters.</li><li>“You might be looking for” suggests searches from what you’ve talked about.</li></ul>"],
   voice:["Voice (Fish Audio)","<ol><li>Sign up at fish.audio, create a key under API Keys and paste it here.</li><li>The accent comes from the voice: paste one fish.audio voice link for Chinese and one for English. With Accent on Auto, Chinese replies use the Chinese voice and English replies the English one; you can also fix it to Chinese or English.</li><li>“S2.1 Pro Free” is free with fair-use limits; the paid S2.1 Pro needs API credit on Fish Audio (separate from a website membership).</li><li>Turn on “Read replies aloud” to hear every answer, or press “Read aloud” under a reply.</li><li>Voice volume follows the speaker button; nothing is read while muted. She lip-syncs while talking.</li><li>Only use voices you made or have permission to use — no voices imitating real people.</li></ol>"],
   localai:["Local AI (Ollama)","<ol><li>With the local AI, the app starts Ollama for you (llama icon in the menu bar or taskbar); if it isn’t installed, choose “Local AI” and it installs in one click.</li><li>Download a chat model right here: Light (qwen3.5:4b) for 8GB computers, Standard (qwen3.5:9b) for 16GB or more, Powerful (qwen3.5:27b) for 32GB Macs or 20GB+ graphics cards. The one that fits this computer is marked. You can download all of them and switch from the AI menu under the chat; local AI can’t be used while a model is downloading.</li><li>These models see pictures themselves and can think before answering, so the speed levels (Fast / Medium / Slow / Deep) really change something.</li><li>Downloads fail? Update Ollama from ollama.com/download — newer models need a newer Ollama.</li><li>“Can’t reach Ollama”: quit and reopen Ollama, then reopen this app.</li><li>Local AI not smart enough? Use Gemini (has a free tier) or Claude (an Anthropic API key, pay per use, separate from a claude.ai subscription). Keys stay on this computer.</li></ol>"],
   sprites:["Character images","<ol><li>“Eyes open (neutral)” is required; “Mouth open” alternates with it for lip-sync; “Eyes closed” makes her blink every few seconds.</li><li>Other expressions are optional: she picks one when replying (e.g. “Shy” when praised), uses “Thinking” while looking things up, and switches to “Asleep” after 10 idle minutes. Missing ones fall back to neutral.</li><li>Keep every image the same size with the character in the same place — change only the mouth or eyes so switching doesn’t jump. Transparent PNGs work best.</li><li>Convert HEIC photos first: open in Preview → File → Export → PNG.</li><li>Please use art you drew yourself or have permission to use.</li></ol>"],
@@ -3264,7 +3357,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="1.4.3",APP_STAGE="",APP_BUILD="2026-11-07 03:30";
+const APP_VER="1.5.0",APP_STAGE="",APP_BUILD="2026-11-07 03:43";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -3275,6 +3368,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"1.5.0",d:"11/07 04:30",add:[["她每次回話前，會先花幾秒看你說的話裡有沒有新的事要記（例如出生地、考試、喜好），先記下來再回答，這句回覆就已經知道了；你回答她的問題（像考試考得怎樣）也會被記住","Before every reply she takes a few seconds to note anything new you said (where you were born, a test, what you like), so the reply already knows it; your answers to her questions (like how a test went) are remembered too"],["語音說話時，嘴巴會跟著聲音的大小開合","While her voice plays, her mouth opens and closes with how loud she is speaking"],["重點分頁：不再分類，改成依時間排的一個清單，加上搜尋框；原本的「FOLLOW-UP」併進同一個清單，標示「之後會問你結果」，問過之後就變成一般的重點","Memory tab: no more categories — one list by date with a search box; the old “FOLLOW-UP” items now sit in the same list marked “She’ll ask how it went” and become normal notes once she has asked"],["她偶爾會主動傳訊息，問一個跟你有關的問題或分享她自己的看法（最多一天一次）；畫面上的小對話框也會問跟你有關的事，你回她的時候她知道你在回哪句","Now and then (at most once a day) she messages you first with a question about you or her own view on something; her little speech bubbles can ask about you too, and when you answer she knows what you are answering"],["搜尋分頁加上「猜你想搜」：依你們聊過的內容建議搜尋詞，點一下就能搜","Search tab: “You might be looking for” suggests searches from what you’ve talked about — tap one to search"]],fix:[["精確位置只會問一次：之後沿用上次的位置，除非你把「使用精確位置」關掉再打開","Precise location is asked only once and then reused, unless you turn “Use my precise location” off and on again"],["極高畫質換成其他角色圖也能正常打光","Ultra quality lighting works with any character pictures, not just the sample"]]},
  {v:"1.4.3",d:"11/07 03:30",add:[["極高畫質重做：打光直接畫進每張角色圖（動畫風的暗部、左上暖色主光、主題色輪廓光、腳下反光），線條保持清楚、顏色不會變淡；她還會微微轉向你的滑鼠，沒動時會自己輕輕擺動，更有立體感","Ultra quality redone: the lighting is now painted into every character picture (anime-style shadow side, warm key light from the upper left, a rim light in the theme colour, floor bounce), with crisp lines and no washed-out colours; she also turns slightly toward your pointer and drifts gently on her own for more depth"],["記憶多一層保險：她回覆後會再檢查一次你剛說的話，有關於你的新事情（像出生地、學校、喜好）但她忘了記，就會自動補記下來","A memory safety net: after each reply she double-checks what you just said, and if there was something new about you (like where you were born, your school or what you like) that she forgot to note, it gets saved automatically"]],fix:[["極高畫質：換表情時，舊表情的手（例如揮手）會變成黑色或藍色的影子留在畫面上","Ultra quality: when her expression changed, the hand from the previous picture (like the waving one) stayed on screen as a black or blue shadow"],["極高畫質：換表情的瞬間有時會閃出黑灰色的方格","Ultra quality: black-and-grey squares sometimes flashed when her expression changed"],["你說了關於自己的事（例如「我是美國出生的」）時，她有時會誤會成別的意思，也沒有記下來","When you said something about yourself (like “I was born in the US”), she sometimes misread it and didn’t save it"]]},
  {v:"1.4.2",d:"11/07 03:00",add:[["極高畫質：角色多了打光（左上暖光、右下暗部、腳下映出主題色）和細緻的紋理，看起來更有立體感","Ultra quality: the character now has lighting (warm light from the upper left, shade lower right, the theme colour reflected from the floor) and fine texture for more depth"]],fix:[["AI 有時把記憶標記少寫一個括號（像「[[記住：…]」），結果沒被記住，還直接顯示出來、被語音唸出來。現在少括號、單括號、全形括號都認得","When the AI wrote a memory marker with a missing bracket (like “[[記住：…]”), it wasn’t saved and was shown and read aloud instead. Missing, single and full-width brackets are all recognised now"],["極高畫質：掠過角色身上的光澤調暗、變柔和，輪廓光也調淡一點","Ultra quality: the sheen across the character is dimmer and softer, and the rim light is a little lighter"],["重新安裝時會清掉舊的 App 內更新檔，資訊頁不會再顯示舊版本號","Reinstalling now clears old in-app update files, so the info page no longer shows an old version number"]]},
  {v:"1.4.1",d:"11/07 02:30",add:[["角色畫質：低／中／高／極高（設定 → 外觀與音效）。高：沒事時會自然晃動、偶爾換重心，腳下有跟著呼吸的陰影；極高：再加上輪廓光、背光、飄浮光點和掠過畫面的光澤。低最省資源","Character quality: Low / Medium / High / Ultra (Settings → Look & sound). High: she sways naturally and shifts her weight when idle, with a shadow that breathes with her; Ultra adds a rim light, back light, drifting light motes and a sheen. Low uses the least power"]],fix:[["音樂只支援 Spotify：瀏覽器裡的 YouTube 沒辦法從外面穩定控制，所以不再顯示（Mac 和 Windows 都一樣）","Music is Spotify only: YouTube in a browser can’t be controlled reliably from outside, so it’s no longer shown (Mac and Windows)"],["按暫停／播放馬上有反應，不會再跳回原本的狀態；Mac 上不再卡住其他功能","Play / Pause answers right away and no longer flips back; on a Mac it no longer holds up the rest of the app"],["更快發現音樂變化：換歌約 2 秒內、打開 Spotify 約 5 秒內就會顯示","Notices music changes sooner: a new song within about 2 seconds, Spotify opening within about 5"]]},
@@ -3659,9 +3753,9 @@ const HELP={
   chat:["怎麼聊天",`<ul><li>輸入文字後按 <code>Enter</code> 送出，<code>Shift + Enter</code> 換行。</li><li>按迴紋針可以傳圖片或檔案（PDF、Word、Excel、文字檔），她會記住檔案全文。</li><li>傳圖時說「這是你」，她就會記住那是她的樣子。</li><li>按麥克風會教你用系統的語音輸入。</li><li>她回覆時按「停止」或 <code>Esc</code> 可以中斷。</li><li>滑到自己的訊息上會出現「編輯」「刪除」：編輯後她會重新回答（這則之後的對話會被換掉）；刪除會連她的回覆一起刪，附的檔案如果沒有其他地方用到也會一起刪掉。</li></ul>`],
   convs:["對話紀錄與無痕",`<ul><li>按左邊的對話名稱，可以切換、改名或刪除以前的對話。</li><li>「＋ 新對話」隨時開一段新的；不管在哪段對話，她都記得所有對話裡的事和重點。</li><li>「無痕」：這段對話不會被保存、不會留下記憶，她也不會讀取你過去的記憶。再按一次就離開。</li><li>刪除對話不會刪掉她記下的重點，要刪請到「重點」分頁。</li></ul>`],
   status:["數字代表什麼","<ul><li>MESSAGES：你們總共聊過的訊息數。</li><li>FILES：上傳過、她能翻閱的檔案數。</li><li>MEMORIES：她特別記下的重點數。</li></ul>"],
-  memlog:["重點記憶","<ul><li>每一句對話都會完整保存，這裡是她另外記下的「重點」，例如你的喜好、重要的人、計畫。</li><li>你可以自己輸入一條按「記下」，或按「刪除」移除錯誤的內容。</li><li>她回答時會優先參考這裡；如果記錯了，直接在這裡改最快。</li></ul>"],
+  memlog:["重點記憶","<ul><li>每一句對話都會完整保存，這裡是她另外記下的「重點」，例如你的喜好、重要的人、計畫。</li><li>你可以自己輸入一條按「記下」，或按「刪除」移除錯誤的內容。</li><li>她回答時會優先參考這裡；如果記錯了，直接在這裡改最快。</li><li>她每次回話前，會先花幾秒看你說的話裡有沒有新的事要記。</li><li>之後要發生的事（考試、出遊…）會標示「之後會問你結果」；問過之後就變成一般的重點。</li><li>用上面的搜尋框可以很快找到某一條。</li></ul>"],
   files:["檔案","<ul><li>從聊天區的迴紋針上傳，檔案全文會被保存，之後問她檔案內容她會去翻。</li><li>按「刪除」會把檔案和內容都移除，她就不會再記得。</li></ul>"],
-  search:["搜尋","<ul><li>輸入關鍵字，可以搜尋所有聊過的話和檔案內容。</li><li>中文建議用兩個字以上的詞，例如「拉麵」「考試」。</li></ul>"],
+  search:["搜尋","<ul><li>輸入關鍵字，可以搜尋所有聊過的話和檔案內容。</li><li>中文建議用兩個字以上的詞，例如「拉麵」「考試」。</li><li>「猜你想搜」會依你們聊過的內容建議搜尋詞，點一下就能搜。</li></ul>"],
   voice:["語音（Fish Audio）","<ol><li>到 fish.audio 註冊，進「API Keys」建立金鑰，貼到這裡。</li><li>口音跟著聲音走：「中文聲音」和「英文聲音」各貼一個 fish.audio 聲音網址。「口音」選自動時，中文回覆用中文聲音、英文回覆用英文聲音；也可以固定用中文或英文。</li><li>「S2.1 Pro Free」免費，但有合理使用限制；付費的 S2.1 Pro 要先在 Fish Audio 儲值 API 額度（跟網站會員分開算）。</li><li>打開「回覆完自動唸出來」，她每次回答都會唸；不然可以按每則回覆下面的「朗讀」。</li><li>音量跟右上角喇叭一樣；靜音時不會唸。說話時角色會對嘴。</li><li>請只用你自己建立或有授權的聲音，不要用模仿真實人物的聲音。</li></ol>"],
   localai:["本地 AI（Ollama）","<ol><li>用本地 AI 時，App 會自己打開 Ollama（選單列或工作列會出現小羊駝圖示）；還沒裝的話，選「本地 AI」就能一鍵安裝。</li><li>在這裡就能下載聊天模型：輕量版（qwen3.5:4b）給 8GB 的電腦、標準版（qwen3.5:9b）給 16GB 以上、強力版（qwen3.5:27b）給 32GB 的 Mac 或顯示卡 20GB 以上的電腦。適合你電腦的那個會標出來。可以全部下載，要用哪一個在聊天畫面下方的 AI 選單切換；模型下載中的時候不能用本地 AI。</li><li>這些模型自己看得懂圖片，也會先思考再回答，所以回答速度（快／中／慢／詳細）是真的有差。</li><li>下載失敗？到 ollama.com/download 更新 Ollama，新模型需要比較新的 Ollama。</li><li>顯示「連不到 Ollama」：關掉 Ollama 再重新打開，然後重開這個 App。</li><li>覺得本地 AI 太笨：改用 Gemini（有免費額度）或 Claude（Anthropic API 金鑰，按用量付費，跟 claude.ai 訂閱分開）。金鑰只存在這台電腦。</li></ol>"],
   sprites:["角色圖怎麼放","<ol><li>「張眼（平常）」必填；「張嘴」說話時跟它交替做出對嘴；「閉眼」讓她每幾秒眨一次眼。</li><li>其他表情都是選填：她回話時會自己挑表情（例如被稱讚時用「害羞」），查資料時用「思考」，10 分鐘沒互動會換成「睡著」。沒放的表情就用平常那張。</li><li>每張圖的大小和角色位置要一樣，只改嘴巴或眼睛，切換才不會跳。最好用去背 PNG。</li><li>HEIC 照片請先轉成 PNG：用「預覽程式」打開 → 檔案 → 輸出 → 選 PNG。</li><li>請使用你自己畫的或有授權的圖。</li></ol>"],
@@ -4768,7 +4862,7 @@ paintSnd();
     }catch(e){}finally{refilling=false}}
   window.__pokeRefill=refill;
   window.__say=t=>say(t);
-  function say(t){const th=document.querySelector("#heroWrap .thought");if(!th)return;clearTimeout(sayT);th.textContent=t;th.classList.add("say");
+  function say(t){const th=document.querySelector("#heroWrap .thought");if(!th)return;clearTimeout(sayT);window.__lastSay={t:Date.now(),text:String(t)};th.textContent=t;th.classList.add("say");
     sayT=setTimeout(()=>{th.classList.remove("say");setTimeout(()=>{if(!th.classList.contains("say"))th.textContent="···"},300)},Math.min(6500,2600+t.length*90))}
   function react(){const el=$("sprite");if(!el)return;el.classList.remove("poked");void el.offsetWidth;el.classList.add("poked");
     const sp=sprites(),opts=["shy","surprised","happy","angry","smug"].filter(k=>sp[k]);if(opts.length&&!S.streaming)setExpr(opts[Math.floor(Math.random()*opts.length)],2400)}
@@ -5207,17 +5301,30 @@ details.cl>summary{cursor:pointer}
     try{const ac=new AbortController();const t=setTimeout(()=>ac.abort(),7000);const r=await fetch(u,{signal:ac.signal,cache:"no-store"});clearTimeout(t);if(r.ok){const j=await r.json();if(j&&!j.error)return j}}catch(e){}
     try{const j=await getJSON(u);if(j&&!j.error)return j}catch(e){}
     return null}
-  let WX=null,wxBusy=false,wxTimer=null;
+  let WX=null,wxBusy=false,wxTimer=null,wxAgain=false;
   try{WX=JSON.parse(localStorage.getItem("m01.wx")||"null")}catch(e){}
   async function locate(){
     const w=W();
     if(w.city){const name=w.city.trim().replace(/臺/g,"台");const k=Object.keys(TW_CITIES).find(c=>name.includes(c));if(k)return{lat:TW_CITIES[k][0],lon:TW_CITIES[k][1],name:k,how:"city"};
       const g=await wxJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=${E()?"en":"zh"}&format=json`).catch(()=>null);
       if(g&&g.results&&g.results[0]){const x=g.results[0];return{lat:x.latitude,lon:x.longitude,name:x.name,how:"city"}}return{error:"city"}}
-    if(w.precise&&navigator.geolocation){const p=await new Promise(ok=>{try{navigator.geolocation.getCurrentPosition(x=>ok(x),()=>ok(null),{timeout:9000,maximumAge:30*60e3})}catch(e){ok(null)}});
-      if(p){const lat=+p.coords.latitude.toFixed(3),lon=+p.coords.longitude.toFixed(3);let name="";
-        const r=await wxJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${E()?"en":"zh"}`).catch(()=>null);
-        if(r)name=r.city||r.locality||r.principalSubdivision||"";return{lat,lon,name:window.__toTrad&&!E()?window.__toTrad(name):name,how:"gps"}}}
+    // precise location: the browser asks only once. The spot is kept and reused; it is refreshed quietly only while
+    // permission is already granted. Turning "Use my precise location" off and on again asks one more time.
+    if(w.precise&&navigator.geolocation){
+      let G=null;try{G=JSON.parse(localStorage.getItem("m01.geo")||"null")}catch(e){}
+      let perm="";try{perm=(await navigator.permissions.query({name:"geolocation"})).state}catch(e){}
+      let asked=false;try{asked=localStorage.getItem("m01.geoAsked")==="1"}catch(e){}
+      const cached=G&&G.lat!=null?{lat:G.lat,lon:G.lon,name:G.name||"",how:"gps"}:null;
+      if(cached&&(perm!=="granted"||Date.now()-(G.t||0)<6*3600e3))return cached;
+      if(perm==="granted"||(!asked&&perm!=="denied")){
+        try{localStorage.setItem("m01.geoAsked","1")}catch(e){}
+        const p=await new Promise(ok=>{try{navigator.geolocation.getCurrentPosition(x=>ok(x),()=>ok(null),{timeout:9000,maximumAge:30*60e3})}catch(e){ok(null)}});
+        if(p){const lat=+p.coords.latitude.toFixed(3),lon=+p.coords.longitude.toFixed(3);let name="";
+          const r=await wxJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${E()?"en":"zh"}`).catch(()=>null);
+          if(r)name=r.city||r.locality||r.principalSubdivision||"";name=window.__toTrad&&!E()?window.__toTrad(name):name;
+          try{localStorage.setItem("m01.geo",JSON.stringify({lat,lon,name,t:Date.now()}))}catch(e){}
+          return{lat,lon,name,how:"gps"}}}
+      if(cached)return cached}
     const ip=await wxJSON("https://get.geojs.io/v1/ip/geo.json").catch(()=>null);
     if(ip&&ip.latitude){return{lat:+(+ip.latitude).toFixed(3),lon:+(+ip.longitude).toFixed(3),name:ip.city||ip.region||ip.country||"",how:"ip"}}
     let tz="";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}
@@ -5227,7 +5334,7 @@ details.cl>summary{cursor:pointer}
   async function loadWx(force){
     clearTimeout(wxTimer);if(!W().wx){paintWx();return}
     if(!force&&WX&&WX.t&&Date.now()-WX.t<20*60e3&&WX.v===2){paintWx();wxTimer=setTimeout(loadWx,20*60e3-(Date.now()-WX.t)+500);return}
-    if(wxBusy)return;wxBusy=true;
+    if(wxBusy){if(force)wxAgain=true;return}wxBusy=true;   // a forced refresh while one is running runs right after it
     try{const L=await locate();
       if(L.error){WX=Object.assign(WX||{},{err:L.error});}
       else{const f=await wxJSON(`https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`).catch(()=>null);
@@ -5239,7 +5346,7 @@ details.cl>summary{cursor:pointer}
           maybeMorningLine()}
         else WX=Object.assign(WX||{},{err:"net"})}}
     catch(e){WX=Object.assign(WX||{},{err:"net"})}
-    finally{wxBusy=false;paintWx();wxTimer=setTimeout(loadWx,20*60e3)}}
+    finally{wxBusy=false;paintWx();clearTimeout(wxTimer);if(wxAgain){wxAgain=false;wxTimer=setTimeout(()=>loadWx(true),50)}else wxTimer=setTimeout(loadWx,20*60e3)}}
   function wxTip(en){if(!WX||!WX.c)return"";const c=WX.c,d=WX.d,k=kind(c.weather_code),soon=Math.max(0,...(WX.hrs||[]).slice(0,4).map(x=>x.p));
     if(k==="storm")return en?"Thunderstorms — better stay inside if you can.":"有雷雨，能待在室內就待在室內吧。";
     if(c.precipitation>0||k==="rain")return en?"It’s raining — take an umbrella!":"外面在下雨，出門記得帶傘！";
@@ -5296,9 +5403,10 @@ details.cl>summary{cursor:pointer}
     try{if(!S.sample||S.incog)throw 0;const E2=E(),name=S.settings.botName||"Claude";
       const items=S.logs.flatMap(l=>l.items).slice(-8).map(m=>(m.role==="user"?(E2?"Them":"對方"):(E2?"You":"你"))+"："+String(m.text||"").replace(/\s+/g," ").slice(0,160)).join("\n");
       const ctx=[(window.__wxLine&&window.__wxLine())||"",(window.__musicLine&&window.__musicLine())||""].join("").trim();
+      const mem=(S.facts||[]).slice().sort(()=>Math.random()-.5).slice(0,8).map(f=>"- "+String(f.text).slice(0,100)).join("\n");
       const now=new Date();const prompt=E2
-        ?`You are ${name}. Your personality: ${String(S.settings.persona||"").slice(0,500)}\n\nTime now: ${now.toLocaleString("en")}\n${ctx||"(no weather or music info)"}\n\nRecent chat:\n${items||"(nothing yet)"}\n\nThey haven't said anything for a while. Write 5 different short things you'd say to start talking to them again, in character, each under 30 words: ask what they're doing, care about them because of the weather (cold, rain, heat) if it fits, follow up on something you talked about, or say what you think of the song they're playing if there is one. Reply with a JSON array of strings only.`
-        :`你是${name}。你的個性：${String(S.settings.persona||"").slice(0,500)}\n\n現在時間：${now.toLocaleString("zh-TW")}\n${ctx||"（沒有天氣或音樂資料）"}\n\n最近的對話：\n${items||"（還沒聊什麼）"}\n\n對方有一陣子沒說話了。用你的個性寫 5 句不一樣、主動找對方說話的短句，每句 30 字以內：可以問對方在做什麼、依天氣關心對方（冷、下雨、熱，有資料才用）、接續剛剛聊的事、或說說你對對方正在聽的歌的看法（有在聽歌才用）。只回傳 JSON 字串陣列，用繁體中文。`;
+        ?`You are ${name}. Your personality: ${String(S.settings.persona||"").slice(0,500)}\n\nTime now: ${now.toLocaleString("en")}\n${ctx||"(no weather or music info)"}\n\nRecent chat:\n${items||"(nothing yet)"}\n\nThings you remember about them:\n${mem||"(nothing yet)"}\n\nThey haven't said anything for a while. Write 5 different short things you'd say to start talking to them again, in character, each under 30 words: ask what they're doing, care about them because of the weather (cold, rain, heat) if it fits, follow up on something you talked about, ask a question about them that builds on what you remember (their likes, plans, how something went), share your own opinion or feeling about something and ask what they think, or say what you think of the song they're playing if there is one. Reply with a JSON array of strings only.`
+        :`你是${name}。你的個性：${String(S.settings.persona||"").slice(0,500)}\n\n現在時間：${now.toLocaleString("zh-TW")}\n${ctx||"（沒有天氣或音樂資料）"}\n\n最近的對話：\n${items||"（還沒聊什麼）"}\n\n你記得關於對方的事：\n${mem||"（還沒有）"}\n\n對方有一陣子沒說話了。用你的個性寫 5 句不一樣、主動找對方說話的短句，每句 30 字以內：可以問對方在做什麼、依天氣關心對方（冷、下雨、熱，有資料才用）、接續剛剛聊的事、從你記得的事延伸問一個跟對方有關的問題（喜好、計畫、某件事後來怎麼樣）、說說你自己對某件事的看法或心情再問對方覺得呢、或說說你對對方正在聽的歌的看法（有在聽歌才用）。只回傳 JSON 字串陣列，用繁體中文。`;
       const r=await Promise.race([S.sample.json(prompt,{modelTier:"quick"}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),30000))]);
       const arr=(Array.isArray(r)?r:[]).map(v=>(window.__toTrad&&!E2?window.__toTrad(String(v)):String(v)).trim()).filter(v=>v&&v.length<=80&&!/^\[|^\{/.test(v));
       if(arr.length>=2){chatPool=arr.sort(()=>Math.random()-.5);chatAt=Date.now();chatSig=sig}else throw 0}
@@ -5347,7 +5455,7 @@ details.cl>summary{cursor:pointer}
     $("wgMusic").onchange=e=>{W().music=e.target.checked;saveSettingsQuiet();poll();paintMusic()};
     $("wgChat").onchange=e=>{W().chat=e.target.checked;saveSettingsQuiet()};
     $("wgWx").onchange=e=>{W().wx=e.target.checked;saveSettingsQuiet();if(e.target.checked)loadWx(true);else paintWx()};
-    $("wgPrecise").onchange=e=>{W().precise=e.target.checked;saveSettingsQuiet();loadWx(true)};
+    $("wgPrecise").onchange=e=>{W().precise=e.target.checked;try{localStorage.removeItem("m01.geoAsked");localStorage.removeItem("m01.geo")}catch(x){}saveSettingsQuiet();loadWx(true)};
     const city=$("wgCity");let ct=null;city.oninput=()=>{clearTimeout(ct);ct=setTimeout(()=>{W().city=city.value.trim();saveSettingsQuiet();loadWx(true)},900)};
     city.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();clearTimeout(ct);W().city=city.value.trim();saveSettingsQuiet();loadWx(true);city.blur()}}}
 

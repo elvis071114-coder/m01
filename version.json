@@ -1,7 +1,7 @@
 {
- "version": "1.4.3",
- "notes": "1.4.3：極高畫質重做，打光直接畫進角色圖，更有立體感，還會微微轉向滑鼠；修正換表情時留下黑色／藍色的手影和閃出黑灰色方格；她忘了記你說的新事情時會自動補記。",
- "notes_en": "1.4.3: Ultra quality redone with lighting painted into the character for more depth, and she turns slightly toward your pointer; fixes a black/blue ghost hand and grey squares when her expression changed; new things you say about yourself are saved even if she forgets to note them.",
+ "version": "1.5.0",
+ "notes": "1.5.0：她每次回話前會先記下你說的新事情；語音說話時嘴巴跟著聲音動；重點分頁改成一個可以搜尋的清單，FOLLOW-UP 併進去；她偶爾會主動問你的事或分享看法；搜尋加上「猜你想搜」；精確位置只問一次。",
+ "notes_en": "1.5.0: before every reply she notes anything new you said; her mouth follows her voice; the Memory tab is one searchable list with follow-ups merged in; now and then she asks about you or shares her view; Search suggests what you might be looking for; precise location is asked only once.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
@@ -12,6 +12,6 @@
  "helper_win": "https://elvis071114-coder.github.io/m01/helper/server.ps1",
  "helper_win_sha": "59b575798bda566f3db95a517e9da730f53079fca747a76f2241a1606b3e8bfe",
  "pkg": 3,
- "windows_sha": "0d033359243054fca298cc3949d07415be2dc541fc26137b385f56f3bd751927",
- "mac_sha": "8fa27972eef884f639e8104f10bfafb6946a6a31e2b603bffa905a455e648321"
+ "windows_sha": "1bcc80d0b88d1fac8176026dbcbcf3da4979e0704688a54fe49e10191df10a11",
+ "mac_sha": "8691c5fcc555078aab27a98335276f42d79aec9e0143bdbe5d3386ecd9201eec"
 }
