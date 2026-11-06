@@ -473,6 +473,7 @@ body.exiting .stage{animation-delay:.06s}body.exiting .frame{animation-delay:.12
 .upd-box{display:flex;flex-direction:column;gap:4px;margin:8px 0 10px;padding:10px 12px;background:var(--panel2);border-left:3px solid #ff4d4d}.upd-box b{margin:0!important}.upd-box span{font-size:13px}.upd-box a{font-weight:700;color:var(--accent)}.upd-box small{color:var(--dim);font-size:12px}
 #lmBox{display:flex;flex-direction:column;gap:6px}#lmBox .lm-cmp{display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:var(--panel2);border-left:3px solid var(--line2)}.lm-cmp div{display:flex;flex-direction:column}.lm-cmp b{font-size:13.5px}.lm-cmp span{font-size:13px;color:var(--muted);line-height:1.55}
 .lm-h{font-size:13px;font-weight:700;color:var(--muted)}#lmBox .lm-card button.sure,#lmBox .row button.sure{color:#ff6b6b;border-color:#ff6b6b}
+#factList .mem-cat{margin:10px 0 2px;font-size:12.5px;letter-spacing:.08em;color:var(--accent)}#factList .mem-tools{flex-wrap:wrap;align-items:center;gap:8px}#factList .row .fe{margin-right:4px}#factList .fedit{width:100%;box-sizing:border-box;margin-bottom:6px}#factList .fcat{font:inherit;background:var(--panel2);color:var(--ink);border:1px solid var(--line2)}
 .composer .box{position:relative}#aiLock{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px 0 14px;background:var(--panel2,#222);border:1px solid var(--accent);font-size:13.5px;cursor:pointer}#aiLock[hidden]{display:none}#aiLock span{line-height:1.35}#aiLock .pbtn{flex:none;padding:6px 12px}
 #lmBox .lm-job{border:1px solid var(--accent);padding:10px 12px;display:grid;gap:7px;margin-bottom:10px}
 .dl-pill{position:relative;margin-left:6px;border:1px solid var(--line,#444);background:var(--panel2,#222);color:inherit;font:inherit;font-size:12px;padding:3px 9px;border-radius:99px;cursor:pointer;overflow:hidden}.dl-pill i{position:absolute;inset:0;width:var(--p);background:var(--accent);opacity:.25;transition:width .4s}.dl-pill span{position:relative}.dl-pill.paused{opacity:.75}
@@ -844,7 +845,7 @@ body.kb .tabs{padding-top:4px}
             <div class="inline" id="fsDeskBtns" hidden><button class="sbtn" id="fsOpen">打開資料夾</button><button class="sbtn" id="fsMove">更換位置…</button><button class="sbtn" id="fsDrive">Google 雲端硬碟備份教學</button></div>
             </div>
             <label class="sbtn pick" style="align-self:flex-start">從備份還原（JSON）<input type="file" accept=".json,application/json" class="fileover" id="importFile"></label>
-            <button class="sbtn" id="exportBtn" style="align-self:flex-start">下載全部記憶備份（JSON）</button>
+            <button class="sbtn" id="exportBtn" style="align-self:flex-start">下載全部記憶備份（含角色圖）</button>
             <p class="note">對話、記憶和角色圖存在這台裝置裡；用 Google 登入的話，也會自動同步到你自己的雲端。備份檔可以拿來保險，或搬到沒有登入的電腦。</p>
             <div id="unSec" class="subbox" hidden>
               <div class="sec">UNINSTALL</div>
@@ -1848,16 +1849,81 @@ async function maybeFollowUp(){
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(maybeFollowUp,1500)});
 setInterval(()=>{if(document.visibilityState==="visible")maybeFollowUp()},30*60*1000);
 
+/* ---------- memory: grouped by topic, editable, and tidied up now and then (merge duplicates, drop what's out of date) ---------- */
+const MEM_CATS=[["基本資料","About them"],["喜好","Likes & dislikes"],["重要的人","People"],["計畫與約定","Plans & promises"],["學校與工作","School & work"],["健康與生活","Health & daily life"],["其他","Other"]];
+function catLabel(c,en){const m=MEM_CATS.find(x=>x[0]===c);return m?(en?m[1]:m[0]):(en?"Not sorted yet":"還沒分類")}
+let memPrev=null;   // the list before the last tidy-up, for undo
 function renderFacts(){
-  const el=$("factList");el.innerHTML="";
-  if(!S.facts.length){el.innerHTML=`<p class="note">還沒有重點。聊天時提到重要的事，夥伴會自動記下。</p>`}
-  for(const f of [...S.facts].reverse()){
-    const r=document.createElement("div");r.className="row";
-    r.innerHTML=`<div class="t">${esc(f.text)}<div class="d">${stamp(f.t)}</div></div><button aria-label="刪除這條">刪除</button>`;
-    r.querySelector("button").onclick=()=>{S.facts=S.facts.filter(x=>x.id!==f.id);saveFacts();renderFacts();updateStats();};
-    el.appendChild(r);
+  const el=$("factList");if(!el)return;el.innerHTML="";const en=isEN();
+  const tools=document.createElement("div");tools.className="inline mem-tools";
+  const last=S.settings.memTidy&&S.settings.memTidy.t;
+  tools.innerHTML=`<button class="sbtn" id="memTidyBtn"${S.facts.length<4?" disabled":""}>${en?"Tidy up memories":"整理記憶"}</button>${memPrev?`<button class="sbtn" id="memUndo">${en?"Undo last tidy-up":"復原上次整理"}</button>`:""}<span class="note" style="margin:0">${last?(en?"Last tidied ":"上次整理：")+stamp(last):(en?"She tidies them by herself about once a week.":"她大約每週會自己整理一次：合併重複的、刪掉過時的，並分類。")}</span>`;
+  el.appendChild(tools);
+  if(!S.facts.length){const p=document.createElement("p");p.className="note";p.textContent=en?"Nothing yet. When you mention something important while chatting, she notes it down.":"還沒有重點。聊天時提到重要的事，夥伴會自動記下。";el.appendChild(p)}
+  const groups=new Map();for(const f of S.facts){const c=MEM_CATS.some(x=>x[0]===f.cat)?f.cat:"";if(!groups.has(c))groups.set(c,[]);groups.get(c).push(f)}
+  const order=[...MEM_CATS.map(x=>x[0]),""].filter(c=>groups.has(c));
+  for(const c of order){
+    const list=groups.get(c).slice().sort((a,b)=>b.t-a.t);
+    const h=document.createElement("div");h.className="mem-cat";h.textContent=`${catLabel(c,en)}（${list.length}）`;el.appendChild(h);
+    for(const f of list){
+      const r=document.createElement("div");r.className="row";
+      r.innerHTML=`<div class="t"><span class="ft">${esc(f.text)}</span><div class="d">${stamp(f.t)}</div></div><button class="fe" aria-label="${en?"Edit":"修改"}">${en?"Edit":"修改"}</button><button class="fd" aria-label="${en?"Delete":"刪除這條"}">${en?"Delete":"刪除"}</button>`;
+      r.querySelector(".fd").onclick=()=>{S.facts=S.facts.filter(x=>x.id!==f.id);saveFacts();renderFacts();updateStats()};
+      r.querySelector(".fe").onclick=()=>{const t=r.querySelector(".t");t.innerHTML=`<input class="fedit" value="${esc(f.text)}"><select class="fcat">${MEM_CATS.map(x=>`<option value="${x[0]}"${x[0]===f.cat?" selected":""}>${en?x[1]:x[0]}</option>`).join("")}</select>`;
+        const inp=t.querySelector(".fedit");inp.focus();const b=r.querySelector(".fe");b.textContent=en?"Save":"儲存";
+        const save=()=>{const v=inp.value.trim();if(v){f.text=v.slice(0,300);f.cat=t.querySelector(".fcat").value;f.t=Date.now()}saveFacts();renderFacts()};
+        b.onclick=save;inp.onkeydown=e=>{if(e.key==="Enter")save();if(e.key==="Escape")renderFacts()}};
+      el.appendChild(r);
+    }
   }
+  const tb=$("memTidyBtn");if(tb)tb.onclick=()=>tidyMemory(true);
+  const ub=$("memUndo");if(ub)ub.onclick=()=>{if(!memPrev)return;S.facts=memPrev;memPrev=null;saveFacts();renderFacts();updateStats();toast(en?"Back to how it was before.":"已經復原成整理前的樣子。")};
 }
+let memTidying=false;
+async function tidyMemory(manual){
+  const en=isEN();if(memTidying||S.incog||!S.sample)return;
+  if(S.facts.length<4){if(manual)toast(en?"Not enough to tidy yet.":"重點還太少，不用整理。");return}
+  if(!S.aiOK){if(manual)toast(en?"Set up an AI first.":"要先設定好 AI 才能整理。");return}
+  memTidying=true;const b=$("memTidyBtn");if(b){b.disabled=true;b.textContent=en?"Tidying…":"整理中…"}
+  const before=S.facts.map(f=>({...f}));
+  try{
+    const list=before.slice(-150);   // the newest 150 at most per run; older ones stay as they are
+    const lines=list.map((f,i)=>`${i+1}. (${dayOf(f.t)}) ${String(f.text).replace(/\s+/g," ").slice(0,200)}`).join("\n");
+    const cats=MEM_CATS.map(x=>x[0]).join("、");
+    const prompt=`以下是你記下的、關於對方的重點（編號、日期、內容）。請幫忙整理：
+1. 意思重複的合併成一條（保留所有細節）。
+2. 被比較新的重點取代或矛盾的舊重點刪掉（例如以前喜歡 A、後來說改喜歡 B，就只留新的）。
+3. 每條分到一個類別：${cats}。
+不要編造新內容，不確定就保留原樣。內容保持原本的語言（中文用繁體）。
+只回傳 JSON，格式：{"items":[{"from":[原本的編號…],"text":"整理後的內容","cat":"類別"}],"drop":[要刪掉的編號…]}
+每個編號只能出現一次（在某個 items 的 from 裡，或在 drop 裡）。
+
+${lines}`;
+    const r=await Promise.race([S.sample(prompt,{modelTier:"quick",cache:false}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),150000))]);
+    let raw=visible(String(r&&r.text||"")).trim();const m=raw.match(/\{[\s\S]*\}/);if(!m)throw new Error("format");
+    const j=JSON.parse(m[0]);if(!j||!Array.isArray(j.items))throw new Error("format");
+    const n=list.length,used=new Set(),out=[],drop=new Set();
+    for(const it of j.items){const from=(Array.isArray(it.from)?it.from:[]).map(Number).filter(k=>k>=1&&k<=n&&!used.has(k));if(!from.length)continue;
+      let text=String(it.text||"").trim().slice(0,300);if(!text)continue;if(!en&&typeof toTraditional==="function")text=toTraditional(text);
+      from.forEach(k=>used.add(k));const src=from.map(k=>list[k-1]);
+      out.push({id:src.length===1?src[0].id:rid(),text,t:Math.max(...src.map(s=>s.t||0)),cat:MEM_CATS.some(x=>x[0]===it.cat)?it.cat:(src[0].cat||"其他")})}
+    for(const k of (Array.isArray(j.drop)?j.drop:[]).map(Number))if(k>=1&&k<=n&&!used.has(k)){drop.add(k);used.add(k)}
+    // safety: anything the AI didn't mention is kept as it was; refuse results that would throw away a lot
+    for(let k=1;k<=n;k++)if(!used.has(k))out.push({...list[k-1]});
+    const merged=n-out.length-drop.size;
+    if(drop.size>Math.max(3,Math.floor(n*.3))||out.length+drop.size<n*.5)throw new Error("unsafe");
+    const older=before.slice(0,before.length-list.length);
+    // facts added while she was tidying are kept too
+    const added=S.facts.filter(f=>!before.some(x=>x.id===f.id));
+    memPrev=before;S.facts=[...older,...out.sort((a,b)=>a.t-b.t),...added];
+    S.settings.memTidy={t:Date.now(),n:S.facts.length};saveSettingsQuiet();saveFacts();renderFacts();updateStats();
+    const sm=en?`Memories tidied: ${Math.max(0,merged+drop.size)} fewer duplicates or outdated notes, all sorted by topic.`:`記憶整理好了：合併或刪掉 ${Math.max(0,merged+drop.size)} 條重複或過時的，並依主題分類。`;
+    if(manual)toast(sm+(en?" You can undo it in the Memory tab.":"不滿意可以在「重點」分頁復原。"),8000);
+  }catch(e){if(manual)toast(e&&e.message==="unsafe"?(en?"The tidy-up wanted to remove too much, so nothing was changed.":"這次整理想刪掉太多，為了安全沒有套用。"):(en?"Couldn’t tidy up this time — try again later.":"這次沒整理成功，晚點再試。"),7000);console.warn("tidy",e)}
+  finally{memTidying=false;const b2=$("memTidyBtn");if(b2){b2.disabled=false;b2.textContent=en?"Tidy up memories":"整理記憶"}}
+}
+// about once a week, or after many new notes, while she isn't busy
+setInterval(()=>{try{const mt=S.settings&&S.settings.memTidy||{t:0,n:0};if(!S.busy&&!document.hidden&&S.facts.length>=12&&(Date.now()-mt.t>7*864e5||S.facts.length-(mt.n||0)>=20))tidyMemory(false)}catch(e){}},10*60e3);
 function renderFiles(){
   const el=$("fileList");el.innerHTML="";
   if(!S.files.length){el.innerHTML=`<p class="note">還沒有檔案。點輸入框左邊的迴紋針上傳。</p>`}
@@ -2697,7 +2763,8 @@ $("qBtn").onclick=()=>{
 };
 $("q").onkeydown=e=>{if(e.key==="Enter")$("qBtn").click()};
 $("exportBtn").onclick=()=>{
-  const data={exported:new Date().toISOString(),settings:S.settings,facts:S.facts,files:S.files.map(f=>({...f,text:(S.chunks.get(f.id)||[]).join("")})),messages:allMsgs()};
+  const spr={};for(const [k,v] of Object.entries(S.spriteData||{}))if(typeof v==="string"&&v.startsWith("data:"))spr[k]=v;   // character pictures go in the backup too
+  const data={exported:new Date().toISOString(),version:APP_VER,settings:S.settings,facts:S.facts,files:S.files.map(f=>({...f,text:(S.chunks.get(f.id)||[]).join("")})),messages:allMsgs(),sprites:spr};
   if(typeof APP_MODE!=="undefined"&&APP_MODE&&FS.dir&&FS.dir.server){const nm=`companion-backup-${dayOf(Date.now())}.json`;serverFS.putText(["備份",nm],JSON.stringify(data,null,1)).then(()=>{pruneBackups();return 0}).then(()=>toast("備份已存到 Companion/備份/"+nm,6000),()=>toast("備份失敗"));return}
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,1)],{type:"application/json"}));a.download=`companion-backup-${dayOf(Date.now())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast("備份檔已下載");
 };
@@ -2743,7 +2810,7 @@ const I18N={
 "檢查中…":"Checking…","聊天模型（Ollama 模型名稱）":"Chat model (Ollama model name)","看圖模型（選填，留空就不看圖）":"Vision model (optional — leave empty to skip images)","Ollama 位址":"Ollama address","儲存並測試連線":"Save & test connection",
 "例如 gemma3:4b":"e.g. gemma3:4b",
 "記憶目前存在 App 裡。選「文件」裡的 Companion 資料夾，所有記憶就會存進去，再由 Google 雲端硬碟同步。":"Memory is currently stored inside the app. Choose the Companion folder in Documents and everything will be saved there, then synced by Google Drive.",
-"選擇備份資料夾":"Choose folder","立即全部匯出":"Export everything now","從備份還原（JSON）":"Restore from backup (JSON)","下載全部記憶備份（JSON）":"Download full memory backup (JSON)",
+"選擇備份資料夾":"Choose folder","立即全部匯出":"Export everything now","從備份還原（JSON）":"Restore from backup (JSON)","下載全部記憶備份（含角色圖）":"Download a full backup (with character pictures)","下載全部記憶備份（JSON）":"Download full memory backup (JSON)",
 "對話、記憶和角色圖都存在上面的記憶資料夾裡，再由 Google 雲端硬碟同步。備份檔可以用來搬到別台電腦。":"Chats, memory and character images are stored in the memory folder above and synced by Google Drive. Use a backup file to move to another computer.",
 "選擇記憶資料夾":"Choose memory folder","選擇資料夾":"Choose folder","先存在 App 裡":"Keep it in the app for now","更換記憶資料夾":"Change memory folder",
 "她說過的話、記下的重點和你的檔案，全部會存在這個資料夾裡。請選「文件」裡的":"Everything she says, her notes and your files will be saved in this folder. Please choose, inside Documents, the",
@@ -2831,7 +2898,7 @@ const HELP_EN={
   localai:["Local AI (Ollama)","<ol><li>Make sure Ollama is running (llama icon in the menu bar or taskbar).</li><li>Download a chat model right here: Light (qwen3.5:4b) for 8GB computers, Standard (qwen3.5:9b) for 16GB or more, Powerful (qwen3.5:27b) for 32GB Macs or 20GB+ graphics cards. The one that fits this computer is marked.</li><li>These models see pictures themselves and can think before answering, so the speed levels (Fast / Medium / Slow / Deep) really change something.</li><li>Downloads fail? Update Ollama from ollama.com/download — newer models need a newer Ollama.</li><li>“Can’t reach Ollama”: quit and reopen Ollama, then reopen this app.</li><li>Local AI not smart enough? Switch “AI source” to Claude and paste an Anthropic API key (pay per use, separate from a claude.ai subscription). The key stays on this computer.</li></ol>"],
   sprites:["Character images","<ol><li>“Eyes open (neutral)” is required; “Mouth open” alternates with it for lip-sync; “Eyes closed” makes her blink every few seconds.</li><li>Other expressions are optional: she picks one when replying (e.g. “Shy” when praised), uses “Thinking” while looking things up, and switches to “Asleep” after 10 idle minutes. Missing ones fall back to neutral.</li><li>Keep every image the same size with the character in the same place — change only the mouth or eyes so switching doesn’t jump. Transparent PNGs work best.</li><li>Convert HEIC photos first: open in Preview → File → Export → PNG.</li><li>Please use art you drew yourself or have permission to use.</li></ol>"],
   profile:["Name & personality","<ul><li>“Partner’s name” shows on the name plate and in the big scrolling background text.</li><li>“Theme colour”: click a swatch or use the picker on the right for any colour.</li><li>“Language” switches the interface, and she’ll reply in that language too.</li><li>Volume is on the speaker button at the top-right: click it for a vertical slider, with Mute below.</li><li>“Personality & speaking style” decides how she talks — add a few sample lines to help her.</li><li>Changes save automatically — no button to press.</li></ul>"],
-  folder:["Memory folder","<ul><li>Everything lives in Documents/Companion: <code>對話/</code> holds daily chat logs, <code>記憶重點.md</code> her key notes, <code>檔案/</code> your uploads.</li><li>You can edit 記憶重點.md directly — she follows it the next time the app opens.</li><li><code>_資料（請勿修改）</code> is the app’s own data — don’t touch it.</li><li>To see it on other devices, sync this folder with Google Drive for desktop.</li></ul>"],
+  folder:["Memory folder","<ul><li>Everything lives in the app’s own folder (press “Open folder” to see it), and is backed up to your Google Drive when you’re signed in: <code>對話/</code> holds daily chat logs, <code>記憶重點.md</code> her key notes, <code>檔案/</code> your uploads.</li><li>You can edit 記憶重點.md directly — she follows it the next time the app opens.</li><li><code>_資料（請勿修改）</code> is the app’s own data — don’t touch it.</li><li>To see it on other devices, sync this folder with Google Drive for desktop.</li></ul>"],
   dl:["What is Get App","<ul><li><b style=\"display:inline;font-size:inherit\">Web version</b> (this one): uses your Claude account, works on phones and computers, memory lives in your Claude account.</li><li><b style=\"display:inline;font-size:inherit\">Desktop app</b>: uses a local AI (Ollama) — free, no Claude account, memory saved in Documents/Companion.</li><li>The two memories are separate. To move: Settings → Copy all memory here, save as a .json file, then Settings → Restore from backup in the app.</li><li>Each zip includes “先看我.txt” with full steps and fixes.</li></ul>"],
   data_local:["Backup & restore","<ul><li>“Download full memory backup” packs chats, notes and files into one JSON file (the app saves it to <code>Companion/備份/</code>).</li><li>“Restore from backup” imports a backup — use it when changing computers or moving from the web version.</li></ul>"],
   data_web:["Backup & restore","<ul><li>“Copy all memory” copies chats, notes and files as JSON text; paste it into a text file saved as .json to keep a backup.</li><li>To move to the desktop app: use “Restore from backup” in the app’s settings.</li></ul>"],
@@ -2966,7 +3033,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
- {v:"1.1.0",d:"11/06 14:30",add:[["模型可以背景下載：切換畫面、關掉 App 都會繼續下載；電腦睡眠或斷線後會從中斷的地方接著下載。會顯示速度和大概還要多久，也可以暫停、繼續（需要重新安裝一次 App）","Models download in the background: it keeps going when you switch screens or close the app, and continues where it stopped after sleep or a dropped connection. Shows speed and time left, with Pause and Continue (reinstall the app once)"],["第一次打開要先用 Google 登入，再設定至少一個 AI（建議 Gemini 或本地 AI）；還沒設定 AI 前聊天框會先鎖住","First launch now asks you to sign in with Google, then set up at least one AI (Gemini or local recommended); the message box stays locked until an AI is set up"],["安裝程式變簡單了：只裝 App（中英對照）。打開後先登入 Google、選 AI；選本地 AI 時，App 會一鍵幫你安裝 Ollama，再選模型下載","Simpler installer: it only installs the app (Chinese and English). In the app you sign in with Google and choose an AI; picking the local AI installs Ollama for you in one click, then you choose a model"],["Windows 的小圖示重新畫過，工作列和捷徑不再模糊","Redrew the small Windows icons so the taskbar and shortcuts are sharp"]],fix:[["電腦建議更準：沒有 NVIDIA 顯示卡的 Windows 電腦和 Intel Mac 會建議輕量版，並提醒本地 AI 會比較慢、建議用 Gemini（之前 16GB 沒顯示卡也會建議標準版，結果要等快一分鐘）","Better model suggestions: Windows PCs without an NVIDIA card and Intel Macs get Light, with a note that local AI is slow there and Gemini is faster (before, a 16GB PC without a graphics card was told to use Standard and waited about a minute)"],["本地 AI 回得更快：每次都會變的內容（時間、天氣、音樂、前情提要）移到提示最後，Ollama 可以重用前面算好的部分，不用每次從頭讀","Faster local replies: things that change every time (time, weather, music, summary) moved to the end of the prompt so Ollama can reuse the rest instead of rereading it all"]]},
+ {v:"1.1.0",d:"11/06 14:30",add:[["模型可以背景下載：切換畫面、關掉 App 都會繼續下載；電腦睡眠或斷線後會從中斷的地方接著下載。會顯示速度和大概還要多久，也可以暫停、繼續（需要重新安裝一次 App）","Models download in the background: it keeps going when you switch screens or close the app, and continues where it stopped after sleep or a dropped connection. Shows speed and time left, with Pause and Continue (reinstall the app once)"],["第一次打開要先用 Google 登入，再設定至少一個 AI（建議 Gemini 或本地 AI）；還沒設定 AI 前聊天框會先鎖住","First launch now asks you to sign in with Google, then set up at least one AI (Gemini or local recommended); the message box stays locked until an AI is set up"],["安裝程式變簡單了：只裝 App（中英對照）。打開後先登入 Google、選 AI；選本地 AI 時，App 會一鍵幫你安裝 Ollama，再選模型下載","Simpler installer: it only installs the app (Chinese and English). In the app you sign in with Google and choose an AI; picking the local AI installs Ollama for you in one click, then you choose a model"],["Windows 的小圖示重新畫過，工作列和捷徑不再模糊","Redrew the small Windows icons so the taskbar and shortcuts are sharp"],["以後更新幾乎都不用重新下載：連背景小幫手都能在 App 裡一鍵更新（這是最後一次需要重新安裝）","Future updates almost never need a download: even the background helper updates with one click inside the app (this is the last reinstall)"],["她會自己整理記憶：大約每週一次，合併重複的、刪掉過時的，並依主題分類；「重點」分頁可以修改每一條，也能復原上次整理","She tidies her memories by herself about once a week — merging duplicates, dropping outdated notes and sorting them by topic; every note can be edited in the Memory tab, and the last tidy-up can be undone"],["網頁上有一步一步的安裝說明，Mac 和 Windows 都可以複製一行指令就裝好，不用解壓縮、也不會跳安全性警告","The website has step-by-step install instructions; on Mac and Windows you can install by pasting one line, with no unzipping and no security warnings"],["記憶資料夾搬到 App 自己的資料區，不會在「文件」裡被誤刪（舊的會自動搬過去）；備份檔也會包含角色圖","The memory folder moved into the app’s own data area so it can’t be deleted by accident from Documents (the old one moves over automatically); backups now include character pictures"]],fix:[["電腦建議更準：沒有 NVIDIA 顯示卡的 Windows 電腦和 Intel Mac 會建議輕量版，並提醒本地 AI 會比較慢、建議用 Gemini（之前 16GB 沒顯示卡也會建議標準版，結果要等快一分鐘）","Better model suggestions: Windows PCs without an NVIDIA card and Intel Macs get Light, with a note that local AI is slow there and Gemini is faster (before, a 16GB PC without a graphics card was told to use Standard and waited about a minute)"],["本地 AI 回得更快：每次都會變的內容（時間、天氣、音樂、前情提要）移到提示最後，Ollama 可以重用前面算好的部分，不用每次從頭讀","Faster local replies: things that change every time (time, weather, music, summary) moved to the end of the prompt so Ollama can reuse the rest instead of rereading it all"]]},
  {v:"1.0.0",d:"11/06 08:30",add:[["正式版！經過完整的長時間測試：連續聊幾百則，速度、記憶體都不會變差，重開後資料完整","Version 1.0! Fully tested for long use: hundreds of messages in a row with no slowdown or memory growth, and everything intact after reopening"],["用越久越不怕失憶：記憶重點和檔案再多，也會挑跟這次對話相關的和最新的放進提示，不會超過 AI 能讀的長度；沒列出的也能用搜尋找到","Memory that holds up over time: however many notes and files there are, the ones related to this message plus the newest go into the prompt, so it never overflows; the rest can still be found by search"],["記憶重點也能被搜尋到","Memory notes are now searchable too"],["大幅省電：視窗沒在用或她睡著時，背景動畫、粒子和音樂條都會停下，閒置時的 CPU 用量少了約 99%；使用中也少了約三成","Big power savings: background animation, particles and music bars stop while the window isn’t in use or she’s asleep — about 99% less CPU when idle and about a third less in use"],["長時間聊天時畫面只保留最近約 100 則，舊的收進「顯示更早的訊息」，不會越聊越卡","In long sessions only the latest ~100 messages stay on screen; older ones fold behind “show earlier”, so it never gets sluggish"],["備份資料夾只保留最新 5 份","The backup folder keeps only the newest five backups"]],fix:[["天氣暫時拿不到時，上方橫條會寫出原因，不會只剩一朵雲","When the weather can’t be fetched, the top bar says why instead of showing only a cloud"],["Ollama 狀態確認一次後一分鐘內不重查，送出更快","Ollama’s status is checked at most once a minute, so sending is quicker"]]},
  {v:"0.10.35",d:"11/06 07:40",add:[["長對話不再忘記開頭：較早的對話會自動整理成「前情提要」，跟著對話一起保存、同步，每次回答都會參考","Long chats no longer forget the beginning: earlier messages are folded into a running summary, saved and synced with the chat, and used for every reply"],["用 Gemini 或 Claude 時，AI 選單旁邊有用量圓圈：快用完會變黃、橘、紅，點開看今天／本月用量、重置時間和官方用量頁面","With Gemini or Claude, a usage ring sits next to the AI menu: yellow, orange, then red as it runs out; click for today’s/this month’s usage, reset time and the official usage pages"],["本地 AI 會一直待在記憶體裡（App 開著時），打開 App 就先暖機，第一句不用等載入","The local AI stays loaded while the app is open and warms up on start, so the first reply doesn’t wait for loading"],["Ollama 沒開時 App 會自動幫你打開","The app starts Ollama for you when it isn’t running"],["她提到你沒傳的圖片時會自動重寫","If she talks about a picture you never sent, the reply is rewritten automatically"],["Gemini 免費額度用完時，自動改由本地 AI 回答並註明","When Gemini’s free quota runs out, the local AI answers instead and says so"]],fix:[["「重說」按鈕一直顯示，不用滑過去才看得到","The “Again” button is always visible"]]},
  {v:"0.10.34",d:"11/06 07:20",add:[["她講到失控時會自動重寫：用比較穩的設定重新回答一次，回覆下面會註明（預設開，在「設定 → AI 模型」可以關）","When she rambles, the reply is rewritten automatically with calmer settings and a note says so (on by default; Settings → AI model)"],["每則回覆旁邊多了「重說」按鈕，不滿意就讓她重新回答","Every reply has an “Again” button to have her answer once more"],["穩定模式：本地 AI 一直用比較穩的設定，比較少出錯，但說話會平淡一點","Stable mode: the local AI always uses calmer settings — fewer slips, a little plainer"],["重寫後還是失控時，會截掉並在訊息旁邊建議重說","If the rewrite still rambles, it is cut off and the note suggests asking again"]],fix:[]},
@@ -3294,7 +3361,7 @@ addEventListener("keydown",e=>{if($("tour").hidden)return;if(e.key==="Escape"){e
 function maybeTour(){
   let done=!!S.settings.tourDone;try{done=done||localStorage.getItem("m01.tourDone")==="1"}catch(e){}
   if(done)return;
-  const wait=()=>{if(($("ghKey")&&!$("ghKey").hidden)||!$("setupPop").hidden||(typeof aiPickPending!=="undefined"&&aiPickPending)||($("aiPick")&&!$("aiPick").hidden)){setTimeout(wait,600);return}startTour()};setTimeout(wait,700);
+  const wait=()=>{if((window.__aiGate&&(window.__aiGate.locked()||window.__aiGate.state.phase==="boot"))||($("ghKey")&&!$("ghKey").hidden)||!$("setupPop").hidden||(typeof aiPickPending!=="undefined"&&aiPickPending)||($("aiPick")&&!$("aiPick").hidden)){setTimeout(wait,600);return}startTour()};setTimeout(wait,700);
 }
 
 /* ---------- hover: selection frame + soft tick ---------- */
@@ -3340,7 +3407,7 @@ const HELP={
   localai:["本地 AI（Ollama）","<ol><li>確認 Ollama 有開著（選單列或工作列有小羊駝圖示）。</li><li>在這裡就能下載聊天模型：輕量版（qwen3.5:4b）給 8GB 的電腦、標準版（qwen3.5:9b）給 16GB 以上、強力版（qwen3.5:27b）給 32GB 的 Mac 或顯示卡 20GB 以上的電腦。適合你電腦的那個會標出來。</li><li>這些模型自己看得懂圖片，也會先思考再回答，所以回答速度（快／中／慢／詳細）是真的有差。</li><li>下載失敗？到 ollama.com/download 更新 Ollama，新模型需要比較新的 Ollama。</li><li>顯示「連不到 Ollama」：關掉 Ollama 再重新打開，然後重開這個 App。</li><li>覺得本地 AI 太笨：「AI 來源」改成 Claude，貼上 Anthropic 的 API 金鑰（按用量付費，跟 claude.ai 訂閱分開）。金鑰只存在這台電腦。</li></ol>"],
   sprites:["角色圖怎麼放","<ol><li>「張眼（平常）」必填；「張嘴」說話時跟它交替做出對嘴；「閉眼」讓她每幾秒眨一次眼。</li><li>其他表情都是選填：她回話時會自己挑表情（例如被稱讚時用「害羞」），查資料時用「思考」，10 分鐘沒互動會換成「睡著」。沒放的表情就用平常那張。</li><li>每張圖的大小和角色位置要一樣，只改嘴巴或眼睛，切換才不會跳。最好用去背 PNG。</li><li>HEIC 照片請先轉成 PNG：用「預覽程式」打開 → 檔案 → 輸出 → 選 PNG。</li><li>請使用你自己畫的或有授權的圖。</li></ol>"],
   profile:["稱呼與個性","<ul><li>「夥伴的名字」會顯示在名牌上，背景流動的大字也會跟著變。</li><li>「主題顏色」可以點色塊，或用最右邊的調色盤自訂任何顏色。</li><li>「語言」可以切換中文或英文，介面和她回話的語言都會跟著換。</li><li>音量在右上角喇叭鍵：點一下會出現直立的滑桿，往上拉變大聲，下面有「靜音」。</li><li>「個性與說話方式」決定她怎麼講話，可以加幾句範例台詞讓她學得更像。</li><li>改完會自動儲存，不用按按鈕。</li></ul>"],
-  folder:["記憶資料夾","<ul><li>所有記憶存在「文件/Companion」：<code>對話/</code> 是每天的紀錄，<code>記憶重點.md</code> 是她記下的重點，<code>檔案/</code> 是上傳過的檔案。</li><li>你可以直接打開「記憶重點.md」修改，下次開 App 她就會照新的內容記。</li><li><code>_資料（請勿修改）</code> 是 App 自己用的，不要動。</li><li>想在手機或別台電腦看：用 Google 雲端硬碟電腦版同步這個資料夾。</li></ul>"],
+  folder:["記憶資料夾","<ul><li>所有記憶存在 App 自己的資料夾（按「打開資料夾」就能看到），用 Google 登入時也會自動備份到你的雲端硬碟：<code>對話/</code> 是每天的紀錄，<code>記憶重點.md</code> 是她記下的重點，<code>檔案/</code> 是上傳過的檔案。</li><li>你可以直接打開「記憶重點.md」修改，下次開 App 她就會照新的內容記。</li><li><code>_資料（請勿修改）</code> 是 App 自己用的，不要動。</li><li>想在手機或別台電腦看：用 Google 雲端硬碟電腦版同步這個資料夾。</li></ul>"],
   data:["備份與還原",IS_LOCAL?"<ul><li>「下載全部記憶備份」會把對話、重點、檔案打包成一個 JSON 檔（App 版會存到 <code>Companion/備份/</code>）。</li><li>「從備份還原」可以把備份檔匯入，換電腦或從網頁版搬過來時用。</li></ul>":"<ul><li>「複製全部記憶」會把對話、重點、檔案複製成 JSON 文字，貼到記事本存成 .json 檔就是備份。</li><li>想搬到電腦版 App：在 App 的設定用「從備份還原」匯入這個檔案。</li></ul>"],
 };
 function showHelp(btn){
@@ -3413,6 +3480,10 @@ $("importFile").onchange=async e=>{
     for(const l of S.logs)persistLog(l);saveFacts();saveSettingsQuiet();
     for(const f2 of (j.files||[])){const {text,...rec}=f2;S.files.push(rec);queueWrite(()=>S.base.collection("files").doc(rec.id).set(rec));
       if(text){const parts=[];for(let i=0;i<text.length;i+=30000)parts.push(text.slice(i,i+30000));S.chunks.set(rec.id,parts);parts.forEach((p,i)=>queueWrite(()=>S.base.collection("chunks").doc(`${rec.id}_${i}`).set({fileId:rec.id,i,text:p})))}}
+    if(j.sprites&&typeof j.sprites==="object"){const sp={...sprites()};
+      for(const [k,data] of Object.entries(j.sprites)){if(typeof data!=="string"||!data.startsWith("data:image/"))continue;S.spriteData[k]=data;sp[k]={...(sp[k]||{}),db:true,t:Date.now()};
+        if(S.db)queueWrite(()=>S.db.doc(`data/users/${S.uid}/sprite_${k}`).set({data,t:Date.now()}))}
+      S.settings.sprites=sp;saveSettingsQuiet();try{renderSlots();renderStage()}catch(e){}}
     S.idxDirty=true;fillSettings();setStatusUI();renderThread();renderFacts();renderFiles();updateStats();toast("已還原 "+j.messages.length+" 則訊息");
   }catch(err){toast("還原失敗："+err.message,5000)}
 };
@@ -3636,13 +3707,22 @@ async function updMode(){
   // "page": one click swaps in the new version; "web": just reload; "install": the background helper changed too, so download it
   const u=S.update;if(!u)return"none";if(window.GH_MODE)return"web";
   if(!u.page)return"install";let hv=1;try{const pg=await serverFS.ping();hv=pg&&pg.hv||1}catch(e){}
-  return (u.helper||1)<=hv?"page":"install";
+  if((u.helper||1)<=hv)return"page";
+  // helpers from 1.1.0 on can update themselves, so a new helper no longer means reinstalling
+  const win=/Windows/i.test(navigator.userAgent),hu=win?u.helper_win:u.helper_mac,hs=win?u.helper_win_sha:u.helper_mac_sha;
+  return hv>=6&&hu&&/^[0-9a-f]{64}$/.test(hs||"")?"helper":"install";
 }
 function updLink(u){const os=/Windows/i.test(navigator.userAgent)?u.windows:/Mac/i.test(navigator.userAgent)?u.mac:"";const pick=os||u.url||"";return /^https:\/\//.test(pick)?pick:""}
 async function applyUpdateNow(){
   const u=S.update;if(!u)return;const en=isEN(),mode=await updMode();
   if(mode==="web"){try{sessionStorage.setItem("m01.autoboot","1")}catch(e){}location.replace(location.pathname+"?v="+encodeURIComponent(u.version));return}
-  if(mode==="page"){toast(en?"Updating…":"更新中…",30000);let j=null;
+  if(mode==="helper"){toast(en?"Updating the background helper…":"正在更新背景小幫手…",60000);
+    const win=/Windows/i.test(navigator.userAgent),hu=win?u.helper_win:u.helper_mac,hs=win?u.helper_win_sha:u.helper_mac_sha;let j=null;
+    try{j=await (await fetch("/helperupdate?url="+encodeURIComponent(hu)+"&sha="+hs,{method:"POST",headers:{"X-M01":"1"}})).json()}catch(e){}
+    if(j&&j.ok){let ok=false;for(let i=0;i<40&&!ok;i++){await new Promise(r=>setTimeout(r,500));try{const pg=await serverFS.ping();ok=!!(pg&&(pg.hv||1)>=(u.helper||1))}catch(e){}}
+      if(ok){return applyUpdateNow()}}   // the helper is new now, so this time it's a normal one-click page update
+    toast(en?"Couldn’t update automatically — download the new version instead.":"沒辦法自動更新，請改用下載安裝。",7000)}
+  else if(mode==="page"){toast(en?"Updating…":"更新中…",30000);let j=null;
     try{j=await (await fetch("/selfupdate?url="+encodeURIComponent(u.page),{method:"POST",headers:{"X-M01":"1"}})).json()}catch(e){}
     if(j&&j.ok){toast(en?"Updated! Restarting…":"更新好了，重新開啟中…",4000);try{sessionStorage.setItem("m01.autoboot","1")}catch(e){}setTimeout(()=>location.reload(),700);return}
     toast(en?"Couldn’t update automatically — download the new version instead.":"沒辦法自動更新，請改用下載安裝。",7000)}
@@ -5150,31 +5230,42 @@ details.cl>summary{cursor:pointer}
     if(p)p.innerHTML=en()?'Get a free key at <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> with a Google account and paste it below — it saves and tests automatically. The free tier has per-minute and per-day limits. The key stays only in this browser and is sent only to Google; on the free tier Google may use chats to improve its products.'
       :'用 Google 帳號到 <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> 免費建立金鑰，貼到下面就會自動儲存並測試。免費額度每分鐘、每天有次數上限，用完等一下就會恢復。金鑰只存在這個瀏覽器裡，只會送到 Google；免費方案的對話內容 Google 可能會拿去改進產品。';
     const dn=[...document.querySelectorAll("#pSet .note")].find(x=>/記憶資料夾裡|存在這台裝置裡|memory folder above|saved on this device/i.test(x.textContent)||x.dataset.ghData);
-    if(dn){dn.dataset.ghData="1";dn.textContent=en()?"Chats, memory and character images are saved in this browser only. Download a backup now and then — clearing browser data or switching phones starts empty. A backup can be imported into the desktop app too.":"對話、記憶和角色圖只存在這個瀏覽器裡。記得偶爾下載備份：清除瀏覽器資料或換手機，就會是空的。備份檔也可以匯入電腦版 App。"}
+    if(dn){dn.dataset.ghData="1";dn.textContent=en()?"Chats, memory and character images are saved in this browser and backed up to your own Google Drive, so signing in on another phone or computer brings them back. A backup file is optional, and can be imported into the desktop app too.":"對話、記憶和角色圖存在這個瀏覽器，並自動備份到你自己的 Google 雲端硬碟：換手機、換電腦登入就會回來。備份檔只是額外再留一份，也可以匯入電腦版 App。"}
   };
   // download page
   const BASE="downloads/";
   window.renderGhDl=()=>{const E=en(),p=$("pDl");if(!p)return;
     p.innerHTML=`<div class="sec">DOWNLOAD</div>
-    <p class="note">${E?"This web version runs on your own free Gemini key and keeps memory in this browser. The desktop app can also run a free local AI (works offline), look things up on the web, read replies aloud and save memory to a folder on your computer.":"這個網頁版用你自己的免費 Gemini 金鑰，記憶存在這個瀏覽器裡。電腦版 App 還可以用免費的本地 AI（不用網路）、上網查資料、用語音唸出回覆，記憶存在你電腦的資料夾。"}</p>
+    <p class="note">${E?"This web version runs on your own free Gemini key. The desktop app can also run a free local AI (works offline), look things up on the web and read replies aloud. Both back up your memories to your own Google Drive, so they stay in sync.":"這個網頁版用你自己的免費 Gemini 金鑰。電腦版 App 還可以用免費的本地 AI（不用網路）、上網查資料、用語音唸出回覆。兩邊的記憶都會備份到你自己的 Google 雲端硬碟，會互相同步。"}</p>
     <table class="gh-cmp"><thead><tr><th></th><th>${E?"This web version":"這個網頁版"}</th><th>${E?"Desktop app":"電腦版 App"}</th></tr></thead><tbody>
     <tr><th>${E?"AI":"AI"}</th><td>Gemini</td><td>${E?"Local AI (free), Gemini or Claude":"本地 AI（免費）、Gemini 或 Claude"}</td></tr>
     <tr><th>${E?"Web search":"上網查資料"}</th><td class="n">✗</td><td class="y">✓</td></tr>
     <tr><th>${E?"Voice":"語音朗讀"}</th><td class="n">✗</td><td class="y">✓ Fish Audio</td></tr>
-    <tr><th>${E?"Memory":"記憶存在哪"}</th><td>${E?"This browser":"這個瀏覽器"}</td><td>${E?"A folder on your computer":"電腦裡的資料夾"}</td></tr>
+    <tr><th>${E?"Memory":"記憶存在哪"}</th><td>${E?"This browser + your Google Drive":"這個瀏覽器＋你的 Google 雲端硬碟"}</td><td>${E?"This computer + your Google Drive":"這台電腦＋你的 Google 雲端硬碟"}</td></tr>
     <tr><th>${E?"Phone":"手機"}</th><td class="y">✓</td><td class="n">✗</td></tr></tbody></table>
-    <div class="dl-card"><div class="dl-head"><b>Mac</b><span>${E?"Optional local AI (needs Ollama, 16GB memory recommended) — or just Gemini / Claude":"可選本地 AI（要裝 Ollama、建議 16GB 記憶體）或只用 Gemini／Claude"}</span></div>
-      <a class="pbtn dl-btn" href="${BASE}M-01-Companion-Mac.zip" download>${E?"Download for Mac":"下載 Mac 版"}</a>
-      <ol>${E?'<li>(Only for the local AI) install Ollama from <a href="https://ollama.com/download">ollama.com/download</a>.</li><li>Unzip the download.</li><li>Open Terminal, type <code>bash</code> and a space, drag in “安裝 M-01 Companion.command”, press Enter.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB), 3 = no local AI (Gemini / Claude only).</li>':'<li>（想用本地 AI 才需要）先到 <a href="https://ollama.com/download">ollama.com/download</a> 安裝 Ollama。</li><li>解壓縮下載的 zip。</li><li>打開「終端機」，輸入 <code>bash</code> 加一個空格，把「安裝 M-01 Companion.command」拖進去，按 Enter。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB），3 = 不要本地 AI（只用 Gemini／Claude）。</li>'}</ol>
-      <details><summary>${E?"Troubleshooting":"遇到問題怎麼辦"}</summary><ul>${E?"<li>“Developer cannot be verified”: don’t double-click — use Terminal as in step 3.</li><li>“先看我.txt” in the zip has the full guide.</li>":"<li>出現「無法驗證開發者」：不要點兩下，照第 3 步用終端機執行。</li><li>zip 裡的「先看我.txt」有完整說明。</li>"}</ul></details></div>
-    <div class="dl-card"><div class="dl-head"><b>Windows</b><span>${E?"Optional local AI (needs Ollama, 16GB memory recommended) — or just Gemini / Claude":"可選本地 AI（要裝 Ollama、建議 16GB 記憶體）或只用 Gemini／Claude"}</span></div>
-      <a class="pbtn dl-btn" href="${BASE}M-01-Companion-Windows.zip" download>${E?"Download for Windows":"下載 Windows 版"}</a>
-      <ol>${E?'<li>(Only for the local AI) install Ollama from <a href="https://ollama.com/download/windows">ollama.com/download/windows</a>.</li><li>Right-click the zip → “Extract All”.</li><li>Double-click “install.bat”. If “Windows protected your PC” appears, click “More info” → “Run anyway”.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB), 3 = no local AI (Gemini / Claude only).</li>':'<li>（想用本地 AI 才需要）先到 <a href="https://ollama.com/download/windows">ollama.com/download/windows</a> 安裝 Ollama。</li><li>在 zip 上按右鍵 →「全部解壓縮」。</li><li>按兩下「install.bat」。出現「Windows 已保護您的電腦」時，按「其他資訊」→「仍要執行」。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB），3 = 不要本地 AI（只用 Gemini／Claude）。</li>'}</ol>
-      <details><summary>${E?"Troubleshooting":"遇到問題怎麼辦"}</summary><ul>${E?"<li>install.bat flashes and closes: Shift + right-click in the folder → “Open PowerShell here”, run <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>.</li><li>“先看我.txt” in the zip has the full guide.</li>":"<li>install.bat 一閃就消失：在資料夾按住 Shift 再按右鍵 →「在這裡開啟 PowerShell」，執行 <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>。</li><li>zip 裡的「先看我.txt」有完整說明。</li>"}</ul></details></div>
+    <div class="dl-card"><div class="dl-head"><b>${E?"Mac — easiest way (about 1 minute)":"Mac：最簡單的方法（約 1 分鐘）"}</b><span>${E?"No unzipping, no security warnings":"不用解壓縮，也不會跳安全性警告"}</span></div>
+      <ol class="dl-steps">${E?'<li>Press <kbd>⌘ Command</kbd> + <kbd>Space</kbd>, type <b>Terminal</b> and press <kbd>Enter</kbd>. A window with text appears — that’s normal.</li><li>Press <b>Copy</b> below, click into the Terminal window, press <kbd>⌘ Command</kbd> + <kbd>V</kbd> to paste, then <kbd>Enter</kbd>.</li><li>Wait until it says <b>✅ Done</b> — the app opens by itself and is in your Applications folder from now on.</li>':'<li>按 <kbd>⌘ Command</kbd> + <kbd>空白鍵</kbd>，輸入「<b>終端機</b>」（或 Terminal），按 <kbd>Enter</kbd>。會出現一個有文字的視窗，這是正常的。</li><li>按下面的「<b>複製</b>」，點一下終端機視窗，按 <kbd>⌘ Command</kbd> + <kbd>V</kbd> 貼上，再按 <kbd>Enter</kbd>。</li><li>等它出現「<b>✅ 安裝完成</b>」，App 會自己打開，之後在「應用程式」資料夾就找得到。</li>'}</ol>
+      <div class="dl-cmd"><code id="cmdMac">curl -fsSL ${new URL("get.sh",location.href).href} | bash</code><button class="sbtn" data-copy="cmdMac">${E?"Copy":"複製"}</button></div>
+      <p class="note" style="margin:0">${E?"This line downloads the M-01 package from this site and runs its installer. It only installs the app — nothing else on your Mac is changed.":"這行會從這個網站下載 M-01 的安裝包並執行安裝，只會裝 App 本身，不會動到 Mac 上的其他東西。"}</p>
+      <details><summary>${E?"Other way: download the zip":"另一種方法：下載 zip"}</summary>
+        <a class="sbtn dl-btn" href="${BASE}M-01-Companion-Mac.zip" download>${E?"Download for Mac (zip)":"下載 Mac 版（zip）"}</a>
+        <ol>${E?'<li>Double-click the zip to unzip it.</li><li>Open Terminal (step 1 above), type <code>bash</code> and a space, drag “安裝 M-01 Companion.command” into the window, press Enter.</li><li><b>Don’t double-click the .command file</b> — macOS will say it “cannot be opened because the developer cannot be verified”. If you already did: System Settings → Privacy &amp; Security → scroll down → “Open Anyway”.</li>':'<li>點兩下 zip 解壓縮。</li><li>打開終端機（同上面第 1 步），輸入 <code>bash</code> 加一個空格，把「安裝 M-01 Companion.command」拖進視窗，按 Enter。</li><li><b>不要直接點兩下 .command 檔</b>：Mac 會說「無法打開，因為無法驗證開發者」。如果已經點了：到「系統設定 → 隱私權與安全性」，往下捲，按「強制打開」。</li>'}</ol></details></div>
+    <div class="dl-card"><div class="dl-head"><b>${E?"Windows — easiest way (about 1 minute)":"Windows：最簡單的方法（約 1 分鐘）"}</b><span>${E?"No unzipping, no blue warning screen":"不用解壓縮，也不會跳藍色警告"}</span></div>
+      <ol class="dl-steps">${E?'<li>Press the <kbd>Windows</kbd> key, type <b>PowerShell</b> and press <kbd>Enter</kbd>. A blue or black window with text appears — that’s normal.</li><li>Press <b>Copy</b> below, then <b>right-click</b> inside the PowerShell window (or press <kbd>Ctrl</kbd> + <kbd>V</kbd>) to paste, then <kbd>Enter</kbd>.</li><li>Wait until it says <b>✅ Done</b> — the app opens by itself, and there’s an M-01 Companion icon on your desktop.</li>':'<li>按鍵盤上的 <kbd>Windows</kbd> 鍵，輸入「<b>PowerShell</b>」，按 <kbd>Enter</kbd>。會出現藍色或黑色、有文字的視窗，這是正常的。</li><li>按下面的「<b>複製</b>」，在 PowerShell 視窗裡<b>按滑鼠右鍵</b>（或按 <kbd>Ctrl</kbd> + <kbd>V</kbd>）貼上，再按 <kbd>Enter</kbd>。</li><li>等它出現「<b>✅ 安裝完成</b>」，App 會自己打開，桌面也會多一個 M-01 Companion 圖示。</li>'}</ol>
+      <div class="dl-cmd"><code id="cmdWin">irm ${new URL("get.ps1",location.href).href} | iex</code><button class="sbtn" data-copy="cmdWin">${E?"Copy":"複製"}</button></div>
+      <p class="note" style="margin:0">${E?"This line downloads the M-01 package from this site and runs its installer. It only installs the app — nothing else on your PC is changed.":"這行會從這個網站下載 M-01 的安裝包並執行安裝，只會裝 App 本身，不會動到電腦上的其他東西。"}</p>
+      <details><summary>${E?"Other way: download the zip":"另一種方法：下載 zip"}</summary>
+        <a class="sbtn dl-btn" href="${BASE}M-01-Companion-Windows.zip" download>${E?"Download for Windows (zip)":"下載 Windows 版（zip）"}</a>
+        <ol>${E?'<li>Right-click the zip → “Extract All”.</li><li>Double-click “install.bat”.</li><li>A blue “Windows protected your PC” screen may appear: click <b>More info</b> → <b>Run anyway</b>. It appears because the app isn’t from a paid publisher, not because something is wrong.</li><li>If install.bat flashes and closes: Shift + right-click in the folder → “Open PowerShell here”, run <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>.</li>':'<li>在 zip 上按右鍵 →「全部解壓縮」。</li><li>按兩下「install.bat」。</li><li>可能會出現藍色的「Windows 已保護您的電腦」：按「<b>其他資訊</b>」→「<b>仍要執行</b>」。會出現這個是因為 App 沒有付費簽章，不是有問題。</li><li>如果 install.bat 一閃就消失：在資料夾按住 Shift 再按右鍵 →「在這裡開啟 PowerShell」，執行 <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>。</li>'}</ol></details></div>
+    <div class="dl-card"><div class="dl-head"><b>${E?"After installing":"裝好之後"}</b></div>
+      <ol class="dl-steps">${E?'<li>Sign in with Google — your memories are backed up to your own Google Drive.</li><li>Choose an AI: <b>Gemini</b> (free, fastest to set up) or the <b>local AI</b> (free, offline — the app installs Ollama for you and suggests a model for your computer).</li><li>Updates later are one click inside the app — no need to download again.</li>':'<li>用 Google 登入：記憶會自動備份到你自己的 Google 雲端硬碟。</li><li>選一個 AI：<b>Gemini</b>（免費、設定最快）或<b>本地 AI</b>（免費、不用網路，App 會幫你裝好 Ollama，並建議適合你電腦的模型）。</li><li>之後的更新在 App 裡按一下就好，不用再下載。</li>'}</ol></div>
     <div class="dl-card"><div class="dl-head"><b>${E?"Sample character":"範例角色圖"}</b><span>${E?"12 expressions · transparent PNG · about 15MB":"12 種表情 · 去背 PNG · 約 15MB"}</span></div>
       <a class="pbtn dl-btn" href="${BASE}M-01-sample-character.zip" download>${E?"Download sample character":"下載範例角色圖"}</a>
       <p class="note" style="margin:0">${E?"For the desktop app: in Settings press “Use the sample character”, or pick this zip with “Add many pictures or a zip”. In this web version just press “Use the sample character” in Settings. Inspired by the community’s “Claude-chan” fan personification; made with AI.":"電腦版可以在「設定」按「套用範例角色」，或用「一次放多張圖片或 zip」直接選這個 zip。網頁版直接在「設定」按「套用範例角色」就好。角色靈感來自社群的 Claude娘 二創形象，用 AI 製作。"}</p></div>
     <p class="note">${E?"Phones: add this page to your Home Screen (Share → Add to Home Screen) to open it like an app.":"手機：把這個網頁「加到主畫面」，就能像 App 一樣打開。"}</p>`;
+    p.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const t=$(b.dataset.copy).textContent;let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const r=document.createRange();r.selectNodeContents($(b.dataset.copy));const sl=getSelection();sl.removeAllRanges();sl.addRange(r);ok=document.execCommand("copy")}catch(e2){}}
+      b.textContent=ok?(E?"Copied ✓":"已複製 ✓"):(E?"Select and copy":"請手動選取複製");setTimeout(()=>{b.textContent=E?"Copy":"複製"},2500)});
+    if(!$("dlCmdCss")){const st=document.createElement("style");st.id="dlCmdCss";st.textContent=".dl-cmd{display:flex;gap:8px;align-items:stretch;margin:4px 0}.dl-cmd code{flex:1;display:block;padding:10px 12px;background:var(--panel2);border:1px solid var(--line2);font-size:13px;word-break:break-all;user-select:all}.dl-cmd .sbtn{flex:none}.dl-steps{margin:4px 0 6px;padding-left:1.4em;line-height:1.7}.dl-steps kbd{display:inline-block;padding:0 6px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;font-size:.9em;background:var(--panel2)}";document.head.appendChild(st)}
   };
   // first-run key screen
   const box=document.createElement("div");box.id="ghKey";box.hidden=true;box.dataset.i18n="none";document.body.appendChild(box);

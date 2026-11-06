@@ -1,10 +1,14 @@
 {
  "version": "1.1.0",
- "notes": "1.1.0：模型可背景下載（可暫停、繼續，顯示剩餘時間）、第一次使用改成先登入 Google 再設定 AI、電腦建議更準、本地 AI 回得更快、安裝程式中英對照。這版需要重新安裝一次電腦版。",
- "notes_en": "1.1.0: background model downloads (pause, continue, time left), first launch now signs in with Google then sets up an AI, better model suggestions, faster local replies, bilingual installer. Reinstall the desktop app once for this version.",
+ "notes": "1.1.0：以後更新不用再下載、模型背景下載（可暫停）、記憶自動整理分類、第一次使用改成先登入 Google 再設定 AI、一行指令就能安裝。這版需要重新安裝一次電腦版，之後的更新都在 App 裡按一下就好。",
+ "notes_en": "1.1.0: future updates without downloading, background model downloads (pausable), automatic memory tidy-up by topic, first launch signs in with Google then sets up an AI, one-line install. Reinstall the desktop app once — after that, updates are one click inside the app.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
  "page": "https://elvis071114-coder.github.io/m01/app.html",
- "helper": 6
+ "helper": 6,
+ "helper_mac": "https://elvis071114-coder.github.io/m01/helper/server.pl",
+ "helper_mac_sha": "69141cd8574ab5010601ef424df65ce0a547338d9086a5449d4cae0d10486529",
+ "helper_win": "https://elvis071114-coder.github.io/m01/helper/server.ps1",
+ "helper_win_sha": "633ed499c08067fc6f2be0a2b841f4a9b23beffe261ab8c78a17eded9529a3a0"
 }
