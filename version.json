@@ -1,7 +1,7 @@
 {
- "version": "1.4.1",
- "notes": "1.4.1：角色畫質（低／中／高／極高）、音樂只支援 Spotify、暫停播放馬上有反應、更快偵測換歌。也包含 1.3.1 的大優化。會先更新背景小幫手，再一鍵更新。",
- "notes_en": "1.4.1: character quality (Low / Medium / High / Ultra), Spotify-only music, instant play/pause, faster song detection. Includes the 1.3.1 tune-up. Updates the helper first, then one click.",
+ "version": "1.4.2",
+ "notes": "1.4.2：修正記憶標記少一個括號時沒被記住、還被唸出來的問題；極高畫質加上打光和紋理，光澤調柔和。安裝程式有更新，會在背景重新安裝。",
+ "notes_en": "1.4.2: fixes memory markers with a missing bracket not being saved and being read aloud; Ultra quality gets lighting and texture with a softer sheen. The installer changed, so it reinstalls in the background.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
@@ -11,7 +11,7 @@
  "helper_mac_sha": "2dd7ae86e83415f1f1fac49ad37b7c9597efdb442956539bf4ac83962dc7b18d",
  "helper_win": "https://elvis071114-coder.github.io/m01/helper/server.ps1",
  "helper_win_sha": "59b575798bda566f3db95a517e9da730f53079fca747a76f2241a1606b3e8bfe",
- "pkg": 2,
- "windows_sha": "6edd838784c77dbfeefce6661f3a04c96f74f02ba6394a45880494dd670168dd",
- "mac_sha": "6d44c7d85672bcc08b9e2bba7b5aba437284a1e811f52facd285630221d3e5d9"
+ "pkg": 3,
+ "windows_sha": "0d033359243054fca298cc3949d07415be2dc541fc26137b385f56f3bd751927",
+ "mac_sha": "8fa27972eef884f639e8104f10bfafb6946a6a31e2b603bffa905a455e648321"
 }
