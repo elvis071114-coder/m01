@@ -785,7 +785,8 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
             <div class="sec">MEMORY LOG<button class="help" data-help="memlog" aria-label="說明">?</button></div>
             <p class="note">每一句對話都完整保存；這裡是夥伴特別記下的重點，你也可以自己加。</p>
             <div class="inline"><input id="factInput" placeholder="例如：喜歡喝珍珠奶茶、對花生過敏"><button class="pbtn" id="addFact">記下</button></div>
-            <div class="inline"><input id="factSearch" type="search" placeholder="搜尋記下的重點" aria-label="搜尋記下的重點"></div>
+            <div class="inline"><input id="factSearch" type="search" placeholder="搜尋記下的重點" aria-label="搜尋記下的重點"><button class="pbtn" id="factSearchBtn">搜尋</button></div>
+            <div id="fSug" class="qsug" hidden></div>
             <div id="factList" style="display:flex;flex-direction:column;gap:6px"></div>
           </div>
           <div class="pane" id="pFiles" hidden>
@@ -1926,7 +1927,8 @@ function renderFacts(){
   const el=$("factList");if(!el)return;el.innerHTML="";const en=isEN();
   const tools=document.createElement("div");tools.className="inline mem-tools";
   const last=S.settings.memTidy&&S.settings.memTidy.t;
-  tools.innerHTML=`<button class="sbtn" id="memTidyBtn"${S.facts.length<4?" disabled":""}>${en?"Tidy up memories":"整理記憶"}</button>${memPrev?`<button class="sbtn" id="memUndo">${en?"Undo last tidy-up":"復原上次整理"}</button>`:""}<span class="note" style="margin:0">${last?(en?"Last tidied ":"上次整理：")+stamp(last):(en?"She tidies them by herself about once a week.":"她大約每週會自己整理一次：合併重複的、刪掉過時的。")}</span>`;
+  const cut=S.settings.memTidy&&S.settings.memTidy.cut;
+  tools.innerHTML=`<span class="note" style="margin:0">${en?"She tidies these by herself (merges duplicates, drops outdated ones).":"她會自動整理：合併重複的、刪掉過時的。"}${last?(en?` Last tidied ${stamp(last)}${cut?`, ${cut} fewer`:""}.`:`上次整理：${stamp(last)}${cut?`，少了 ${cut} 條`:""}。`):""}</span>${memPrev?`<button class="sbtn" id="memUndo">${en?"Undo last tidy-up":"復原上次整理"}</button>`:""}`;
   el.appendChild(tools);
   const q=String(($("factSearch")||{}).value||"").trim().toLowerCase(),hit=t=>!q||String(t).toLowerCase().includes(q);
   const ups=(S.follows||[]).filter(f=>!f.asked&&hit(f.text+" "+f.date)).sort((a,b)=>a.date<b.date?-1:1);
@@ -1949,16 +1951,41 @@ function renderFacts(){
       const save=()=>{const v=inp.value.trim();if(v){f.text=v.slice(0,300);f.t=Date.now()}saveFacts();renderFacts()};
       b.onclick=save;inp.onkeydown=e=>{if(e.key==="Enter")save();if(e.key==="Escape")renderFacts()}};
     el.appendChild(r)}
-  const tb=$("memTidyBtn");if(tb)tb.onclick=()=>tidyMemory(true);
   const ub=$("memUndo");if(ub)ub.onclick=()=>{if(!memPrev)return;S.facts=memPrev;memPrev=null;saveFacts();renderFacts();updateStats();toast(en?"Back to how it was before.":"已經復原成整理前的樣子。")};
 }
-{const fs=$("factSearch");if(fs)fs.addEventListener("input",()=>renderFacts())}
+{const fs=$("factSearch");if(fs){fs.addEventListener("input",()=>renderFacts());fs.addEventListener("keydown",e=>{if(e.key==="Enter")renderFacts()})}
+ const fb=$("factSearchBtn");if(fb)fb.onclick=()=>{renderFacts();const x=document.querySelector("#factList mark");if(x)x.scrollIntoView({block:"nearest"})}}
+/* suggestions for the memory search, from what she has noted (only words that find a note) */
+let fSugBusy=false;
+const fHit=x=>{x=String(x).toLowerCase();return S.facts.some(f=>String(f.text).toLowerCase().includes(x))||(S.follows||[]).some(f=>!f.asked&&f.text.toLowerCase().includes(x))};
+function fSugPaint(list){const el=$("fSug");if(!el)return;const en=isEN();const seen=new Set();
+  list=(list||[]).map(x=>String(x).trim()).filter(x=>x&&!seen.has(x)&&seen.add(x)&&fHit(x)).slice(0,8);
+  if(!list.length){el.hidden=true;return}
+  el.innerHTML=`<b>${en?"You might be looking for":"猜你想搜"}</b>`+list.map(x=>`<button type="button">${esc(x)}</button>`).join("");
+  el.querySelectorAll("button").forEach((b,i)=>b.onclick=()=>{$("factSearch").value=list[i];renderFacts()});el.hidden=false}
+function fSugQuick(){const out=[];for(const f of (S.follows||[]).filter(f=>!f.asked).slice(-3))out.push(f.text.replace(/^對方(要|會|在)?/,"").slice(0,6));return out}
+async function fSuggest(){
+  const n=S.facts.length;if(!n){fSugPaint(fSugQuick());return}
+  let c=null;try{c=JSON.parse(localStorage.getItem("m01.fsug")||"null")}catch(e){}
+  if(c&&Array.isArray(c.list)&&Math.abs(n-c.n)<4&&Date.now()-c.t<24*3600e3&&c.en===isEN()){fSugPaint(c.list.concat(fSugQuick()));return}
+  fSugPaint((c&&c.list||[]).concat(fSugQuick()));
+  if(fSugBusy||!S.sample||S.incog||(typeof LOCAL_CFG!=="undefined"&&!S.aiOK))return;fSugBusy=true;
+  try{const en=isEN();
+    const lines=S.facts.slice(-80).map(f=>"- "+String(f.text).slice(0,100)).join("\n");
+    const prompt=`下面是記下的、關於對方的重點。給 6 個對方可能會想在這些重點裡搜尋的關鍵字：每個 2 到 6 個字，一定要是下面真的出現過的詞（人名、地方、東西、事情、主題），不要整句、不要重複。${en?"Use the language the words appear in.":"中文用繁體。"}只回傳 JSON 字串陣列，例如 ["考試","拉麵"]。\n\n${lines}`;
+    const r=await Promise.race([S.sample(prompt,{modelTier:"quick",cache:false}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),30000))]);
+    const m=String(r&&r.text||"").match(/\[[\s\S]*\]/);const arr=m?JSON.parse(m[0]):[];
+    const list=(Array.isArray(arr)?arr:[]).map(x=>String(x).trim()).map(x=>en?x:toTraditional(x)).filter(x=>x&&x.length<=10&&fHit(x));
+    if(list.length){try{localStorage.setItem("m01.fsug",JSON.stringify({t:Date.now(),n,list,en}))}catch(e){}if(!$("pMem").hidden)fSugPaint(list.concat(fSugQuick()))}
+  }catch(e){console.warn("memory suggestions",e)}
+  finally{fSugBusy=false}}
+{const pm=$("pMem");if(pm)new MutationObserver(()=>{if(!pm.hidden)fSuggest()}).observe(pm,{attributes:true,attributeFilter:["hidden"]})}
 let memTidying=false;
 async function tidyMemory(manual){
   const en=isEN();if(memTidying||S.incog||!S.sample)return;
   if(S.facts.length<4){if(manual)toast(en?"Not enough to tidy yet.":"重點還太少，不用整理。");return}
   if(!S.aiOK){if(manual)toast(en?"Set up an AI first.":"要先設定好 AI 才能整理。");return}
-  memTidying=true;const b=$("memTidyBtn");if(b){b.disabled=true;b.textContent=en?"Tidying…":"整理中…"}
+  memTidying=true;
   const before=S.facts.map(f=>({...f}));
   try{
     const list=before.slice(-150);   // the newest 150 at most per run; older ones stay as they are
@@ -1990,14 +2017,15 @@ ${lines}`;
     // facts added while she was tidying are kept too
     const added=S.facts.filter(f=>!before.some(x=>x.id===f.id));
     memPrev=before;S.facts=[...older,...out.sort((a,b)=>a.t-b.t),...added];
-    S.settings.memTidy={t:Date.now(),n:S.facts.length};saveSettingsQuiet();saveFacts();renderFacts();updateStats();
+    S.settings.memTidy={t:Date.now(),n:S.facts.length,cut:Math.max(0,before.length-S.facts.length)};saveSettingsQuiet();saveFacts();renderFacts();updateStats();
     const sm=en?`Memories tidied: ${Math.max(0,merged+drop.size)} fewer duplicates or outdated notes, all sorted by topic.`:`記憶整理好了：合併或刪掉 ${Math.max(0,merged+drop.size)} 條重複或過時的，並依主題分類。`;
     if(manual)toast(sm+(en?" You can undo it in the Memory tab.":"不滿意可以在「重點」分頁復原。"),8000);
   }catch(e){if(manual)toast(e&&e.message==="unsafe"?(en?"The tidy-up wanted to remove too much, so nothing was changed.":"這次整理想刪掉太多，為了安全沒有套用。"):(en?"Couldn’t tidy up this time — try again later.":"這次沒整理成功，晚點再試。"),7000);console.warn("tidy",e)}
-  finally{memTidying=false;const b2=$("memTidyBtn");if(b2){b2.disabled=false;b2.textContent=en?"Tidy up memories":"整理記憶"}}
+  finally{memTidying=false}
 }
-// about once a week, or after many new notes, while she isn't busy
-setInterval(()=>{try{const mt=S.settings&&S.settings.memTidy||{t:0,n:0};if(!S.busy&&!document.hidden&&S.facts.length>=12&&(Date.now()-mt.t>7*864e5||S.facts.length-(mt.n||0)>=20))tidyMemory(false)}catch(e){}},10*60e3);
+// automatic: every 3 days, or after 10 new notes, while she isn't busy (also checked a minute after opening)
+function autoTidy(){try{const mt=S.settings&&S.settings.memTidy||{t:0,n:0};if(!S.busy&&!S.followBusy&&!document.hidden&&S.facts.length>=6&&(Date.now()-mt.t>3*864e5||S.facts.length-(mt.n||0)>=10))tidyMemory(false)}catch(e){}}
+setInterval(autoTidy,10*60e3);setTimeout(autoTidy,60e3);
 function renderFiles(){
   const el=$("fileList");el.innerHTML="";
   if(!S.files.length){el.innerHTML=`<p class="note">還沒有檔案。點輸入框左邊的迴紋針上傳。</p>`}
@@ -2340,6 +2368,7 @@ ${typeof WEB_OK!=="undefined"&&WEB_OK?"- 回答事實性問題（新聞、時事
 - 閒聊時像朋友一樣自然、簡短；問問題時給清楚正確的答案，必要時才用條列。
 - 會主動接住對方的情緒，也會在合適時自然提起以前聊過的事（只在真的有關時）。
 - 不確定的事要說不確定。
+- 對方想聊比較私人的話題（感情、喜歡的人、交往、家裡的事、心情和煩惱、身體或成長的困擾、別人不好開口的事）時，像值得信任的好朋友一樣自然、認真地陪對方聊，給真心的意見；不要說教、不要迴避、不要一直叫對方去問別人。只有遇到危險或傷害自己的情況，才溫柔地建議找信任的人或專業協助。不寫露骨的色情內容。
 
 【關於對方的重點記憶】（這些全部是對方的事。對方自己寫的內容裡如果有「我」，指的是對方，不是你；例如「我愛珍珠奶茶」= 對方愛珍珠奶茶。問到對方的喜好、習慣、計畫時，先看這裡，有寫就直接照著回答。）
 ${facts}
@@ -3226,7 +3255,7 @@ const HELP_EN={
   chat:["How to chat","<ul><li>Type and press <code>Enter</code> to send, <code>Shift + Enter</code> for a new line.</li><li>Use the paperclip to send images or files (PDF, Word, Excel, text) — she remembers the full content.</li><li>Send a picture and say “this is you” and she’ll remember that’s how she looks.</li><li>The mic button starts voice input where the system allows it.</li><li>While she’s replying, press “Stop” or <code>Esc</code> to interrupt.</li><li>Hover your own message for “Edit” and “Delete”: editing makes her answer again (everything after it in this chat is replaced); deleting removes it with her reply, plus attached files that aren’t used anywhere else.</li></ul>"],
   convs:["Chats & incognito","<ul><li>Click the chat name to switch, rename or delete past chats.</li><li>“＋ New chat” starts a fresh one anytime; she still remembers everything from every chat.</li><li>“Incognito”: this chat isn’t saved, leaves no memory, and she won’t read your past memories. Press again to leave.</li><li>Deleting a chat doesn’t delete her saved notes — remove those in Memory.</li></ul>"],
   status:["What the numbers mean","<ul><li>MESSAGES: total messages you’ve exchanged.</li><li>FILES: files she can look through.</li><li>MEMORIES: key points she has saved.</li></ul>"],
-  memlog:["Memory notes","<ul><li>Every message is saved in full; these are the extra “key points” she keeps, like your likes, important people and plans.</li><li>Type your own and press “Save”, or press “Delete” to remove a wrong one.</li><li>She checks these first when answering — fixing a mistake here is the fastest way.</li><li>Before every reply she takes a few seconds to note anything new about you.</li><li>Things coming up (a test, a trip) show here as “She’ll ask how it went”; once she has asked, they become normal notes.</li><li>Use the search box to find a note quickly.</li></ul>"],
+  memlog:["Memory notes","<ul><li>Every message is saved in full; these are the extra “key points” she keeps, like your likes, important people and plans.</li><li>Type your own and press “Save”, or press “Delete” to remove a wrong one.</li><li>She checks these first when answering — fixing a mistake here is the fastest way.</li><li>Before every reply she takes a few seconds to note anything new about you.</li><li>Things coming up (a test, a trip) show here as “She’ll ask how it went”; once she has asked, they become normal notes.</li><li>Use the search box (or a suggestion under it) to find a note quickly.</li><li>She tidies the list by herself every few days; if you don’t like a tidy-up, press “Undo last tidy-up”.</li></ul>"],
   files:["Files","<ul><li>Upload with the paperclip in Chat. The full text is saved and she’ll look it up when you ask.</li><li>“Delete” removes the file and its contents, and she won’t remember it any more.</li></ul>"],
   search:["Search","<ul><li>Search everything you’ve said and every file’s contents by keyword.</li><li>For Chinese, use words of two or more characters.</li><li>“You might be looking for” suggests searches from what you’ve talked about.</li></ul>"],
   voice:["Voice (Fish Audio)","<ol><li>Sign up at fish.audio, create a key under API Keys and paste it here.</li><li>The accent comes from the voice: paste one fish.audio voice link for Chinese and one for English. With Accent on Auto, Chinese replies use the Chinese voice and English replies the English one; you can also fix it to Chinese or English.</li><li>“S2.1 Pro Free” is free with fair-use limits; the paid S2.1 Pro needs API credit on Fish Audio (separate from a website membership).</li><li>Turn on “Read replies aloud” to hear every answer, or press “Read aloud” under a reply.</li><li>Voice volume follows the speaker button; nothing is read while muted. She lip-syncs while talking.</li><li>Only use voices you made or have permission to use — no voices imitating real people.</li></ol>"],
@@ -3357,7 +3386,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="1.5.0",APP_STAGE="",APP_BUILD="2026-11-07 03:43";
+const APP_VER="1.6.0",APP_STAGE="",APP_BUILD="2026-11-07 04:04";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -3368,6 +3397,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"1.6.0",d:"11/07 05:00",add:[["重點分頁的搜尋框右邊加上「搜尋」按鈕，下面也有「猜你想搜」，依她記下的重點建議關鍵字，點一下就能找到","The memory search now has a “Search” button on the right and “You might be looking for” suggestions under it, taken from what she has noted"],["整理記憶改成全自動：不用再按按鈕，她每 3 天或多了 10 條重點時會自己整理，畫面會顯示上次整理的時間和少了幾條，不滿意可以按「復原上次整理」","Tidying memories is fully automatic: no button any more — she tidies every 3 days or after 10 new notes, shows when it last ran and how many fewer there are, and you can still undo it"],["可以跟她聊比較私人的話題（感情、喜歡的人、家裡的事、心情和煩惱、成長的困擾），她會像信任的好朋友一樣認真陪你聊，不會說教或一直叫你去問別人","You can talk with her about more personal things (relationships, crushes, family, worries, growing up) — she talks it through like a trusted friend instead of lecturing or sending you elsewhere"]],fix:[]},
  {v:"1.5.0",d:"11/07 04:30",add:[["她每次回話前，會先花幾秒看你說的話裡有沒有新的事要記（例如出生地、考試、喜好），先記下來再回答，這句回覆就已經知道了；你回答她的問題（像考試考得怎樣）也會被記住","Before every reply she takes a few seconds to note anything new you said (where you were born, a test, what you like), so the reply already knows it; your answers to her questions (like how a test went) are remembered too"],["語音說話時，嘴巴會跟著聲音的大小開合","While her voice plays, her mouth opens and closes with how loud she is speaking"],["重點分頁：不再分類，改成依時間排的一個清單，加上搜尋框；原本的「FOLLOW-UP」併進同一個清單，標示「之後會問你結果」，問過之後就變成一般的重點","Memory tab: no more categories — one list by date with a search box; the old “FOLLOW-UP” items now sit in the same list marked “She’ll ask how it went” and become normal notes once she has asked"],["她偶爾會主動傳訊息，問一個跟你有關的問題或分享她自己的看法（最多一天一次）；畫面上的小對話框也會問跟你有關的事，你回她的時候她知道你在回哪句","Now and then (at most once a day) she messages you first with a question about you or her own view on something; her little speech bubbles can ask about you too, and when you answer she knows what you are answering"],["搜尋分頁加上「猜你想搜」：依你們聊過的內容建議搜尋詞，點一下就能搜","Search tab: “You might be looking for” suggests searches from what you’ve talked about — tap one to search"]],fix:[["精確位置只會問一次：之後沿用上次的位置，除非你把「使用精確位置」關掉再打開","Precise location is asked only once and then reused, unless you turn “Use my precise location” off and on again"],["極高畫質換成其他角色圖也能正常打光","Ultra quality lighting works with any character pictures, not just the sample"]]},
  {v:"1.4.3",d:"11/07 03:30",add:[["極高畫質重做：打光直接畫進每張角色圖（動畫風的暗部、左上暖色主光、主題色輪廓光、腳下反光），線條保持清楚、顏色不會變淡；她還會微微轉向你的滑鼠，沒動時會自己輕輕擺動，更有立體感","Ultra quality redone: the lighting is now painted into every character picture (anime-style shadow side, warm key light from the upper left, a rim light in the theme colour, floor bounce), with crisp lines and no washed-out colours; she also turns slightly toward your pointer and drifts gently on her own for more depth"],["記憶多一層保險：她回覆後會再檢查一次你剛說的話，有關於你的新事情（像出生地、學校、喜好）但她忘了記，就會自動補記下來","A memory safety net: after each reply she double-checks what you just said, and if there was something new about you (like where you were born, your school or what you like) that she forgot to note, it gets saved automatically"]],fix:[["極高畫質：換表情時，舊表情的手（例如揮手）會變成黑色或藍色的影子留在畫面上","Ultra quality: when her expression changed, the hand from the previous picture (like the waving one) stayed on screen as a black or blue shadow"],["極高畫質：換表情的瞬間有時會閃出黑灰色的方格","Ultra quality: black-and-grey squares sometimes flashed when her expression changed"],["你說了關於自己的事（例如「我是美國出生的」）時，她有時會誤會成別的意思，也沒有記下來","When you said something about yourself (like “I was born in the US”), she sometimes misread it and didn’t save it"]]},
  {v:"1.4.2",d:"11/07 03:00",add:[["極高畫質：角色多了打光（左上暖光、右下暗部、腳下映出主題色）和細緻的紋理，看起來更有立體感","Ultra quality: the character now has lighting (warm light from the upper left, shade lower right, the theme colour reflected from the floor) and fine texture for more depth"]],fix:[["AI 有時把記憶標記少寫一個括號（像「[[記住：…]」），結果沒被記住，還直接顯示出來、被語音唸出來。現在少括號、單括號、全形括號都認得","When the AI wrote a memory marker with a missing bracket (like “[[記住：…]”), it wasn’t saved and was shown and read aloud instead. Missing, single and full-width brackets are all recognised now"],["極高畫質：掠過角色身上的光澤調暗、變柔和，輪廓光也調淡一點","Ultra quality: the sheen across the character is dimmer and softer, and the rim light is a little lighter"],["重新安裝時會清掉舊的 App 內更新檔，資訊頁不會再顯示舊版本號","Reinstalling now clears old in-app update files, so the info page no longer shows an old version number"]]},
@@ -3753,7 +3783,7 @@ const HELP={
   chat:["怎麼聊天",`<ul><li>輸入文字後按 <code>Enter</code> 送出，<code>Shift + Enter</code> 換行。</li><li>按迴紋針可以傳圖片或檔案（PDF、Word、Excel、文字檔），她會記住檔案全文。</li><li>傳圖時說「這是你」，她就會記住那是她的樣子。</li><li>按麥克風會教你用系統的語音輸入。</li><li>她回覆時按「停止」或 <code>Esc</code> 可以中斷。</li><li>滑到自己的訊息上會出現「編輯」「刪除」：編輯後她會重新回答（這則之後的對話會被換掉）；刪除會連她的回覆一起刪，附的檔案如果沒有其他地方用到也會一起刪掉。</li></ul>`],
   convs:["對話紀錄與無痕",`<ul><li>按左邊的對話名稱，可以切換、改名或刪除以前的對話。</li><li>「＋ 新對話」隨時開一段新的；不管在哪段對話，她都記得所有對話裡的事和重點。</li><li>「無痕」：這段對話不會被保存、不會留下記憶，她也不會讀取你過去的記憶。再按一次就離開。</li><li>刪除對話不會刪掉她記下的重點，要刪請到「重點」分頁。</li></ul>`],
   status:["數字代表什麼","<ul><li>MESSAGES：你們總共聊過的訊息數。</li><li>FILES：上傳過、她能翻閱的檔案數。</li><li>MEMORIES：她特別記下的重點數。</li></ul>"],
-  memlog:["重點記憶","<ul><li>每一句對話都會完整保存，這裡是她另外記下的「重點」，例如你的喜好、重要的人、計畫。</li><li>你可以自己輸入一條按「記下」，或按「刪除」移除錯誤的內容。</li><li>她回答時會優先參考這裡；如果記錯了，直接在這裡改最快。</li><li>她每次回話前，會先花幾秒看你說的話裡有沒有新的事要記。</li><li>之後要發生的事（考試、出遊…）會標示「之後會問你結果」；問過之後就變成一般的重點。</li><li>用上面的搜尋框可以很快找到某一條。</li></ul>"],
+  memlog:["重點記憶","<ul><li>每一句對話都會完整保存，這裡是她另外記下的「重點」，例如你的喜好、重要的人、計畫。</li><li>你可以自己輸入一條按「記下」，或按「刪除」移除錯誤的內容。</li><li>她回答時會優先參考這裡；如果記錯了，直接在這裡改最快。</li><li>她每次回話前，會先花幾秒看你說的話裡有沒有新的事要記。</li><li>之後要發生的事（考試、出遊…）會標示「之後會問你結果」；問過之後就變成一般的重點。</li><li>用上面的搜尋框（或下面的「猜你想搜」）可以很快找到某一條。</li><li>她每隔幾天會自動整理一次；不滿意可以按「復原上次整理」。</li></ul>"],
   files:["檔案","<ul><li>從聊天區的迴紋針上傳，檔案全文會被保存，之後問她檔案內容她會去翻。</li><li>按「刪除」會把檔案和內容都移除，她就不會再記得。</li></ul>"],
   search:["搜尋","<ul><li>輸入關鍵字，可以搜尋所有聊過的話和檔案內容。</li><li>中文建議用兩個字以上的詞，例如「拉麵」「考試」。</li><li>「猜你想搜」會依你們聊過的內容建議搜尋詞，點一下就能搜。</li></ul>"],
   voice:["語音（Fish Audio）","<ol><li>到 fish.audio 註冊，進「API Keys」建立金鑰，貼到這裡。</li><li>口音跟著聲音走：「中文聲音」和「英文聲音」各貼一個 fish.audio 聲音網址。「口音」選自動時，中文回覆用中文聲音、英文回覆用英文聲音；也可以固定用中文或英文。</li><li>「S2.1 Pro Free」免費，但有合理使用限制；付費的 S2.1 Pro 要先在 Fish Audio 儲值 API 額度（跟網站會員分開算）。</li><li>打開「回覆完自動唸出來」，她每次回答都會唸；不然可以按每則回覆下面的「朗讀」。</li><li>音量跟右上角喇叭一樣；靜音時不會唸。說話時角色會對嘴。</li><li>請只用你自己建立或有授權的聲音，不要用模仿真實人物的聲音。</li></ol>"],
