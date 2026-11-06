@@ -1,14 +1,17 @@
 {
- "version": "1.1.1",
- "notes": "1.1.1：打開更快、AI 回答時其他功能不會卡住、Windows 工作列圖示變清楚、安裝說明改成中英對照。",
- "notes_en": "1.1.1: faster start, nothing freezes while the AI replies, sharp Windows taskbar icon, bilingual install guide.",
+ "version": "1.2.0",
+ "notes": "1.2.0：本地 AI 可以全部下載、在聊天畫面切換；更新改在 App 裡完成（有進度條）；開始畫面點了馬上有反應；音樂小工具支援瀏覽器的 YouTube。這次會先更新背景小幫手，再在 App 裡下載安裝新版。",
+ "notes_en": "1.2.0: keep several local AI models and switch from the chat; updates install inside the app with a progress bar; instant start screen; the music widget follows YouTube in a browser. This one updates the helper first, then downloads and installs the new version inside the app.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
  "page": "https://elvis071114-coder.github.io/m01/app.html",
- "helper": 7,
+ "helper": 8,
  "helper_mac": "https://elvis071114-coder.github.io/m01/helper/server.pl",
- "helper_mac_sha": "d6267c965eac81db1f71289f0a10bbb682996d24f1fbee6b922d8d53eeb37d06",
+ "helper_mac_sha": "feccda6a7bd2352e66621a70e18531163155d6944252e150729d108b53e9aadb",
  "helper_win": "https://elvis071114-coder.github.io/m01/helper/server.ps1",
- "helper_win_sha": "3de1e5bb4bec87f86cbdc7b6a612adcc4bbe00a3e475bdb1b710be21b1a1a4de"
+ "helper_win_sha": "75762b30be1e9cbdc92435ab27c25fc8be001977b44f3fd72d51f15c724ad329",
+ "pkg": 2,
+ "windows_sha": "30800b2a865e00093dc89cdc1ecf8086675caa9c2f34b6332211262c68c9078e",
+ "mac_sha": "ae2e0c6e13607e5c69bc1dd2a28f9f32a49c788f5b965cfd6a5dfab9ae63cf40"
 }

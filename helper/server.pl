@@ -67,7 +67,7 @@ my $GSECRET = '';
 for my $gf ((dirname(abs_path($0)))."/gclient.txt", ($ARGV[0] ? dirname($ARGV[0])."/gclient.txt" : ()), ($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/gclient.txt") {
   my $t = slurp_early($gf); if (defined $t) { $t =~ s/\s+//g; if (length $t) { $GSECRET = $t; last; } } }
 my $WEBOVR = $ENV{M01_WEBOVR} // (($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/web");
-my $HV = 7;
+my $HV = 8;
 my $HELPEROVR = $ENV{M01_HELPEROVR} // (($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/helper");   # helper version: the page asks for a reinstall when a newer helper is needed
 sub page_ver { my $t = shift // ''; return $t =~ /const APP_VER="(\d+)\.(\d+)\.(\d+)"/ ? $1*1000000+$2*1000+$3 : 0; }
 my $FISHBASE = $ENV{M01_FISH_URL} // 'https://api.fish.audio';
@@ -136,7 +136,7 @@ while (my $c = $srv->accept) {
   $target =~ s/\?.*$//;
 
   # only our own page may use the data API (other sites cannot send this header)
-  my $api = $target =~ m{^/(fs|ls|ping|pick|search|fetch|open|battery|dictate|reveal|setdata|getjson|secret|uninstall|gemini|fishtts|gtoken|selfupdate|sysinfo|music|ollamastart|pull|ollamainstall|helperupdate)(/|$)};
+  my $api = $target =~ m{^/(fs|ls|ping|pick|search|fetch|open|battery|dictate|reveal|setdata|getjson|secret|uninstall|gemini|fishtts|gtoken|selfupdate|sysinfo|music|ollamastart|pull|ollamainstall|helperupdate|appupdate)(/|$)};
   if ($api && ($h{'x-m01'} // '') ne '1') { reply($c, 403, 'text/plain', 'forbidden'); close $c; next; }
   # network calls (AI replies, sign-in, weather) are answered by their own process, so a slow one never holds up the rest of the app
   my $forked = 0;
@@ -312,7 +312,7 @@ while (my $c = $srv->accept) {
       }
     }
   }
-  elsif ($target eq '/ping') { reply($c, 200, 'application/json', '{"ok":true,"hv":'.$HV.',"data":'.json_str($DATA).'}'); }
+  elsif ($target eq '/ping') { my $pk = slurp(dirname($WEBROOT).'/pkgver.txt') // '1'; $pk =~ s/\D//g; $pk ||= 1; reply($c, 200, 'application/json', '{"ok":true,"hv":'.$HV.',"pkg":'.$pk.',"data":'.json_str($DATA).'}'); }
   elsif ($target eq '/music') {
     # what Spotify is playing, and play/pause/next/previous/volume/seek (Spotify desktop app, through AppleScript)
     my %q = map { my ($k,$v) = split /=/, $_, 2; ($k, url_decode($v // '')) } grep { length } split /&/, $qs;
@@ -350,6 +350,58 @@ while (my $c = $srv->accept) {
     elsif (-d '/Applications/Ollama.app' || -d "$ENV{HOME}/Applications/Ollama.app") { system('/usr/bin/open -g -a Ollama >/dev/null 2>&1'); $ok = 1; }
     else { my $bin = `command -v ollama 2>/dev/null`; chomp $bin; if ($bin) { system("nohup '$bin' serve >/dev/null 2>&1 &"); $ok = 1; } }
     reply($c, $ok ? 200 : 404, 'application/json', $ok ? '{"ok":true}' : '{"ok":false,"reason":"not installed"}');
+  }
+  elsif ($target eq '/appupdate') {
+    # full update from inside the app: download the new package, check its fingerprint, then run its installer (the app closes and reopens)
+    my %q = map { my ($k,$v) = split /=/, $_, 2; ($k, url_decode($v // '')) } grep { length } split /&/, $qs;
+    my $act = $q{act} // 'status';
+    my $ud = $ENV{M01_UPDDIR} // (($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/update");
+    make_path($ud) unless -d $ud;
+    my $stf = "$ud/state.txt"; my $zip = "$ud/pkg.zip"; my $pidf = "$ud/pid.txt"; my $pkd = "$ud/pkg";
+    my $opid = (slurp($pidf) // 0) + 0; my $running = pull_alive($opid);
+    my $inst = "$pkd/\x{5b89}\x{88dd} M-01 Companion.command"; utf8::encode($inst);
+    if ($act eq 'start') {
+      my $u = $q{url} // ''; my $want = lc($q{sha} // '');
+      my $okUrl = ($u =~ m{^https://[A-Za-z0-9-]+\.github\.io/[^\s?#'"\\]*\.zip$}) || ($ENV{M01_UPD_ALLOW} && index($u, $ENV{M01_UPD_ALLOW}) == 0);
+      if (!$okUrl || $want !~ /^[0-9a-f]{64}$/) { reply($c, 403, 'application/json', '{"ok":false,"error":"forbidden"}'); close $c; next; }
+      if (!$running) {
+        unlink $stf, $zip; system('/bin/rm', '-rf', $pkd);
+        my $ditto = $ENV{M01_DITTO} // '/usr/bin/ditto -x -k'; my $shacmd = $ENV{M01_SHACMD} // '/usr/bin/shasum -a 256';
+        my ($sq, $zq, $pq, $uq, $iq) = map { shq($_) } ($stf, $zip, $pkd, $u, $inst);
+        my $script = "T=\$(/usr/bin/curl -sIL --max-time 20 $uq | tr -d '\\r' | awk 'tolower(\$1)==\"content-length:\"{n=\$2} END{print n+0}'); echo \"dl \$T\" > $sq; "
+          ."if /usr/bin/curl -fsSL -o $zq $uq; then "
+          ."G=\$($shacmd $zq | awk '{print \$1}'); if [ \"\$G\" != '$want' ]; then echo 'error checksum' > $sq; exit 0; fi; "
+          ."mkdir -p $pq; if $ditto $zq $pq && [ -f $iq ]; then echo \"ready \$T\" > $sq; else echo 'error unzip' > $sq; fi; "
+          ."else echo 'error download' > $sq; fi";
+        my $kid = fork();
+        if (defined $kid && $kid == 0) { POSIX::setsid(); my $g = fork(); if (defined $g && $g == 0) { open(STDIN, '<', '/dev/null'); open(STDOUT, '>', '/dev/null'); open(STDERR, '>', '/dev/null'); exec('/bin/sh', '-c', $script) or POSIX::_exit(127); }
+          if (open(my $pf, '>', $pidf)) { print $pf ($g // 0); close $pf; } POSIX::_exit(0); }
+        waitpid($kid, 0) if $kid; select(undef, undef, undef, 0.2); $opid = (slurp($pidf) // 0) + 0; $running = 1;
+      }
+    }
+    elsif ($act eq 'cancel') {
+      kill('TERM', $opid) if $running && $opid > 1; unlink $stf, $zip, $pidf; system('/bin/rm', '-rf', $pkd); $running = 0;
+    }
+    elsif ($act eq 'install') {
+      my $line = slurp($stf) // '';
+      if ($line !~ /^ready/ || !-f $inst) { reply($c, 200, 'application/json', '{"ok":false,"error":"notready"}'); close $c; next; }
+      reply($c, 200, 'application/json', '{"ok":true}'); close $c;
+      # quit the app window, then run the new installer (it replaces the app, restarts this helper and opens the app again)
+      my $quit = $BUNDLE =~ /^[A-Za-z0-9.\-]+$/ ? "/usr/bin/osascript -e 'tell application id \"$BUNDLE\" to quit' >/dev/null 2>&1; sleep 1; " : '';
+      my $script = $ENV{M01_UPD_INSTALL} // ("sleep 1; $quit"."echo done > ".shq($stf)."; /bin/bash ".shq($inst)." >".shq("$ud/install.log")." 2>&1");
+      my $kid = fork();
+      if (defined $kid && $kid == 0) { POSIX::setsid(); my $g = fork(); if (defined $g && $g == 0) { open(STDIN, '<', '/dev/null'); open(STDOUT, '>', '/dev/null'); open(STDERR, '>', '/dev/null'); exec('/bin/sh', '-c', $script) or POSIX::_exit(127); } POSIX::_exit(0); }
+      waitpid($kid, 0) if $kid;
+      next;
+    }
+    my $line = slurp($stf) // ''; $line =~ s/\s+$//;
+    my ($phase, $rest) = split / /, $line, 2; $phase //= ''; $rest //= '';
+    my $total = $rest =~ /^(\d+)$/ ? $1 : 0; my $got = -s $zip || 0;
+    my $err = $phase eq 'error' ? $rest : '';
+    $phase = 'idle' if $phase eq '' && !$running;
+    if (!$running && $phase eq 'dl') { $phase = 'error'; $err = 'stopped'; }
+    $phase = 'dl' if $phase eq '' && $running;
+    reply($c, 200, 'application/json', '{"ok":true,"phase":'.json_str($phase).',"total":'.$total.',"got":'.$got.',"error":'.json_str($err).'}');
   }
   elsif ($target eq '/ollamainstall') {
     # one-click Ollama install from inside the app: download the official zip, unpack it into Applications, open it

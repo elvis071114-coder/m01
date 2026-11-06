@@ -474,6 +474,7 @@ body.exiting .stage{animation-delay:.06s}body.exiting .frame{animation-delay:.12
 #lmBox{display:flex;flex-direction:column;gap:6px}#lmBox .lm-cmp{display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:var(--panel2);border-left:3px solid var(--line2)}.lm-cmp div{display:flex;flex-direction:column}.lm-cmp b{font-size:13.5px}.lm-cmp span{font-size:13px;color:var(--muted);line-height:1.55}
 .lm-h{font-size:13px;font-weight:700;color:var(--muted)}#lmBox .lm-card button.sure,#lmBox .row button.sure{color:#ff6b6b;border-color:#ff6b6b}
 #factList .mem-cat{margin:10px 0 2px;font-size:12.5px;letter-spacing:.08em;color:var(--accent)}#factList .mem-tools{flex-wrap:wrap;align-items:center;gap:8px}#factList .row .fe{margin-right:4px}#factList .fedit{width:100%;box-sizing:border-box;margin-bottom:6px}#factList .fcat{font:inherit;background:var(--panel2);color:var(--ink);border:1px solid var(--line2)}
+body.ai-busy #g_ai>:not(summary):not(#aiBusyNote){pointer-events:none;opacity:.45}#aiBusyNote{margin:8px 0;padding:8px 12px;border-left:2px solid var(--accent);background:rgba(var(--accent-rgb),.08);font-size:13px}#aiBusyNote[hidden]{display:none}
 .composer .box{position:relative}#aiLock{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px 0 14px;background:var(--panel2,#222);border:1px solid var(--accent);font-size:13.5px;cursor:pointer}#aiLock[hidden]{display:none}#aiLock span{line-height:1.35}#aiLock .pbtn{flex:none;padding:6px 12px}
 #lmBox .lm-job{border:1px solid var(--accent);padding:10px 12px;display:grid;gap:7px;margin-bottom:10px}
 .dl-pill{position:relative;margin-left:6px;border:1px solid var(--line,#444);background:var(--panel2,#222);color:inherit;font:inherit;font-size:12px;padding:3px 9px;border-radius:99px;cursor:pointer;overflow:hidden}.dl-pill i{position:absolute;inset:0;width:var(--p);background:var(--accent);opacity:.25;transition:width .4s}.dl-pill span{position:relative}.dl-pill.paused{opacity:.75}
@@ -627,6 +628,7 @@ body.kb .tabs{padding-top:4px}
 #sprite.poked{animation:poke .4s cubic-bezier(.3,1.6,.5,1)}@keyframes poke{35%{transform:scale(.97,1.03) translateY(-8px)}}
 #heroWrap .thought.say{opacity:1;transform:none;animation:none;font-family:var(--font-body);font-size:15px;letter-spacing:.02em;color:var(--ink);max-width:min(64%,340px);line-height:1.5;padding:10px 16px;white-space:normal;z-index:3}
 #updBar{position:fixed;z-index:35;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(560px,calc(100vw - 20px));display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 14px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+#updBar .ub-bar{flex:1 1 100%;height:6px;background:var(--panel3);overflow:hidden}#updBar .ub-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .5s}
 #updBar[hidden]{display:none}#updBar b{font-size:14.5px}#updBar span{flex:1 1 200px;font-size:13px;color:var(--muted)}#updBar .pbtn,#updBar .sbtn{padding:7px 14px}
 .upd-box .pbtn{align-self:flex-start;margin:4px 0}
 .lm-card{display:flex;gap:10px;align-items:center;padding:11px 12px;background:var(--panel2);border-left:3px solid var(--line2)}.lm-card.on{border-left-color:var(--accent)}
@@ -758,7 +760,7 @@ body.kb .tabs{padding-top:4px}
             </div>
             <div id="ollamaBox" class="subbox">
               <div id="lmBox" data-i18n="none"></div>
-              <label class="field" for="lcModel">聊天模型（Ollama 模型名稱）<input id="lcModel" placeholder="qwen3.5:9b"></label>
+              <label class="field" for="lcModel" hidden style="display:none!important">聊天模型（Ollama 模型名稱）<input id="lcModel" placeholder="qwen3.5:9b"></label>
               <label class="field" for="lcVision" hidden style="display:none!important">看圖片工具（裝好後會自動填，通常不用改）<input id="lcVision" placeholder="例如 gemma3:4b"></label>
               <label class="field" for="lcUrl">Ollama 位址<input id="lcUrl" placeholder="http://localhost:11434"></label>
               <div class="inline" hidden><button class="pbtn" id="lcSave">儲存並測試連線</button></div><span class="autosave">改完會自動儲存並測試連線</span>
@@ -2357,6 +2359,9 @@ async function sendCore(ov){
 }
 function setBusyUI(){
   if(S.busy&&!S.busySince)S.busySince=Date.now();if(!S.busy)S.busySince=0;
+  document.body.classList.toggle("ai-busy",!!S.busy);if(S.busy){const mp=$("modelPop");if(mp&&!mp.hidden)mp.hidden=true}
+  {const g=$("g_ai");if(g){let n=$("aiBusyNote");if(!n){n=document.createElement("div");n.id="aiBusyNote";n.dataset.i18n="none";const sm=g.querySelector("summary");sm?sm.after(n):g.prepend(n)}
+    n.hidden=!S.busy;n.textContent=isEN()?"She’s answering — AI settings can be changed when she’s done.":"她正在回答，回答完才能改 AI 設定。"}}
   const b=$("send");
   b.innerHTML=S.busy?`停止 <kbd>ESC</kbd>`:`送出 <kbd>ENTER</kbd>`;
   b.title=S.busy?"停止":"送出";b.setAttribute("aria-label",b.title);updateSend();
@@ -2964,7 +2969,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="1.1.1",APP_STAGE="",APP_BUILD="2026-11-06 22:30";
+const APP_VER="1.2.0",APP_STAGE="",APP_BUILD="2026-11-06 23:30";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -2974,6 +2979,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"1.2.0",d:"11/06 23:30",add:[["本地 AI 可以全部下載起來，要用哪一個直接在聊天畫面下方的 AI 選單切換，會標示輕量版／標準版／強力版；設定裡只剩下載和刪除。一次按好幾個「下載」會排隊，一個接一個下載","Download any or all local AI models, then choose one from the AI menu under the chat (marked Light / Standard / Powerful); Settings now just downloads and deletes. Press Download on several and they queue up"],["App 更新改在 App 裡完成：會顯示下載進度、速度和剩下的時間，下載好自動安裝並重新打開，不會再跑到瀏覽器的下載資料夾","Updates happen inside the app: download progress, speed and time left, then it installs and reopens by itself — no more trips to the browser’s Downloads folder"]],fix:[["開始畫面點下去馬上有反應：資料在 App 打開時就先在背景準備好","The start screen answers your click right away: everything loads in the background as soon as the app opens"],["用量圓圈：滑鼠移上去就會顯示詳細用量，用本地 AI 時不會出現","Usage ring: hover to see the details; it’s hidden while using the local AI"],["Windows 音樂小工具會跟著正在播的東西（例如瀏覽器裡的 YouTube），上一首／暫停／下一首會控制它，也會盡量顯示影片的縮圖","Windows music widget follows whatever is playing (like YouTube in a browser): Previous / Pause / Next control it, and it shows the video’s picture when available"],["模型下載中不能用本地 AI；她回答時不能換 AI 或改 AI 設定，避免中途出錯","While a model downloads, local AI is paused; while she’s answering, the AI and its settings can’t be changed, so nothing breaks midway"]]},
  {v:"1.1.1",d:"11/06 22:30",add:[],fix:[["Windows 版打開更快：不再等本地 AI 開好才出現視窗；背景小幫手同時處理多件事，AI 回答、登入、天氣在等待時，其他功能不會卡住（Mac 也一樣）","Faster start on Windows: the window no longer waits for the local AI to start, and the background helper does several things at once, so nothing freezes while an AI reply, sign-in or weather lookup is on its way (same on Mac)"],["Windows 工作列的圖示變清楚了（第一次打開後就會換成清楚的版本）","The Windows taskbar icon is sharp now (it switches to the sharp one after the app opens)"],["文字字型改成背景載入，網路慢的時候畫面也會馬上出現","Fonts load in the background, so the screen shows up right away even on a slow connection"],["安裝包裡的說明改成簡短的中英對照，只說怎麼安裝和打開","The guide in the install package is now short and bilingual, covering just how to install and open the app"]]},
  {v:"1.1.0",d:"11/06 14:30",add:[["模型可以背景下載：切換畫面、關掉 App 都會繼續下載；電腦睡眠或斷線後會從中斷的地方接著下載。會顯示速度和大概還要多久，也可以暫停、繼續（需要重新安裝一次 App）","Models download in the background: it keeps going when you switch screens or close the app, and continues where it stopped after sleep or a dropped connection. Shows speed and time left, with Pause and Continue (reinstall the app once)"],["第一次打開要先用 Google 登入，再設定至少一個 AI（建議 Gemini 或本地 AI）；還沒設定 AI 前聊天框會先鎖住","First launch now asks you to sign in with Google, then set up at least one AI (Gemini or local recommended); the message box stays locked until an AI is set up"],["安裝程式變簡單了：只裝 App（中英對照）。打開後先登入 Google、選 AI；選本地 AI 時，App 會一鍵幫你安裝 Ollama，再選模型下載","Simpler installer: it only installs the app (Chinese and English). In the app you sign in with Google and choose an AI; picking the local AI installs Ollama for you in one click, then you choose a model"],["Windows 的小圖示重新畫過，工作列和捷徑不再模糊","Redrew the small Windows icons so the taskbar and shortcuts are sharp"],["以後更新幾乎都不用重新下載：連背景小幫手都能在 App 裡一鍵更新（這是最後一次需要重新安裝）","Future updates almost never need a download: even the background helper updates with one click inside the app (this is the last reinstall)"],["她會自己整理記憶：大約每週一次，合併重複的、刪掉過時的，並依主題分類；「重點」分頁可以修改每一條，也能復原上次整理","She tidies her memories by herself about once a week — merging duplicates, dropping outdated notes and sorting them by topic; every note can be edited in the Memory tab, and the last tidy-up can be undone"],["網頁上有一步一步的安裝說明，Mac 和 Windows 都可以複製一行指令就裝好，不用解壓縮、也不會跳安全性警告","The website has step-by-step install instructions; on Mac and Windows you can install by pasting one line, with no unzipping and no security warnings"],["記憶資料夾搬到 App 自己的資料區，不會在「文件」裡被誤刪（舊的會自動搬過去）；備份檔也會包含角色圖","The memory folder moved into the app’s own data area so it can’t be deleted by accident from Documents (the old one moves over automatically); backups now include character pictures"]],fix:[["電腦建議更準：沒有 NVIDIA 顯示卡的 Windows 電腦和 Intel Mac 會建議輕量版，並提醒本地 AI 會比較慢、建議用 Gemini（之前 16GB 沒顯示卡也會建議標準版，結果要等快一分鐘）","Better model suggestions: Windows PCs without an NVIDIA card and Intel Macs get Light, with a note that local AI is slow there and Gemini is faster (before, a 16GB PC without a graphics card was told to use Standard and waited about a minute)"],["本地 AI 回得更快：每次都會變的內容（時間、天氣、音樂、前情提要）移到提示最後，Ollama 可以重用前面算好的部分，不用每次從頭讀","Faster local replies: things that change every time (time, weather, music, summary) moved to the end of the prompt so Ollama can reuse the rest instead of rereading it all"]]},
  {v:"1.0.0",d:"11/06 08:30",add:[["正式版！經過完整的長時間測試：連續聊幾百則，速度、記憶體都不會變差，重開後資料完整","Version 1.0! Fully tested for long use: hundreds of messages in a row with no slowdown or memory growth, and everything intact after reopening"],["用越久越不怕失憶：記憶重點和檔案再多，也會挑跟這次對話相關的和最新的放進提示，不會超過 AI 能讀的長度；沒列出的也能用搜尋找到","Memory that holds up over time: however many notes and files there are, the ones related to this message plus the newest go into the prompt, so it never overflows; the rest can still be found by search"],["記憶重點也能被搜尋到","Memory notes are now searchable too"],["大幅省電：視窗沒在用或她睡著時，背景動畫、粒子和音樂條都會停下，閒置時的 CPU 用量少了約 99%；使用中也少了約三成","Big power savings: background animation, particles and music bars stop while the window isn’t in use or she’s asleep — about 99% less CPU when idle and about a third less in use"],["長時間聊天時畫面只保留最近約 100 則，舊的收進「顯示更早的訊息」，不會越聊越卡","In long sessions only the latest ~100 messages stay on screen; older ones fold behind “show earlier”, so it never gets sluggish"],["備份資料夾只保留最新 5 份","The backup folder keeps only the newest five backups"]],fix:[["天氣暫時拿不到時，上方橫條會寫出原因，不會只剩一朵雲","When the weather can’t be fetched, the top bar says why instead of showing only a cloud"],["Ollama 狀態確認一次後一分鐘內不重查，送出更快","Ollama’s status is checked at most once a minute, so sending is quicker"]]},
@@ -3132,12 +3138,16 @@ async function probeGemini(force){
   saveLocalCfg();try{paintModelChip()}catch(e){}
   return out;
 }
+/* local models are shown by size name (Light / Standard / Powerful) */
+function localName(id,en){const c=(typeof chatChoices==="function"?chatChoices(en):[]).find(x=>x[0]===id);return c?c[1]:String(id||"")}
+const localDownloading=()=>typeof bgPull!=="undefined"&&!!bgPull.job&&!bgPull.job.paused;
+window.__dlLock=()=>typeof LOCAL_CFG!=="undefined"&&(LOCAL_CFG.backend||"ollama")==="ollama"&&localDownloading();
 function modelLabel(){
   if(typeof LOCAL_CFG==="undefined")return"Claude";
   const b=LOCAL_CFG.backend||"ollama";
   if(b==="gemini"){const m=LOCAL_CFG.geminiModel||"gemini-3.6-flash";return (GEMINI_MODELS.find(x=>x[0]===m)||[0,m])[1]}
   if(b==="claude"){const m=LOCAL_CFG.claudeModel||"claude-haiku-5-5";return (CLAUDE_MODELS.find(x=>x[0]===m)||[0,m])[1]}
-  return (isEN()?"Local · ":"本地 · ")+LOCAL_CFG.model;
+  return (isEN()?"Local · ":"本地 · ")+localName(LOCAL_CFG.model,isEN());
 }
 /* how fast this computer runs each local model (measured from real answers, kept on this computer) */
 function perfAll(){try{return JSON.parse(localStorage.getItem("m01.lmPerf")||"{}")}catch(e){return{}}}
@@ -3172,6 +3182,7 @@ function paintModelChip(){const t=TIERS.find(x=>x[0]===(S.settings.tier||"defaul
 async function openModelPop(){
   const pop=$("modelPop"),chip=$("modelChip");
   if(!pop.hidden){pop.hidden=true;chip.setAttribute("aria-expanded","false");return}
+  if(S.busy){toast(isEN()?"Wait until she finishes answering to change the AI.":"等她回答完才能換 AI 或改設定。");return}
   const en=isEN(),tier=S.settings.tier||"default";let h="";
   {const ct=TIERS.find(x=>x[0]===tier)||TIERS[1];
    h+=canChooseTier()?`<div class="mp-h">${en?"SPEED":"回答速度"}</div><div class="mp-seg mp-seg4">${TIERS.map(t=>`<button data-tier="${t[0]}" aria-pressed="${t[0]===tier}">${en?t[3]:t[1]}</button>`).join("")}</div><div class="mp-note" id="mpNote">${en?ct[4]:ct[2]}</div><div class="mp-note mp-why">${thinkNote(en)}</div>`
@@ -3184,8 +3195,12 @@ async function openModelPop(){
       return `<button class="mp-i" data-be="${be}" data-id="${esc(id)}"${ok?"":" disabled"}><i class="ck">${cur?"✓":""}</i><span>${esc(name)}<small>${esc(desc)}</small></span></button>`};
     h+=`<div class="mp-h">${en?"MODEL":"模型"}</div>`;
     h+=`<div class="mp-g">${en?"Local AI (free, offline)":"本地 AI（免費、不用網路）"}</div>`;
-    const loc=[...new Set([LOCAL_CFG.model,...names.filter(n=>!/embed/i.test(n))])];
-    h+=loc.map(n=>item("ollama",n,n,names.includes(n)?(en?"Installed on this computer":"已裝在這台電腦"):(en?"Not downloaded yet":"還沒下載"),names.includes(n))).join("");
+    const order=chatChoices(en).map(c=>c[0]);
+    const loc=[...new Set([...names.filter(n=>!/embed/i.test(n)&&!isVisionModel(n))])].sort((a,b)=>(order.indexOf(a)+1||99)-(order.indexOf(b)+1||99));
+    const dl=localDownloading();
+    if(dl)h+=`<div class="mp-note">${en?`A model is downloading (${Math.floor(bgpPct())}%) — local AI can be used once it’s done.`:`模型下載中（${Math.floor(bgpPct())}%），下載完才能用本地 AI。`}</div>`;
+    h+=loc.length?loc.map(n=>item("ollama",n,localName(n,en),n+" · "+(en?"installed":"已安裝"),!dl)).join("")
+      :`<div class="mp-note">${en?"No local model yet — download one in Settings → AI.":"還沒有本地模型：到「設定 → AI 模型」下載。"}</div>`;
     h+=`<div class="mp-g">Gemini ${gk.has?"":`<small style="color:var(--dim);font-weight:400">${en?"· no key yet":"· 還沒設定金鑰"}</small>`}</div>`;
     const av=gk.has?(LOCAL_CFG.gemAvail||{}):{};
     h+=`<div class="mp-note">${en?"Availability is tested with your own API key (Google AI Plus/Pro subscriptions are for the Gemini app, not API keys).":"能不能用，是用你的 API 金鑰實際測出來的（Google AI Plus／Pro 訂閱是給 Gemini App 用的，不影響 API）。"} <a href="#" id="mpRecheck">${en?"Re-check":"重新檢查"}</a></div>`;
@@ -3640,14 +3655,53 @@ async function checkUpdate(force){
 }
 function markUpdate(){const b=$("infoBtn");if(b)b.classList.toggle("has-update",!!S.update)}
 async function updMode(){
-  // "page": one click swaps in the new version; "web": just reload; "install": the background helper changed too, so download it
+  // "page": one click swaps in the new version; "web": just reload; "helper": the background helper updates itself first;
+  // "app": the whole package is downloaded and installed inside the app (with a progress bar); "install": very old helper, download by hand
   const u=S.update;if(!u)return"none";if(window.GH_MODE)return"web";
-  if(!u.page)return"install";let hv=1;try{const pg=await serverFS.ping();hv=pg&&pg.hv||1}catch(e){}
-  if((u.helper||1)<=hv)return"page";
-  // helpers from 1.1.0 on can update themselves, so a new helper no longer means reinstalling
+  let hv=1,pk=1;try{const pg=await serverFS.ping();hv=pg&&pg.hv||1;pk=pg&&pg.pkg||1}catch(e){}
   const win=/Windows/i.test(navigator.userAgent),hu=win?u.helper_win:u.helper_mac,hs=win?u.helper_win_sha:u.helper_mac_sha;
-  return hv>=6&&hu&&/^[0-9a-f]{64}$/.test(hs||"")?"helper":"install";
+  if((u.helper||1)>hv)return hv>=6&&hu&&/^[0-9a-f]{64}$/.test(hs||"")?"helper":"install";
+  if((u.pkg||1)>pk){const zs=win?u.windows_sha:u.mac_sha;return hv>=8&&updLink(u)&&/^[0-9a-f]{64}$/.test(zs||"")?"app":"install"}
+  return u.page?"page":"install";
 }
+/* full update inside the app: download the new package in the background (progress, speed, time left), check it, install, reopen */
+const appUpd={timer:null,hist:[],busy:false};
+async function appUpdApi(act,extra){const r=await fetch("/appupdate?act="+act+(extra||""),{headers:{"X-M01":"1"}});return r.json()}
+function appUpdBar(){let bar=$("updBar");if(!bar){bar=document.createElement("div");bar.id="updBar";bar.dataset.i18n="none";document.body.appendChild(bar)}return bar}
+function appUpdPaint(st){
+  const en=isEN(),bar=appUpdBar(),u=S.update||{},tot=st.total||0,got=st.got||0,pct=tot?Math.min(100,Math.floor(got/tot*100)):0;
+  const h=appUpd.hist;h.push({t:Date.now(),d:got});while(h.length>2&&Date.now()-h[0].t>15000)h.shift();
+  const sp=h.length>1?Math.max(0,(h[h.length-1].d-h[0].d)/((h[h.length-1].t-h[0].t)/1000||1)):0,left=sp>0&&tot?(tot-got)/sp:NaN;
+  let line,btns;
+  if(st.phase==="ready"){line=en?"Downloaded and checked. Installing — the app closes and opens again by itself.":"下載完成、檢查過了。正在安裝，App 會自己關掉再打開。";btns=""}
+  else if(st.phase==="error"){line=(en?"The update didn’t finish: ":"更新沒有完成：")+({checksum:en?"the file didn’t match (try again)":"檔案不完整（再試一次）",download:en?"couldn’t download (check the internet)":"下載失敗（請檢查網路）",unzip:en?"couldn’t unpack it":"解壓縮失敗",stopped:en?"it stopped":"中途停止了"}[st.error]||st.error);
+    btns=`<button class="pbtn" id="ubRetry">${en?"Try again":"再試一次"}</button><button class="sbtn" id="ubClose">${en?"Close":"關閉"}</button>`}
+  else{line=tot?`${pct}%${en?` (${fmtGB(got)} of ${fmtGB(tot)})`:`（${fmtGB(got)} / ${fmtGB(tot)}）`}`+(sp>0?` · ${(sp/1e6).toFixed(1)} MB/s`:"")+(isFinite(left)&&got<tot?" · "+fmtLeft(left,en):""):(en?"Starting…":"準備中…");
+    btns=`<button class="sbtn" id="ubCancel">${en?"Cancel":"取消"}</button>`}
+  bar.innerHTML=`<b>${en?`Updating to ${esc(u.version||"")}`:`更新到 ${esc(u.version||"")}`}</b><span>${esc(line)}</span>${btns}<div class="ub-bar"><i style="width:${st.phase==="ready"?100:pct}%"></i></div>`;
+  bar.hidden=false;
+  const c=$("ubCancel");if(c)c.onclick=async()=>{clearTimeout(appUpd.timer);try{await appUpdApi("cancel")}catch(e){}bar.hidden=true;toast(en?"Update cancelled.":"已取消更新。")};
+  const r=$("ubRetry");if(r)r.onclick=()=>appUpdStart();const x=$("ubClose");if(x)x.onclick=()=>{bar.hidden=true};
+}
+async function appUpdPoll(){
+  clearTimeout(appUpd.timer);let st=null;try{st=await appUpdApi("status")}catch(e){}
+  if(!st){appUpd.timer=setTimeout(appUpdPoll,3000);return}
+  if(st.phase==="idle"||st.phase==="done"){const b=$("updBar");if(b&&b.querySelector(".ub-bar"))b.hidden=true;return}
+  appUpdPaint(st);
+  if(st.phase==="ready"){if(appUpd.busy)return;appUpd.busy=true;try{sessionStorage.setItem("m01.autoboot","1")}catch(e){}
+    setTimeout(async()=>{let j=null;try{j=await appUpdApi("install")}catch(e){}
+      if(!j||!j.ok){appUpd.busy=false;appUpdPaint({phase:"error",error:isEN()?"couldn’t start the installer":"沒辦法開始安裝"})}},900);return}
+  if(st.phase==="dl")appUpd.timer=setTimeout(appUpdPoll,document.hidden?4000:1000);
+}
+async function appUpdStart(){
+  const u=S.update;if(!u)return;const win=/Windows/i.test(navigator.userAgent),zs=win?u.windows_sha:u.mac_sha;appUpd.hist=[];appUpd.busy=false;
+  appUpdPaint({phase:"dl",total:0,got:0});
+  let j=null;try{j=await appUpdApi("start","&url="+encodeURIComponent(updLink(u))+"&sha="+zs)}catch(e){}
+  if(!j||!j.ok){appUpdPaint({phase:"error",error:isEN()?"couldn’t start":"沒辦法開始"});return}
+  appUpdPoll();
+}
+// a download that was already running when the app opened again: keep showing it
+setTimeout(async()=>{if(window.GH_MODE||!(typeof isDesk==="function"&&isDesk()))return;try{const st=await appUpdApi("status");if(st&&(st.phase==="dl"||st.phase==="ready")&&S.update){appUpd.hist=[];appUpdPoll()}}catch(e){}},5000);
 function updLink(u){const os=/Windows/i.test(navigator.userAgent)?u.windows:/Mac/i.test(navigator.userAgent)?u.mac:"";const pick=os||u.url||"";return /^https:\/\//.test(pick)?pick:""}
 async function applyUpdateNow(){
   const u=S.update;if(!u)return;const en=isEN(),mode=await updMode();
@@ -3658,6 +3712,7 @@ async function applyUpdateNow(){
     if(j&&j.ok){let ok=false;for(let i=0;i<40&&!ok;i++){await new Promise(r=>setTimeout(r,500));try{const pg=await serverFS.ping();ok=!!(pg&&(pg.hv||1)>=(u.helper||1))}catch(e){}}
       if(ok){return applyUpdateNow()}}   // the helper is new now, so this time it's a normal one-click page update
     toast(en?"Couldn’t update automatically — download the new version instead.":"沒辦法自動更新，請改用下載安裝。",7000)}
+  else if(mode==="app"){return appUpdStart()}
   else if(mode==="page"){toast(en?"Updating…":"更新中…",30000);let j=null;
     try{j=await (await fetch("/selfupdate?url="+encodeURIComponent(u.page),{method:"POST",headers:{"X-M01":"1"}})).json()}catch(e){}
     if(j&&j.ok){toast(en?"Updated! Restarting…":"更新好了，重新開啟中…",4000);try{sessionStorage.setItem("m01.autoboot","1")}catch(e){}setTimeout(()=>location.reload(),700);return}
@@ -3701,11 +3756,11 @@ async function renderLocalModels(){
   let h=bgpCard(en)+`<div class="lm-dev">${devLine(dev,rec,en)}</div>`;
   {const sn=slowNote(rec,en),big=rec&&rec.slow&&/9b|27b/.test(LOCAL_CFG.model||"")&&inst(LOCAL_CFG.model);
    if(sn)h+=`<p class="note warnnote" style="margin:0">${sn}${big?(en?` You’re using ${esc(LOCAL_CFG.model)} — switching to Light (qwen3.5:4b) makes it about twice as fast.`:` 你目前用的是 ${esc(LOCAL_CFG.model)}，改成輕量版（qwen3.5:4b）大約會快一倍。`):""}</p>`}
-  h+=`<div class="lm-h">${en?"Chat AI — pick one":"聊天 AI（選一個）"}</div><p class="note" style="margin:0">${en?"All three are the same newer model (Qwen 3.5) in different sizes: they understand pictures themselves and can think before answering. Switching downloads the new one and then deletes the old one.":"三個都是同一代的新模型（Qwen 3.5），只差在大小：自己就看得懂圖片，也會先思考再回答。換的時候會先下載新的，再自動刪掉舊的。"}</p>`;
+  h+=`<div class="lm-h">${en?"Chat AI models":"聊天 AI 模型"}</div><p class="note" style="margin:0">${en?"All three are the same newer model (Qwen 3.5) in different sizes: they understand pictures themselves and can think before answering. You can download any or all of them, then choose which one to use from the AI menu under the chat. While a model downloads, local AI can’t be used.":"三個都是同一代的新模型（Qwen 3.5），只差在大小：自己就看得懂圖片，也會先思考再回答。可以全部下載，要用哪一個在聊天畫面下方的 AI 選單切換。模型下載中的時候不能用本地 AI。"}</p>`;
   for(const c of CH){const m=inst(c[0]),using=m&&LOCAL_CFG.model===c[0],others=[...CH.filter(x=>x[0]!==c[0]&&inst(x[0])).map(x=>x[0]),...legacy];
     const isRec=rec&&rec.model===c[0];
     h+=`<div class="lm-card${m?" on":""}${isRec?" rec":""}"><div class="lm-ct"><b>${c[1]} <small>${c[0]} · ${c[2]}</small>${isRec?`<i class="lm-rec">${en?"Best for this computer":"建議你的電腦用這個"}</i>`:""}</b><span>${c[3]}</span>${m?`<em>${using?(en?"Installed · in use":"已安裝 · 使用中"):(en?"Installed":"已安裝")}</em>`:""}</div>
-      <div class="lm-ca">${m?(using?`<button data-del="${c[0]}">${en?"Delete":"刪除"}</button>`:`<button class="sbtn" data-use="${c[0]}">${en?"Use":"使用"}</button><button data-del="${c[0]}">${en?"Delete":"刪除"}</button>`):`<button class="sbtn" data-pull="${c[0]}" data-replace="${others.join(",")}">${others.length?(en?"Switch to this":"改用這個"):(en?"Download":"下載")}</button>`}</div></div>`}
+      <div class="lm-ca">${m?`<button data-del="${c[0]}">${en?"Delete":"刪除"}</button>`:bgPull.job&&bgPull.job.model===c[0]?`<button class="sbtn" disabled>${en?"Downloading…":"下載中…"}</button>`:bgpQueue().includes(c[0])?`<button class="sbtn" data-unq="${c[0]}">${en?"Queued · remove":"排隊中・移除"}</button>`:`<button class="sbtn" data-pull="${c[0]}">${en?"Download":"下載"}</button>`}</div></div>`}
   if(legacy.length)h+=`<p class="note warnnote" style="margin:0">${en?`You still have the older ${legacy.join(", ")}. Pick one of the models above and the old one is deleted automatically.`:`你還有舊版的 ${legacy.join("、")}。在上面選一個新模型，舊的會自動刪掉。`}</p>`;
   const cur=LOCAL_CFG.model||"",selfSees=chatSeesPictures(cur);
   // pictures are handled automatically: a separate picture model only matters for chat models that can't see, and is removed once it's not needed
@@ -3714,7 +3769,7 @@ async function renderLocalModels(){
     LOCAL_CFG.vision="";$("lcVision").value="";saveLocalCfg();renderLocalModels._cleaning=false;return renderLocalModels()}
   const known=new Set([...CH.map(c=>c[0]),...legacy,...visMs.map(m=>m.name)]);
   const extra=ms.filter(m=>!known.has(m.name));
-  if(extra.length)h+=`<div class="lm-h">${en?"Other models":"其他模型"}</div>`+extra.map(m=>`<div class="row"><div class="t">${esc(m.name)}<div class="d">${gb(m.size||0)}${m.name===cur?(en?" · in use":" · 使用中"):""}</div></div>${m.name===cur?"":`<button class="sbtn" data-use="${esc(m.name)}">${en?"Use":"使用"}</button>`}<button data-del="${esc(m.name)}">${en?"Delete":"刪除"}</button></div>`).join("");
+  if(extra.length)h+=`<div class="lm-h">${en?"Other models":"其他模型"}</div>`+extra.map(m=>`<div class="row"><div class="t">${esc(m.name)}<div class="d">${gb(m.size||0)}${m.name===cur?(en?" · in use":" · 使用中"):""}</div></div><button data-del="${esc(m.name)}">${en?"Delete":"刪除"}</button></div>`).join("");
   h+=`<details class="lm-adv"><summary>${en?"Advanced: download any model by name":"進階：輸入模型名稱下載"}</summary><div class="inline"><input id="lmName" placeholder="${en?"e.g. qwen3.6:35b-a3b":"例如 qwen3.6:35b-a3b"}" spellcheck="false" autocomplete="off"><button class="sbtn" id="lmGo">${en?"Download":"下載"}</button></div><p class="note" style="margin:0">${en?'Names come from <a href="https://ollama.com/library">ollama.com/library</a>. Bigger models are smarter but need more memory; if a model doesn’t fit your graphics card it still runs, just much slower.':'名稱可以到 <a href="https://ollama.com/library">ollama.com/library</a> 找。越大越聰明，但需要更多記憶體；放不進顯示卡的模型一樣能跑，只是會慢很多。'}</p></details>`;
   if(!chatOnes.length&&!legacy.length&&!extra.length)h+=`<p class="note warnnote" style="margin:0">${en?"No chat AI installed yet — download one above, or use Gemini / Claude.":"還沒有安裝聊天 AI：在上面下載一個，或改用 Gemini／Claude。"}</p>`;
   box.innerHTML=h;bgpWire();
@@ -3722,7 +3777,8 @@ async function renderLocalModels(){
     if(!b.classList.contains("sure")){b.classList.add("sure");b.textContent=en?"Sure? Delete":"確定刪除？";setTimeout(()=>{if(b.isConnected){b.classList.remove("sure");b.textContent=en?"Delete":"刪除"}},4000);return}
     deleteLocalModel(b.dataset.del,ms.find(m=>m.name===b.dataset.del))});
   box.querySelectorAll(".lm-card button[data-del]").forEach(b=>b.classList.add("sbtn"));
-  box.querySelectorAll("[data-pull]").forEach(b=>b.onclick=()=>pullLocalModel(b.dataset.pull,b.dataset.replace||""));
+  box.querySelectorAll("[data-pull]").forEach(b=>b.onclick=()=>pullLocalModel(b.dataset.pull,""));
+  box.querySelectorAll("[data-unq]").forEach(b=>b.onclick=()=>{bgpQueueSet(bgpQueue().filter(x=>x!==b.dataset.unq));renderLocalModels()});
   box.querySelectorAll("[data-use]").forEach(b=>b.onclick=async()=>{LOCAL_CFG.model=b.dataset.use;LOCAL_CFG.backend="ollama";$("lcModel").value=b.dataset.use;saveLocalCfg();refreshImageLimits();await checkAI();paintModelChip();renderLocalModels();toast((en?"Now using ":"已改用 ")+b.dataset.use)});
   box.querySelectorAll("[data-ram]").forEach(b=>b.onclick=()=>{try{localStorage.setItem("m01.ramGB",b.dataset.ram)}catch(e){}renderLocalModels()});
   const go=$("lmGo");if(go)go.onclick=()=>{const n=$("lmName").value.trim().replace(/^ollama (pull|run) /,"");if(!/^[\w.\-\/]+(:[\w.\-]+)?$/.test(n)){toast(en?"That doesn’t look like a model name":"這看起來不像模型名稱");return}pullLocalModel(n,"")};
@@ -3849,9 +3905,9 @@ function bgpPaint(){
   const en=isEN(),j=bgPull.job;
   const f=$("lmFill"),t=$("lmTxt");if(j&&f&&t&&$("lmBox").querySelector(".lm-job")){f.style.width=bgpPct()+"%";t.textContent=bgpText(en)}
   let pill=$("dlPill");
-  if(!j){if(pill)pill.hidden=true;return}
+  if(!j){if(pill)pill.hidden=true;if(window.__aiGate&&window.__aiGate.paint)window.__aiGate.paint();return}
   if(!pill){pill=document.createElement("button");pill.id="dlPill";pill.className="dl-pill";pill.dataset.i18n="none";const row=$("modelChip")&&$("modelChip").parentNode;if(!row)return;row.appendChild(pill);pill.onclick=()=>openSec("g_ai","#lmBox")}
-  pill.hidden=false;pill.classList.toggle("paused",!!j.paused);
+  pill.hidden=false;pill.classList.toggle("paused",!!j.paused);if(window.__aiGate&&window.__aiGate.paint)window.__aiGate.paint();
   pill.innerHTML=`<i style="--p:${bgpPct()}%"></i><span>${j.paused?(en?"Paused":"已暫停"):"⬇ "+Math.floor(bgpPct())+"%"}</span>`;
   pill.title=(en?"Downloading ":"下載中 ")+j.model+" — "+bgpText(en);
 }
@@ -3864,7 +3920,7 @@ async function bgpStart(model,replace){
 async function bgpPause(){const j=bgPull.job;if(!j)return;try{await pullApi("pause")}catch(e){}j.paused=true;bgpSave();clearTimeout(bgPull.timer);renderLocalModels();bgpPaint()}
 async function bgpResume(){const j=bgPull.job;if(!j)return;j.paused=false;bgpSave();bgPull.hist=[];bgPull.lastMove=Date.now();bgPull.restarts=[];
   try{await pullApi("start",j.model)}catch(e){}renderLocalModels();bgpPaint();bgpTick(800)}
-async function bgpCancel(){try{await pullApi("cancel")}catch(e){}bgPull.job=null;bgPull.st=null;bgpSave();clearTimeout(bgPull.timer);renderLocalModels();bgpPaint();toast(isEN()?"Download cancelled.":"已取消下載。")}
+async function bgpCancel(){try{await pullApi("cancel")}catch(e){}bgPull.job=null;bgPull.st=null;bgpSave();clearTimeout(bgPull.timer);renderLocalModels();bgpPaint();toast(isEN()?"Download cancelled.":"已取消下載。");setTimeout(bgpNext,800)}
 async function bgpPoll(){
   const j=bgPull.job;if(!j||j.paused||bgPull.busy)return;bgPull.busy=true;
   try{
@@ -3897,15 +3953,23 @@ async function bgpPoll(){
 async function bgpDone(j){
   const en=isEN(),name=j.model;bgPull.job=null;bgPull.st=null;bgpSave();clearTimeout(bgPull.timer);try{await pullApi("cancel")}catch(e){}
   if(isVisionModel(name)){LOCAL_CFG.vision=name;$("lcVision").value=name;saveLocalCfg();refreshImageLimits();toast(en?"Picture reader installed.":"看圖片工具裝好了。",6000)}
-  else{LOCAL_CFG.model=name;LOCAL_CFG.backend="ollama";$("lcModel").value=name;saveLocalCfg();
-    const freedL=[];for(const old of String(j.replace||"").split(",").filter(x=>x&&x!==name)){try{const r=await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:old})});if(r.ok)freedL.push(old)}catch(e){}}
-    const freed=freedL.join(en?", ":"、");refreshImageLimits();
-    toast((en?"Download finished — now using ":"下載完成，已改用 ")+name+(freed?(en?` (deleted ${freed} to save space)`:`（並刪掉了 ${freed} 省空間）`):""),8000);
-    await checkAI();paintModelChip();if(window.__aiGate)window.__aiGate.check()}
-  renderLocalModels();bgpPaint();
+  else{let have=[];try{const r=await ollamaCheck();have=(r.names||[])}catch(e){}
+    const keep=(LOCAL_CFG.backend||"ollama")!=="ollama"||(LOCAL_CFG.model&&LOCAL_CFG.model!==name&&have.includes(LOCAL_CFG.model));
+    if(!keep){LOCAL_CFG.model=name;LOCAL_CFG.backend="ollama";$("lcModel").value=name;saveLocalCfg()}
+    refreshImageLimits();
+    toast(keep?(en?`Download finished: ${localName(name,true)}. Switch to it from the AI menu under the chat.`:`下載完成：${localName(name,false)}。可以在聊天畫面下方的 AI 選單換成它。`)
+      :(en?`Download finished — now using ${localName(name,true)}.`:`下載完成，已改用${localName(name,false)}。`),8000);
+    await checkAI();paintModelChip()}
+  renderLocalModels();bgpPaint();if(window.__aiGate)window.__aiGate.check();setTimeout(bgpNext,800);
 }
+/* download queue: press Download on several models and they come down one after another */
+const BGQ_KEY="m01.pullq";
+function bgpQueue(){try{return JSON.parse(localStorage.getItem(BGQ_KEY)||"[]")}catch(e){return[]}}
+function bgpQueueSet(q){try{q.length?localStorage.setItem(BGQ_KEY,JSON.stringify(q)):localStorage.removeItem(BGQ_KEY)}catch(e){}}
+async function bgpNext(){const q=bgpQueue();if(!q.length||bgPull.job)return;const n=q.shift();bgpQueueSet(q);try{await pullLocalModel(n,"")}catch(e){}}
 async function pullLocalModel(name,replace){
-  if(bgPull.job&&!bgPull.job.paused&&bgPull.job.model!==name){toast(isEN()?"Another model is downloading — pause or cancel it first.":"另一個模型正在下載，先暫停或取消它。");return}
+  if(bgPull.job&&bgPull.job.model!==name){const q=bgpQueue();if(!q.includes(name)){q.push(name);bgpQueueSet(q)}renderLocalModels();
+    toast(isEN()?`${localName(name,true)} is queued — it starts when the current download finishes.`:`已排入下載：${localName(name,false)}，前一個下載完會自動接著下載。`,6000);return}
   if(!window.GH_MODE){try{await bgpStart(name,replace);return}catch(e){if(e.message!=="nohelper"){toast((isEN()?"Couldn’t start the download: ":"沒辦法開始下載：")+e.message,7000);return}}}
   // older helper: download inside the page (stops if the app closes)
   toast(isEN()?"Tip: reinstall the app (1.1.0+) for background downloads you can pause.":"小提醒：重新安裝 App（1.1.0 以上）就能背景下載、暫停和繼續。",7000);
@@ -3976,16 +4040,19 @@ window.__aiGate=(function(){
   const isSigned=()=>!needGoogle()||cloud.signedIn();
   function lockEl(){let el=$("aiLock");if(!el){el=document.createElement("div");el.id="aiLock";el.dataset.i18n="none";const box=document.querySelector(".composer .box");if(!box)return null;box.appendChild(el)}return el}
   function paintLock(){
-    const en=isEN(),el=lockEl();if(!el)return;const locked=!G.signed||!G.ai;
+    const en=isEN(),el=lockEl();if(!el)return;const dlk=G.signed&&G.ai&&!!(window.__dlLock&&window.__dlLock());const locked=!G.signed||!G.ai||dlk;
     el.hidden=!locked;document.body.classList.toggle("ai-locked",locked);
     const inp=$("input");if(inp){inp.readOnly=locked;if(locked)inp.blur()}
     if(!locked)return;
-    el.innerHTML=!G.signed
+    el.innerHTML=dlk
+      ?`<span>${en?`A local model is downloading (${Math.floor(bgpPct())}%) — local AI can be used once it’s done. To chat now, switch to Gemini or Claude in the AI menu.`:`本地模型下載中（${Math.floor(bgpPct())}%），下載完才能用本地 AI。想現在聊天，可以在 AI 選單換成 Gemini 或 Claude。`}</span><button class="pbtn" id="alGo">${en?"AI menu":"AI 選單"}</button>`
+      :!G.signed
       ?`<span>${en?"Sign in with Google to start.":"請先登入 Google 才能開始使用。"}</span><button class="pbtn" id="alGo">${en?"Sign in":"登入"}</button>`
       :(typeof bgPull!=="undefined"&&bgPull.job&&!bgPull.job.paused)?`<span>${en?`The local AI is downloading (${Math.floor(bgpPct())}%) — you can chat once it’s done, or set up Gemini meanwhile.`:`本地 AI 下載中（${Math.floor(bgpPct())}%），下載好就能聊天；也可以先設定 Gemini。`}</span><button class="pbtn" id="alGo">${en?"Set up AI":"設定 AI"}</button>`
       :`<span>${en?"No AI set up yet — set up at least one to chat (Gemini is free and quickest).":"還沒有可以用的 AI：至少設定一個才能聊天（建議 Gemini，免費又最快）。"}</span><button class="pbtn" id="alGo">${en?"Set up AI":"設定 AI"}</button>`;
-    $("alGo").onclick=e=>{e.stopPropagation();if(!G.signed)showGoogle();else showPicker()};
-    el.onclick=()=>{if(!G.signed)showGoogle();else showPicker()};
+    const go=()=>{if(dlk){openModelPop();return}if(!G.signed)showGoogle();else showPicker()};
+    $("alGo").onclick=e=>{e.stopPropagation();go()};
+    el.onclick=go;
   }
   function showGoogle(){
     const en=isEN(),pop=$("setupPop");if(!pop)return;pop.hidden=false;pop.dataset.gate="google";
@@ -4031,7 +4098,7 @@ window.__aiGate=(function(){
     // the web edition's folder screen comes first
     const wait=()=>{const g=$("gate");if(g&&!g.hidden){setTimeout(wait,600);return}loop()};wait();
   }
-  return{boot,check,state:G,showPicker,showGoogle,ensureAI,locked:()=>!G.signed||!G.ai};
+  return{boot,check,paint:paintLock,state:G,showPicker,showGoogle,ensureAI,locked:()=>!G.signed||!G.ai||!!(window.__dlLock&&window.__dlLock())};
 })();
 let aiPickPending=false;
 async function maybeAiPick(){
@@ -4219,13 +4286,20 @@ async function migrateIDB(fdb){
   for(const k of ["idle","talk","blink","happy"]){const d=await idb.doc(base+"/sprite_"+k).get();if(d.exists)await fdb.doc(base+"/sprite_"+k).set(d.data())}
   for(const c of ["logs","files","chunks"]){const snap=await idb.collection(base+"/profile/"+c).get();for(const d of snap.docs)await fdb.doc(base+"/profile/"+c+"/"+d.id).set(d.data())}
 }
+// loading the memory, signing in and syncing start as soon as the page opens (not on the first click), so the click answers right away
+let appPrep=null;
+function startApp(){if(appPrep)return appPrep;appPrep=(async()=>{const mode=await prepareStorage();
+    if(window.cloud){window.__ACTIVE_DB=cloud.wrap(window.__ACTIVE_DB||window.__idbDB);await cloud.ready();if(cloud.signedIn()){if(booting)$("spLog").textContent="CLOUD SYNC";await cloud.bootSync()}}
+    appStarted=true;await init();if(window.cloud){cloud.paint();cloud.schedule(4000)}if(mode==="folder"){await readFactsFile();fsShowPrimary()}})();
+  appPrep.catch(e=>{console.warn("startApp",e);appPrep=null});return appPrep}
 async function boot(){
   if(booting||document.body.classList.contains("booted")||$("splash").classList.contains("lang"))return;booting=true;
-  if(!appStarted){const mode=await prepareStorage();
-    if(window.cloud){window.__ACTIVE_DB=cloud.wrap(window.__ACTIVE_DB||window.__idbDB);await cloud.ready();if(cloud.signedIn()){$("spLog").textContent="CLOUD SYNC";await cloud.bootSync()}}
-    appStarted=true;await init();if(window.cloud){cloud.paint();cloud.schedule(4000)}if(mode==="folder"){await readFactsFile();fsShowPrimary()}}
-  await audioInit();
-  const sp=$("splash");sp.classList.add("booting");bootChime();if(typeof FS!=="undefined"&&FS.dir&&!FS.dir.server&&!FS.ok)fsPerm(true);
+  const sp=$("splash");
+  // answer the click straight away: sound and the start animation first, then wait for anything still loading
+  try{await audioInit();bootChime()}catch(e){}
+  sp.classList.add("booting");$("spLog").textContent="SYSTEM CHECK";
+  if(!appStarted){try{await startApp()}catch(e){booting=false;sp.classList.remove("booting");return}}
+  if(typeof FS!=="undefined"&&FS.dir&&!FS.dir.server&&!FS.ok)fsPerm(true);
   const lines=["SYSTEM CHECK","MEMORY LINK","CHARACTER SYNC","READY"];
   lines.forEach((l,i)=>setTimeout(()=>$("spLog").textContent=l,i*280));
   setTimeout(()=>{sp.classList.add("gone");document.body.classList.remove("exiting");document.body.classList.add("booted");flashMood("wave",1600);booting=false;setTimeout(()=>{if(typeof maybeSetup==="function")maybeSetup();if(typeof maybeAiPick==="function")maybeAiPick();if(typeof maybeTour==="function")maybeTour();setTimeout(()=>{if(typeof maybeFollowUp==="function")maybeFollowUp()},4000)},900);
@@ -4236,6 +4310,7 @@ function shutdown(){
   setTimeout(()=>{document.body.classList.remove("booted");const sp=$("splash");sp.classList.remove("gone","booting");$("spLog").textContent="INITIALIZING";$("spPress").innerHTML="PRESS ANY KEY<small>已離開・點一下或按任意鍵重新開始</small>";sp.focus()},620);
 }
 $("splash").addEventListener("pointerdown",boot);
+setTimeout(()=>{if(!$("splash").classList.contains("lang")&&!appStarted)startApp()},0);
 try{if(sessionStorage.getItem("m01.autoboot")){sessionStorage.removeItem("m01.autoboot");setTimeout(boot,300)}}catch(e){}
 addEventListener("keydown",e=>{if($("splash").classList.contains("lang"))return;if(!document.body.classList.contains("booted")&&!booting){e.preventDefault();boot()}},true);
 /* first launch: choose the language on the start screen; then folder setup (app) and the guided tour */
@@ -4471,6 +4546,7 @@ paintSnd();
 /* usage ring next to the AI chip */
 .uring{all:unset;box-sizing:border-box;cursor:pointer;width:26px;height:26px;display:inline-grid;place-items:center;margin-left:6px;vertical-align:middle;border-radius:50%;transition:background .2s,scale .14s}
 .uring:hover{background:var(--panel3)}.uring:active{scale:.92}
+.uring[hidden]{display:none!important}
 .uring svg{width:20px;height:20px;transform:rotate(-90deg)}
 .uring .tr{stroke:var(--line2)}.uring .ar{transition:stroke-dashoffset .6s var(--ease-out),stroke .4s}
 .mrow{display:flex;align-items:center}
@@ -4739,7 +4815,7 @@ details.cl>summary{cursor:pointer}
     if(needHelper){mu.classList.add("idle");t.textContent=en?"Music needs a reinstall":"音樂功能要重新安裝";a.textContent=en?"Click to open the download page":"點一下打開下載頁面";setArt({});return}
     if(!M.running||!M.title){mu.classList.add("idle");
       if(M.reason==="denied"||M.reason==="timeout"){t.textContent=en?"Allow control of Spotify":"請允許控制 Spotify";a.textContent=en?"Click for how":"點一下看怎麼做"}
-      else{t.textContent=en?"Nothing playing":"目前沒有在播放";a.textContent=en?"Play something in Spotify":"在 Spotify 播首歌吧"}
+      else{t.textContent=en?"Nothing playing":"目前沒有在播放";const mac=/Mac/i.test(navigator.platform||"");a.textContent=mac?(en?"Play something in Spotify":"在 Spotify 播首歌吧"):(en?"Play something in Spotify or YouTube":"在 Spotify 或 YouTube 放點東西吧")}
       setArt({});return}
     mu.classList.remove("idle");
     const txt=q(".p-txt");if(M.id!==lastId){lastId=M.id;if(!reduce()){txt.classList.remove("swap");void txt.offsetWidth;txt.classList.add("swap")}}
@@ -5055,10 +5131,10 @@ details.cl>summary{cursor:pointer}
   ring.innerHTML='<svg viewBox="0 0 20 20"><circle class="tr" cx="10" cy="10" r="7.5" fill="none" stroke-width="2.6"/><circle class="ar" cx="10" cy="10" r="7.5" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12"/></svg>';
   const chip=$("modelChip");if(chip&&chip.parentNode)chip.parentNode.insertBefore(ring,chip.nextSibling);
   const pop=document.createElement("div");pop.id="usagePop";pop.hidden=true;pop.dataset.i18n="none";document.body.appendChild(pop);
-  function paintRing(){const n=usageNow(),en=E();if(n.be==="local"||!n.be){ring.hidden=true;return}ring.hidden=false;
+  function paintRing(){const n=usageNow(),en=E();if(n.be==="local"||!n.be){ring.hidden=true;if(!pop.hidden)closePop();return}ring.hidden=false;
     const ar=ring.querySelector(".ar");ar.style.strokeDashoffset=(47.12*(1-Math.max(n.pct,0)/100)).toFixed(2);ar.style.stroke=ringColor(n.pct);
-    ring.title=n.be==="gemini"?(en?`Gemini today: ${n.used} / ${n.lim} requests (${Math.round(n.pct)}%)`:`Gemini 今天：${n.used} / ${n.lim} 次（${Math.round(n.pct)}%）`):(en?`Claude this month: about US$${n.usd.toFixed(2)} of $${n.budget} (${Math.round(n.pct)}%)`:`Claude 本月：約 US$${n.usd.toFixed(2)} / ${n.budget}（${Math.round(n.pct)}%）`);
-    ring.setAttribute("aria-label",ring.title);if(!pop.hidden)paintPop()}
+    const lbl=n.be==="gemini"?(en?`Gemini today: ${n.used} / ${n.lim} requests (${Math.round(n.pct)}%)`:`Gemini 今天：${n.used} / ${n.lim} 次（${Math.round(n.pct)}%）`):(en?`Claude this month: about US$${n.usd.toFixed(2)} of $${n.budget} (${Math.round(n.pct)}%)`:`Claude 本月：約 US$${n.usd.toFixed(2)} / ${n.budget}（${Math.round(n.pct)}%）`);
+    ring.setAttribute("aria-label",lbl);if(!pop.hidden)paintPop()}
   function resetHour(){try{const d=new Date();const pt=new Date(d.toLocaleString("en-US",{timeZone:"America/Los_Angeles"}));const ms=(24*3600e3)-(pt.getHours()*3600e3+pt.getMinutes()*60e3);const at=new Date(Date.now()+ms);return String(at.getHours()).padStart(2,"0")+":00"}catch(e){return""}}
   function paintPop(){const n=usageNow(),en=E(),c=ringColor(n.pct);
     if(n.be==="gemini"){pop.innerHTML=`<h4>GEMINI · ${esc(n.model)}</h4><div class="big">${Math.round(n.pct)}%</div><div class="bar"><i style="width:${n.pct}%;background:${c}"></i></div>
@@ -5073,10 +5149,17 @@ details.cl>summary{cursor:pointer}
       <p class="note">${en?"Worked out from the tokens and Anthropic’s list prices, on this computer only. Your real balance:":"依 token 數和 Anthropic 官方價格估算，只計算這台電腦。實際餘額請看："} <a href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener">${en?"Billing":"帳單與餘額"}</a> · <a href="https://console.anthropic.com/settings/usage" target="_blank" rel="noopener">${en?"Usage":"用量"}</a></p>`;
       $("upBud").onchange=e=>{const u=U();u.budget=Math.max(.5,+e.target.value||5);saveU(u)}}
     pop.querySelectorAll("a[target]").forEach(a=>a.onclick=ev=>{if(desk()){ev.preventDefault();fetch("/open?url="+encodeURIComponent(a.href),{headers:{"X-M01":"1"}}).catch(()=>{})}})}
-  ring.onclick=e=>{e.stopPropagation();if(!pop.hidden){pop.hidden=true;return}paintPop();pop.hidden=false;const r=ring.getBoundingClientRect();const w=300;
-    pop.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2))+"px";pop.style.top="";pop.style.bottom=(innerHeight-r.top+8)+"px"};
-  document.addEventListener("click",e=>{if(!pop.hidden&&!pop.contains(e.target)&&e.target!==ring)pop.hidden=true});
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!pop.hidden)pop.hidden=true});
+  // hover the ring to see the details; click keeps them open
+  let pinned=false,hideT=0;
+  function openPop(){clearTimeout(hideT);if(!pop.hidden)return;paintPop();pop.hidden=false;const r=ring.getBoundingClientRect();const w=300;
+    pop.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2))+"px";pop.style.top="";pop.style.bottom=(innerHeight-r.top+8)+"px"}
+  function closePop(){clearTimeout(hideT);pop.hidden=true;pinned=false}
+  const softClose=()=>{if(pinned)return;clearTimeout(hideT);hideT=setTimeout(()=>{if(!pinned)pop.hidden=true},280)};
+  ring.addEventListener("mouseenter",openPop);ring.addEventListener("mouseleave",softClose);
+  pop.addEventListener("mouseenter",()=>clearTimeout(hideT));pop.addEventListener("mouseleave",softClose);
+  ring.onclick=e=>{e.stopPropagation();if(pinned){closePop();return}pinned=true;openPop()};
+  document.addEventListener("click",e=>{if(!pop.hidden&&!pop.contains(e.target)&&!ring.contains(e.target))closePop()});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!pop.hidden)closePop()});
   setInterval(paintRing,30000);
   if(typeof window.paintModelChip==="function"){const o=window.paintModelChip;window.paintModelChip=function(){const r=o.apply(this,arguments);try{paintRing()}catch(e){}return r}}
 
@@ -5093,7 +5176,7 @@ details.cl>summary{cursor:pointer}
       starting=null;return false})();return starting}
   window.__ensureOllama=q=>ensureOllama(q);
   async function warm(){if(!isLocal()||document.hidden)return;try{await fetch(ourl()+"/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:LOCAL_CFG.model,keep_alive:"30m"})})}catch(e){}}
-  function wrapSample(){if(typeof S==="undefined"||typeof S.sample!=="function"||S.sample.__wrapped)return;const os=S.sample;const w=async function(input,opts){if(isLocal())await ensureOllama(false);return os.apply(this,arguments)};Object.assign(w,os);w.__wrapped=true;S.sample=w}
+  function wrapSample(){if(typeof S==="undefined"||typeof S.sample!=="function"||S.sample.__wrapped)return;const os=S.sample;const w=async function(input,opts){if(isLocal()){if(window.__dlLock&&window.__dlLock())throw new Error(E()?"The local AI can be used once the model download finishes.":"模型下載完才能用本地 AI。");await ensureOllama(false)}return os.apply(this,arguments)};Object.assign(w,os);w.__wrapped=true;S.sample=w}
   setInterval(()=>{if(isLocal()&&!document.hidden)warm()},20*60e3);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden&&isLocal())warm()});
 

@@ -19,7 +19,7 @@ $GTokUrl = 'https://oauth2.googleapis.com/token'; if ($env:M01_GTOKEN_URL) { $GT
 $GSecret = ''
 foreach ($gf in @((Join-Path (Split-Path -Parent $WebRoot) 'gclient.txt'), (Join-Path $env:LOCALAPPDATA 'M-01 Companion\app\gclient.txt'))) { if ($gf -and (Test-Path -LiteralPath $gf)) { $GSecret = ([IO.File]::ReadAllText($gf)).Trim(); if ($GSecret) { break } } }
 $WebOvr = Join-Path $env:LOCALAPPDATA 'M-01 Companion\web'
-$HV = 7   # helper version: the page asks for a reinstall when a newer helper is needed
+$HV = 8   # helper version: the page asks for a reinstall when a newer helper is needed
 function Page-Ver([string]$t) { $m = [regex]::Match([string]$t, 'const APP_VER="(\d+)\.(\d+)\.(\d+)"'); if ($m.Success) { return ([int]$m.Groups[1].Value)*1000000 + ([int]$m.Groups[2].Value)*1000 + [int]$m.Groups[3].Value }; return 0 }
 $DataMark = [regex]::Unescape('_\u8cc7\u6599\uff08\u8acb\u52ff\u4fee\u6539\uff09')
 if (-not (Test-Path $DataDir)) { New-Item -ItemType Directory -Path $DataDir -Force | Out-Null }
@@ -83,11 +83,28 @@ function Media-Init {
   } catch { $script:MediaOk = $false }
   return $script:MediaOk
 }
+# which player to show: whatever is playing right now wins (YouTube in a browser, Spotify, ...).
+# When nothing plays, stay on the one shown before, so Play resumes the same thing.
+$script:MediaSid = ''
+function Media-Playing($x) { try { return ([string]$x.GetPlaybackInfo().PlaybackStatus -eq 'Playing') } catch { return $false } }
 function Media-Session {
-  $all = @($script:MediaMgr.GetSessions())
-  $sp = $all | Where-Object { $_.SourceAppUserModelId -match 'Spotify' } | Select-Object -First 1
-  if ($sp) { return $sp }
-  return $script:MediaMgr.GetCurrentSession()
+  $all = @($script:MediaMgr.GetSessions() | Where-Object { $_ })
+  if ($all.Count -eq 0) { $script:MediaSid = ''; return $null }
+  $pick = $null
+  $playing = @($all | Where-Object { Media-Playing $_ })
+  if ($playing.Count -gt 0) {
+    $pick = $playing | Where-Object { [string]$_.SourceAppUserModelId -eq $script:MediaSid } | Select-Object -First 1
+    if (-not $pick) { $cur = $script:MediaMgr.GetCurrentSession(); if ($cur -and (Media-Playing $cur)) { $pick = $cur } }
+    if (-not $pick) { $pick = $playing | Where-Object { [string]$_.SourceAppUserModelId -match 'Spotify' } | Select-Object -First 1 }
+    if (-not $pick) { $pick = $playing[$playing.Count - 1] }
+  } else {
+    if ($script:MediaSid) { $pick = $all | Where-Object { [string]$_.SourceAppUserModelId -eq $script:MediaSid } | Select-Object -First 1 }
+    if (-not $pick) { $pick = $script:MediaMgr.GetCurrentSession() }
+    if (-not $pick) { $pick = $all | Where-Object { [string]$_.SourceAppUserModelId -match 'Spotify' } | Select-Object -First 1 }
+    if (-not $pick) { $pick = $all[0] }
+  }
+  if ($pick) { $script:MediaSid = [string]$pick.SourceAppUserModelId }
+  return $pick
 }
 $script:VolReady = $null
 function Vol-Init {
@@ -167,10 +184,10 @@ function Media-State([string]$cmd, [string]$val) {
     if ($dur -gt 0 -and $pos -gt $dur) { $pos = $dur }; if ($pos -lt 0) { $pos = 0 }
   } catch { }
   $app = 'other'; if ([string]$s.SourceAppUserModelId -match 'Spotify') { $app = 'spotify' }
-  $key = $title + '|' + $artist + '|' + $album
+  $key = $title + '|' + $artist + '|' + $album + '|' + [string]$s.SourceAppUserModelId
   # read the cover again on the next two checks after a song change (Spotify often sends the new cover a moment later), and keep trying while it is missing
   if ($key -ne $script:ArtKey) { $script:ArtKey = $key; $script:ArtTries = 0; $script:ArtBytes = $null }
-  if ($script:ArtTries -lt 3 -or (-not $script:ArtBytes -and $script:ArtTries -lt 8)) {
+  if ($script:ArtTries -lt 3 -or (-not $script:ArtBytes -and $script:ArtTries -lt 15)) {   # browsers (YouTube) often send the picture a few seconds late
     $script:ArtTries++
     $nb = $null
     try {
@@ -450,7 +467,7 @@ while ($true) {
     while ($have -lt $len) { $n = $stream.Read($body, $have, $len - $have); if ($n -le 0) { break }; $have += $n }
 
     $qs = ''; $qi = $target.IndexOf('?'); if ($qi -ge 0) { $qs = $target.Substring($qi+1); $target = $target.Substring(0, $qi) }
-    $isApi = $target -match '^/(fs|ls|ping|search|fetch|open|battery|reveal|setdata|getjson|secret|uninstall|gemini|fishtts|gtoken|selfupdate|sysinfo|music|musicart|ollamastart|pull|ollamainstall|helperupdate)(/|$)'
+    $isApi = $target -match '^/(fs|ls|ping|search|fetch|open|battery|reveal|setdata|getjson|secret|uninstall|gemini|fishtts|gtoken|selfupdate|sysinfo|music|musicart|ollamastart|pull|ollamainstall|helperupdate|appupdate)(/|$)'
     if ($isApi -and $h['x-m01'] -ne '1') { Send-Text $stream 403 'text/plain' 'forbidden'; $client.Close(); continue }
 
     if ($target -eq '/battery') {
@@ -591,7 +608,8 @@ while ($true) {
       }
     }
     elseif ($target -eq '/ping') {
-      Send-Text $stream 200 'application/json' ('{"ok":true,"hv":' + $HV + ',"data":' + (Json-Str $DataDir) + '}')
+      $pk = 1; try { $pf = Join-Path (Split-Path -Parent $WebRoot) 'pkgver.txt'; if (Test-Path -LiteralPath $pf) { $pk = [int](([IO.File]::ReadAllText($pf)) -replace '\D', '') } } catch { $pk = 1 }; if ($pk -lt 1) { $pk = 1 }
+      Send-Text $stream 200 'application/json' ('{"ok":true,"hv":' + $HV + ',"pkg":' + $pk + ',"data":' + (Json-Str $DataDir) + '}')
     }
     elseif ($target -eq '/music') {
       $q = Parse-Query $qs; $cmd = [string]$q['cmd']; if ($cmd -notmatch '^(get|toggle|play|pause|next|prev|vol|seek)$') { $cmd = 'get' }
@@ -601,6 +619,72 @@ while ($true) {
     }
     elseif ($target -eq '/musicart') {
       if ($script:ArtBytes -and $script:ArtBytes.Length -gt 0) { Send-Reply $stream 200 'image/jpeg' $script:ArtBytes } else { Send-Text $stream 404 'text/plain' 'none' }
+    }
+    elseif ($target -eq '/appupdate') {
+      # full update from inside the app: download the new package, check its fingerprint, then run its installer (the window closes and reopens)
+      $q = Parse-Query $qs; $act = [string]$q['act']; if (-not $act) { $act = 'status' }
+      $UpdDir = Join-Path $env:LOCALAPPDATA 'M-01 Companion\update'; if ($env:M01_UPDDIR) { $UpdDir = $env:M01_UPDDIR }
+      New-Item -ItemType Directory -Path $UpdDir -Force | Out-Null
+      $stf = Join-Path $UpdDir 'state.txt'; $zip = Join-Path $UpdDir 'pkg.zip'; $pidf = Join-Path $UpdDir 'pid.txt'; $pkd = Join-Path $UpdDir 'pkg'
+      $urun = $false; if (Test-Path -LiteralPath $pidf) { try { $urun = [bool](Get-Process -Id ([int]([IO.File]::ReadAllText($pidf))) -ErrorAction SilentlyContinue) } catch { } }
+      $bad = $false; $sent = $false
+      if ($act -eq 'start') {
+        $u = [string]$q['url']; $want = ([string]$q['sha']).ToLower()
+        $okUrl = ($u -match '^https://[A-Za-z0-9-]+\.github\.io/[^\s?#''"`]*\.zip$') -or ($env:M01_UPD_ALLOW -and $u.StartsWith($env:M01_UPD_ALLOW))
+        if (-not $okUrl -or $want -notmatch '^[0-9a-f]{64}$') { Send-Text $stream 403 'application/json' '{"ok":false,"error":"forbidden"}'; $sent = $true }
+        elseif (-not $urun) {
+          Remove-Item -LiteralPath $stf, $zip -Force -ErrorAction SilentlyContinue
+          if (Test-Path -LiteralPath $pkd) { Remove-Item -LiteralPath $pkd -Recurse -Force -ErrorAction SilentlyContinue }
+          $curl = Join-Path $env:SystemRoot 'System32\curl.exe'; if (-not (Test-Path -LiteralPath $curl)) { $curl = 'curl.exe' }
+          $qs1 = $stf -replace "'", "''"; $qz = $zip -replace "'", "''"; $qp = $pkd -replace "'", "''"; $qc = $curl -replace "'", "''"
+          $job = @"
+`$ErrorActionPreference = 'Continue'
+`$ProgressPreference = 'SilentlyContinue'
+`$t = 0; try { `$h = & '$qc' -sIL --max-time 20 '$u' 2>`$null; foreach (`$l in `$h) { if (`$l -match '^(?i)content-length:\s*(\d+)') { `$t = [int64]`$Matches[1] } } } catch { }
+Set-Content -LiteralPath '$qs1' -Value ("dl " + `$t)
+& '$qc' -fsSL -o '$qz' '$u'
+if (`$LASTEXITCODE -ne 0) { Set-Content -LiteralPath '$qs1' -Value 'error download'; exit }
+`$sha = [Security.Cryptography.SHA256]::Create(); `$fs = [IO.File]::OpenRead('$qz'); `$got = ((`$sha.ComputeHash(`$fs) | ForEach-Object { `$_.ToString('x2') }) -join ''); `$fs.Close()
+if (`$got -ne '$want') { Set-Content -LiteralPath '$qs1' -Value 'error checksum'; exit }
+try { Expand-Archive -LiteralPath '$qz' -DestinationPath '$qp' -Force -ErrorAction Stop } catch { Set-Content -LiteralPath '$qs1' -Value 'error unzip'; exit }
+if (-not (Test-Path -LiteralPath (Join-Path '$qp' 'install.ps1'))) { Set-Content -LiteralPath '$qs1' -Value 'error unzip'; exit }
+Set-Content -LiteralPath '$qs1' -Value ("ready " + `$t)
+"@
+          $enc = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($job))
+          try { $pp = Start-Process -FilePath 'powershell.exe' -ArgumentList ('-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -EncodedCommand ' + $enc) -WindowStyle Hidden -PassThru; [IO.File]::WriteAllText($pidf, [string]$pp.Id); $urun = $true } catch { }
+          Start-Sleep -Milliseconds 300
+        }
+      }
+      elseif ($act -eq 'cancel') {
+        if ($urun) { try { Stop-Process -Id ([int]([IO.File]::ReadAllText($pidf))) -Force -ErrorAction SilentlyContinue } catch { } }
+        Remove-Item -LiteralPath $stf, $zip, $pidf -Force -ErrorAction SilentlyContinue
+        if (Test-Path -LiteralPath $pkd) { Remove-Item -LiteralPath $pkd -Recurse -Force -ErrorAction SilentlyContinue }
+        $urun = $false
+      }
+      elseif ($act -eq 'install') {
+        $ins = Join-Path $pkd 'install.ps1'; $line0 = ''; if (Test-Path -LiteralPath $stf) { $line0 = ([IO.File]::ReadAllText($stf)).Trim() }
+        if ($line0 -notmatch '^ready' -or -not (Test-Path -LiteralPath $ins)) { Send-Text $stream 200 'application/json' '{"ok":false,"error":"notready"}'; $sent = $true }
+        else {
+          Send-Text $stream 200 'application/json' '{"ok":true}'
+          try { $client.Close() } catch {}
+          Set-Content -LiteralPath $stf -Value 'done'
+          # the new installer closes the window, copies the new files and opens the app again; this helper steps aside first
+          $qi = $ins -replace "'", "''"
+          Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @('-NoProfile', '-WindowStyle', 'Hidden', '-ExecutionPolicy', 'Bypass', '-Command', "Start-Sleep -Seconds 1; & '$qi'")
+          $listener.Stop()
+          exit
+        }
+      }
+      if (-not $sent) {
+        $line = ''; if (Test-Path -LiteralPath $stf) { $line = ([IO.File]::ReadAllText($stf)).Trim() }
+        $parts = $line -split ' ', 2; $phase = [string]$parts[0]; $rest = ''; if ($parts.Count -gt 1) { $rest = [string]$parts[1] }
+        $total = 0; if ($rest -match '^\d+$') { $total = [int64]$rest }
+        $got = 0; if (Test-Path -LiteralPath $zip) { try { $got = (Get-Item -LiteralPath $zip).Length } catch { } }
+        $err = ''; if ($phase -eq 'error') { $err = $rest }
+        if (-not $phase) { if ($urun) { $phase = 'dl' } else { $phase = 'idle' } }
+        if (-not $urun -and $phase -eq 'dl') { $phase = 'error'; $err = 'stopped' }
+        Send-Text $stream 200 'application/json' ('{"ok":true,"phase":' + (Json-Str $phase) + ',"total":' + $total + ',"got":' + $got + ',"error":' + (Json-Str $err) + '}')
+      }
     }
     elseif ($target -eq '/ollamainstall') {
       # one-click Ollama install from inside the app: download the official installer and run it silently (per-user, no admin needed)
@@ -721,8 +805,7 @@ if (`$LASTEXITCODE -eq 0) {
           # start the new helper once this one has let go of the port, then stop this one
           $q1 = $nf -replace "'", "''"; $q2 = $WebRoot -replace "'", "''"; $q3 = $DataDirArg -replace "'", "''"
           $cmd = "Start-Sleep -Seconds 1; & '$q1' -WebRoot '$q2' -DataDir '$q3' -Port $Port"
-          $enc = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($cmd))
-          Start-Process powershell.exe -WindowStyle Hidden -ArgumentList ('-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -EncodedCommand ' + $enc)
+          Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @('-NoProfile', '-WindowStyle', 'Hidden', '-ExecutionPolicy', 'Bypass', '-Command', $cmd)
           $listener.Stop()
           exit
         }

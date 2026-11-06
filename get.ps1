@@ -12,7 +12,7 @@ try {
   Expand-Archive -LiteralPath (Join-Path $tmp 'm01.zip') -DestinationPath (Join-Path $tmp 'app') -Force
   & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $tmp 'app\install.ps1')
 } catch {
-  Write-Host ([regex]::Unescape('\u5b89\u88dd\u6c92\u6709\u5b8c\u6210\uff0c\u8acb\u6539\u7528\u7db2\u9801\u4e0a\u7684\u300c\u4e0b\u8f09 Windows \u7248\u300d\u3002 / The install didn't finish \u2014 use the Download for Windows button instead.')) -ForegroundColor Red
+  Write-Host ([regex]::Unescape('\u5b89\u88dd\u6c92\u6709\u5b8c\u6210\uff0c\u8acb\u6539\u7528\u7db2\u9801\u4e0a\u7684\u300c\u4e0b\u8f09 Windows \u7248\u300d\u3002 / The install did not finish \u2014 use the Download for Windows button instead.')) -ForegroundColor Red
   Write-Host $_.Exception.Message
 } finally {
   $ProgressPreference = 'Continue'
