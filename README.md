@@ -48,13 +48,13 @@
 | 驚訝 | Surprised.png | 選填 |
 | 擔心 | Worried.png | 選填 |
 | 難過 | Sad.png | 選填 |
-| 睡著 | Asleep.png | 選填（5 分鐘沒動會睡著） |
+| 睡著 | Asleep.png | 選填（10 分鐘沒動會睡著） |
 
 ## 注意事項
 
 - 她的回答是 AI 產生的，可能會出錯；健康、金錢、法律這類重要的事請自己再確認。
 - 你的金鑰只存在你自己的瀏覽器或電腦裡，不會傳給我們。
-- 目前是 Alpha 測試版，還在持續更新。
+- 這是正式版 1.0，之後會持續更新，版本號規則見下方。
 
 ---
 
@@ -107,13 +107,23 @@ The character concept is inspired by the community’s **“Claude-chan”** fan
 | Surprised | Surprised.png | Optional |
 | Worried | Worried.png | Optional |
 | Sad | Sad.png | Optional |
-| Asleep | Asleep.png | Optional (she dozes off after 5 idle minutes) |
+| Asleep | Asleep.png | Optional (she dozes off after 10 quiet minutes) |
 
 ## Notes
 
 - Her answers are AI-generated and can be wrong. Double-check anything important (health, money, legal).
 - Your keys stay in your own browser or computer and are never sent to us.
-- This is an Alpha version and is still being updated.
+- Version 1.0 — updates keep coming; see the versioning rules below.
 
 
 隱私權政策 Privacy Policy: https://elvis071114-coder.github.io/m01/privacy.html
+
+## 版本號規則 / Versioning
+
+版本號是 `主版本.功能版本.修正版本`（例如 1.2.3）：
+
+- **修正版本**（1.0.**1**）：修 bug、小調整，不加新功能。App 裡一鍵更新就好。
+- **功能版本**（1.**1**.0）：新功能或明顯的改進。如果需要重新安裝電腦端程式，一定會升這一碼，並在更新說明寫清楚。
+- **主版本**（**2**.0.0）：大改版或不相容的變動，例如資料格式改變、所有人都要重新安裝。
+
+Version numbers are `major.minor.patch`. Patch (1.0.**1**): bug fixes only, one-click update. Minor (1.**1**.0): new features or clear improvements — any release that needs the desktop helper reinstalled is at least a minor bump and says so. Major (**2**.0.0): big redesigns or incompatible changes (new data format, everyone reinstalls).

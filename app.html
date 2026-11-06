@@ -896,7 +896,18 @@ body.kb .tabs{padding-top:4px}
   const S2T=new Map();for(let i=0;i<Math.min(S2T_A.length,S2T_B.length);i++)if(S2T_A[i]!==S2T_B[i])S2T.set(S2T_A[i],S2T_B[i]);
   const zhOut=()=>{try{return localStorage.getItem("m01lang")!=="en"}catch(e){return true}};
   const toTrad=t=>zhOut()?t.replace(/[\u4e00-\u9fff]/g,ch=>S2T.get(ch)||ch):t;
-  function looping(s){if(s.length<240)return false;const tail=s.slice(-40);let n=0,i=s.length-40;
+  // a run-on: a long stretch with no sentence break at all (small models sometimes start listing words and can't stop)
+  const RUN_BREAK=/[。！？!?.\n…~～」』）)：:；;]/;
+  function runOn(s){const t=s.slice(-420);if(t.length<420)return false;const words=t.trim().split(/\s+/).length;
+    const cjk=(t.match(/[\u4e00-\u9fff]/g)||[]).length;const lim=cjk>t.length/3?260:380;
+    let last=-1;for(let i=t.length-1;i>=0;i--){if(RUN_BREAK.test(t[i])){last=i;break}}return t.length-1-last>lim||(cjk<t.length/3&&words>70&&!/[,，、]/.test(t.slice(-300))&&!RUN_BREAK.test(t.slice(-300)))}
+  // a reply that talks about a picture/attachment although this message has none (and they didn't bring pictures up)
+  const PIC_RE=/(傳|發|附|寄|給我|貼)[^。！？!?\n]{0,6}(圖片|照片|相片|截圖|附件|檔案|圖)|(這|那)張(圖|照片|相片|截圖)|看到(了)?[^。！？!?\n]{0,4}(圖片|照片|相片|截圖)|\b(image|picture|photo|screenshot|attachment)s?\b/i;
+  function picSlip(reply,last){if(!last)return false;const c=typeof last.content==="string"?last.content:"";
+    if((last.images&&last.images.length)||/\[附件：|\[Attachment|看圖工具看到的內容|What the picture tool saw/.test(c))return false;
+    const userPart=c.split(/\n\n（|\n\n\(/)[0];if(/(圖|照片|相片|截圖|附件|檔案|image|picture|photo|pic|screenshot|file)/i.test(userPart))return false;
+    return PIC_RE.test(reply)}
+  function looping(s){if(runOn(s))return true;if(s.length<240)return false;const tail=s.slice(-40);let n=0,i=s.length-40;
     for(;;){i=s.lastIndexOf(tail,i-1);if(i<0||s.length-i>1500)break;if(++n>=3)return true}return false}
   function noteUrls(out,args){const set=window.__turnUrls;if(!set)return;(String(out).match(/https?:\/\/[^\s"'<>)\]）」】，。、]+/g)||[]).forEach(u=>set.add(u.replace(/[.,;:!?]+$/,"")));if(args&&typeof args.url==="string")set.add(args.url)}
   window.__toTrad=toTrad;
@@ -933,6 +944,7 @@ body.kb .tabs{padding-top:4px}
         for(;;){const {value,done}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
           while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith("data:"))continue;
             let j;try{j=JSON.parse(line.slice(5))}catch(e){continue}
+            try{if(window.__usage){if(j.type==="message_start"&&j.message&&j.message.usage)__usage.cl(body.model,j.message.usage,0);else if(j.type==="message_delta"&&j.usage)__usage.cl(body.model,null,j.usage.output_tokens||0)}}catch(e){}
             if(j.type==="content_block_start"){const cb=j.content_block;blocks[j.index]=cb.type==="tool_use"?{type:"tool_use",id:cb.id,name:cb.name,json:""}:cb.type==="thinking"?{type:"thinking",thinking:"",signature:""}:cb.type==="redacted_thinking"?{type:"redacted_thinking",data:cb.data}:{type:"text",text:""}}
             else if(j.type==="content_block_delta"){const b=blocks[j.index];if(!b)continue;
               if(j.delta.type==="text_delta"){b.text+=j.delta.text;const d=sep()+j.delta.text;text+=d;roundText+=j.delta.text;try{opts.onText&&opts.onText({text,delta:d})}catch(e){}}
@@ -979,6 +991,7 @@ body.kb .tabs{padding-top:4px}
           const model=cfg.geminiModel||"gemini-3.6-flash";
           const r=await fetch("/gemini?model="+encodeURIComponent(model),{method:"POST",signal:opts.signal,headers:{"X-M01":"1","Content-Type":"application/json"},body:JSON.stringify(body)});
           j=await r.json();
+          try{if(window.__usage){if(j&&j.status===200)__usage.gem(model,j.body&&j.body.usageMetadata);else if(j&&j.status===429)__usage.gemHit(model,j.body)}}catch(e){}
           if(j&&j.status&&j.status!==200){const msg=(j.body&&j.body.error&&j.body.error.message)||"";
             if(body.generationConfig&&j.status===400&&/thinking/i.test(msg)){delete body.generationConfig;continue}
             const next={"gemini-3.8-flash":"gemini-3.6-flash","gemini-3.6-flash":"gemini-3.5-flash-lite"}[model];
@@ -1042,14 +1055,16 @@ body.kb .tabs{padding-top:4px}
     // thinking has a time limit worked out for THIS computer: total target (Medium ~10 s, Slow ~20 s, Deep ~35 s)
     // minus how long this computer has been taking to write the answer itself; when it runs out she answers from her notes
     const thinkMs=canThink?thinkBudget(model,opts.modelTier):0;let thinkOn=canThink&&thinkMs>0,thinkCut=false;
-    let text="";
+    let text="",rewrote=false,calm=false,cutoff=false,why="run";
+    // stable mode: calmer generation settings (fewer slips, plainer talk); "calm" is the same, used once to rewrite a reply that ran away
+    const stable=()=>!!cfg.stable||calm;
     const tools=(opts.tools||[]).map(t=>({type:"function",function:{name:t.name,description:t.description,parameters:t.inputSchema||{type:"object",properties:{}}}}));
     try{
       for(let round=0;round<5;round++){
         const useTools=tools.length&&round<4;
         const t0=Date.now();let thinkTxt="",cut=false;
         const res=await fetch(cfg.url.replace(/\/$/,"")+"/api/chat",{method:"POST",signal:opts.signal,headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({model,messages,stream:true,tools:useTools?tools:undefined,think:canThink?(/gpt-oss/i.test(model)?(thinkOn?(opts.modelTier==="default"?"low":opts.modelTier==="complex"?"medium":"high"):"low"):thinkOn):undefined,options:{num_ctx:cfg.ctx,temperature:.65,top_p:.9,repeat_penalty:1.15,repeat_last_n:256,num_predict:(thinkOn?{default:1500,complex:3500,deep:8000}[opts.modelTier]||0:0)+(opts.modelTier==="quick"?260:opts.modelTier==="deep"?2400:opts.modelTier==="complex"?1600:800)}})});
+          body:JSON.stringify({model,messages,stream:true,keep_alive:"30m",tools:useTools?tools:undefined,think:canThink?(/gpt-oss/i.test(model)?(thinkOn?(opts.modelTier==="default"?"low":opts.modelTier==="complex"?"medium":"high"):"low"):thinkOn):undefined,options:{num_ctx:cfg.ctx,temperature:stable()?.45:.65,top_p:stable()?.8:.9,repeat_penalty:stable()?1.2:1.15,repeat_last_n:256,...(/qwen/i.test(model)?{presence_penalty:stable()?1.3:1}:{}),num_predict:(thinkOn?{default:1500,complex:3500,deep:8000}[opts.modelTier]||0:0)+Math.round((opts.modelTier==="quick"?260:opts.modelTier==="deep"?2000:opts.modelTier==="complex"?1200:600)*(stable()?.75:1))}})});
         if(!res.ok){const t=await res.text().catch(()=>"");throw{code:"upstream_error",message:t||("HTTP "+res.status),status:res.status}}
         const rd=res.body.getReader();const dec=new TextDecoder();let buf="",roundText="",calls=[];
         const sep=()=>text&&!roundText?"\n\n":"";
@@ -1069,6 +1084,17 @@ body.kb .tabs{padding-top:4px}
         if(cut){thinkOn=false;thinkCut=true;const L=messages[messages.length-1];const zh=zhOut();
           L.content=(typeof L.content==="string"?L.content:"")+(zh?`\n\n（你剛才已經先想過了，這是你的思考筆記：\n${thinkTxt.slice(-3000)}\n現在直接回答對方，不要再提到思考過程。）`:`\n\n(You have already thought about this; your notes:\n${thinkTxt.slice(-3000)}\nNow answer directly without mentioning the thinking.)`);
           round--;continue}
+        // she mentions a picture or file that was never sent: write it again once, with a reminder
+        if(!looped&&!rewrote&&cfg.autoRewrite!==false&&!calls.length&&picSlip(roundText,messages[messages.length-1])){rewrote=true;why="pic";calm=true;thinkOn=false;text=text.slice(0,text.length-roundText.length);
+          const L=messages[messages.length-1];L.content=(typeof L.content==="string"?L.content:"")+(zhOut()?"\n\n（提醒：對方這次沒有傳任何圖片或檔案，不要提到圖片、照片或附件。）":"\n\n(Reminder: they did not send any picture or file this time — don’t mention pictures, photos or attachments.)");
+          try{opts.onText&&opts.onText({text,delta:"",replace:true,rewriting:true})}catch(e){}round--;continue}
+        // she ran away: write the reply again once with calmer settings, so you get a whole normal answer instead of half of one
+        if(looped&&!rewrote&&cfg.autoRewrite!==false){rewrote=true;calm=true;thinkOn=false;text=text.slice(0,text.length-roundText.length);
+          try{opts.onText&&opts.onText({text,delta:"",replace:true,rewriting:true})}catch(e){}round--;continue}
+        if(looped)cutoff=true;
+        if(looped&&runOn(roundText)){let keep=roundText;for(let k=0;k<6&&runOn(keep);k++){const head=keep.slice(0,Math.max(0,keep.length-420));const m=head.match(/^[\s\S]*[。！？!?.\n…~～」』）)]/);keep=m?m[0]:head}
+          keep=keep.replace(/[\s,，、]+$/,"");if(!keep.trim())keep=roundText.slice(0,200).replace(/\s+\S*$/,"")+"…";
+          text=text.slice(0,text.length-roundText.length)+keep;roundText=keep;try{opts.onText&&opts.onText({text,delta:"",replace:true})}catch(e){}break}
         if(looped){const tail=roundText.slice(-40),la=roundText.lastIndexOf(tail),lb=roundText.lastIndexOf(tail,la-1),per=Math.max(1,la-lb),first=roundText.indexOf(tail);let keep=roundText.slice(0,Math.min(roundText.length,first+per));const sm=keep.match(/^[\s\S]*[。！？!?.\n」）)]/);if(sm&&keep.length-sm[0].length<per)keep=sm[0];text=text.slice(0,text.length-roundText.length)+keep;roundText=keep;try{opts.onText&&opts.onText({text,delta:""})}catch(e){}break}
         if(!calls.length||!useTools)break;
         messages.push({role:"assistant",content:roundText,tool_calls:calls});
@@ -1087,7 +1113,7 @@ body.kb .tabs{padding-top:4px}
       throw{code:"offline",message:String(e&&e.message||e),text};
     }
     if(!text.trim())throw{code:"empty_completion",message:"empty"};
-    return{text,truncated:false,modelTierApplied:"default"};
+    return{text,truncated:false,modelTierApplied:"default",rewritten:rewrote&&!cutoff,cutoff,why};
   }
   sample.limits=async()=>({maxPromptBytes:262144,tools:{maxCount:8},images:(cfg.backend==="claude"||cfg.backend==="gemini")?{maxCount:5,maxInputBytes:5e6,mediaTypes:["image/jpeg","image/png","image/webp","image/gif"]}:(cfg.vision||(typeof chatSeesPictures==="function"&&chatSeesPictures(cfg.model)))?{maxCount:4,maxInputBytes:20e6,mediaTypes:["image/jpeg","image/png","image/webp","image/gif"]}:undefined});
   sample.json=async(input,opts)=>{const r=await sample(input,opts);const m=r.text.match(/[\[{][\s\S]*[\]}]/);return JSON.parse(m?m[0]:r.text)};
@@ -1557,6 +1583,17 @@ function allMsgs(){return S.logs.flatMap(l=>l.items)}
 function convOf(m,l){return m.conv||l.conv||"main"}
 function curMsgs(){if(S.incog)return S.incogMsgs;return S.logs.flatMap(l=>l.items.filter(m=>convOf(m,l)===S.conv))}
 function convTitle(id){const c=S.convs.find(x=>x.id===id);return c?c.title:"對話"}
+/* long sessions: keep at most ~100 messages on screen while you're reading the newest ones; older ones fold behind "show earlier" */
+function trimThread(){
+  const th=$("thread");if(!th)return;const els=[...th.querySelectorAll(":scope>.msg")];const keep=Math.max(100,S.showCount);
+  if(els.length<=keep+20)return;
+  const sc=$("log")||th;if(sc.scrollHeight-sc.scrollTop-sc.clientHeight>400)return;   // you've scrolled up to read: leave it alone
+  const cut=els.length-keep;const stop=els[cut];
+  while(th.firstChild&&th.firstChild!==stop){const n=th.firstChild;if(n.classList&&n.classList.contains("daysep")&&n.nextSibling===stop)break;n.remove()}
+  S.showCount=keep;const start=curMsgs().length-keep;
+  if(start>0){const b=document.createElement("button");b.className="older";b.textContent=`顯示更早的 ${Math.min(60,start)} 則`;b.onclick=()=>{S.showCount+=60;renderThread()};th.insertBefore(b,th.firstChild)}
+  scrollEnd();
+}
 function renderThread(){
   const th=$("thread"); th.innerHTML="";
   if(S.incog)th.insertAdjacentHTML("beforeend",`<div class="incog-note">無痕模式：這段對話不會被保存，她也不會記住，也不會讀取你過去的記憶。關掉無痕就會回到一般對話。</div>`);
@@ -1587,9 +1624,14 @@ function msgEl(m){
   const SP=m.role==="assistant"&&m.text?splitSources(visible(m.text)):{body:m.text,urls:[]};
   if(m.text){const b=document.createElement("div");b.className="bubble";if(m.role==="user")b.textContent=m.text;else b.innerHTML=md(SP.body);w.appendChild(b)}
   if(m.saved&&m.saved.length){for(const f of m.saved){const n=document.createElement("div");n.className="memnote";n.textContent="已記下："+f;w.appendChild(n)}}
+  if(m.role==="assistant"&&m.slip){const n=document.createElement("div");n.className="slipnote";n.dataset.i18n="none";const en=isEN();
+    n.innerHTML=m.slip==="pic"?`<span>${en?"Her first try talked about a picture you never sent, so it was rewritten automatically.":"她第一次提到你沒傳的圖片，已經自動重寫。"}</span><button class="mact sliprg">${en?"Say it again":"不滿意可以重說"}</button>`:m.slip==="fallback"?`<span>${en?"Gemini’s free quota was used up, so the local AI answered this one.":"Gemini 今天的免費額度用完了，這則由本地 AI 回答。"}</span><button class="mact sliprg">${en?"Say it again":"重說"}</button>`:m.slip==="cut"?`<span>${en?"She started rambling and was cut off here.":"她剛剛講到失控，後面已經截掉。"}</span><button class="mact sliprg">${en?"Say it again":"建議重說"}</button>`
+      :`<span>${en?"Her first try ran away, so it was rewritten automatically.":"她第一次講到失控，已經自動重寫。"}</span><button class="mact sliprg">${en?"Say it again":"不滿意可以重說"}</button>`;
+    n.querySelector(".sliprg").onclick=()=>regenTurn(m);w.appendChild(n)}
   const meta=document.createElement("div");meta.className="meta";meta.innerHTML=`<span>${timeOf(m.t)}</span>`;
   if(m.role==="assistant"&&m.text){
     const cp=document.createElement("button");cp.textContent="複製";cp.onclick=()=>navigator.clipboard.writeText(visible(SP.body)).then(()=>toast("已複製"),()=>toast("無法複製"));meta.appendChild(cp);
+    const rg=document.createElement("button");rg.className="mact regen";rg.textContent="重說";rg.title="讓她重新回答這一則";rg.onclick=()=>regenTurn(m);meta.appendChild(rg);
     if(typeof fishReady==="function"&&fishReady()){const sp=document.createElement("button");sp.className="spk";sp.textContent="朗讀";sp.onclick=()=>{if(FISH.btn===sp){stopVoice();return}playVoice(m.text,sp,true,m.expr)};meta.appendChild(sp)}
     if(SP.urls.length){
       const sb=document.createElement("button");sb.className="srcbtn";sb.textContent="來源 ▸";sb.setAttribute("aria-expanded","false");
@@ -1626,6 +1668,16 @@ function deleteTurn(m){
   const {list,i}=msgPos(m);if(i<0)return;
   const ids=new Set([m.id]);for(let j=i+1;j<list.length&&list[j].role!=="user";j++)ids.add(list[j].id);
   dropMsgs(ids);dropOrphanFiles((m.attach||[]).map(a=>a.fileId));renderThread();updateStats();toast("已刪除這則訊息和她的回覆");
+}
+/* say it again: drop her reply (and anything after it) and send your message once more */
+function regenTurn(m){
+  if(S.busy){toast(isEN()?"Wait until she finishes, or press Stop first":"等她回完，或先按「停止」");return}
+  const list=curMsgs(),i=list.findIndex(x=>x.id===m.id);if(i<0)return;
+  let j=i;while(j>=0&&list[j].role!=="user")j--;
+  if(j<0){toast(isEN()?"There is no message of yours to answer again":"找不到要重新回答的訊息");return}
+  const u=list[j];const re=(u.attach||[]).map(a=>S.files.find(f=>f.id===a.fileId)).filter(Boolean).map(f=>{const full=(S.chunks.get(f.id)||[]).join("");return{fileId:f.id,name:f.name,kind:f.kind,preview:f.kind==="image"?"":full.slice(0,12000),chars:full.length}});
+  dropMsgs(new Set(list.slice(j).map(x=>x.id)));renderThread();updateStats();
+  send({edit:true,text:u.text==="（傳了附件）"?"":u.text,att:re});
 }
 function startEdit(m,w){
   if(S.busy){toast("等她回完再編輯，或先按「停止」");return}
@@ -1846,7 +1898,7 @@ function persistLog(log){
   const body={day:log.day,part:log.part,conv:log.conv||"main",items:log.items};
   return queueWrite(()=>S.base.collection("logs").doc(log.id).set(JSON.parse(JSON.stringify(body))));
 }
-function saveFacts(){if(typeof fsMark==="function")fsMark("facts");if(!S.db)return;const facts=S.facts.slice();return queueWrite(()=>S.db.doc(`data/users/${S.uid}/memory`).set({facts}))}
+function saveFacts(){S.idxDirty=true;if(typeof fsMark==="function")fsMark("facts");if(!S.db)return;const facts=S.facts.slice();return queueWrite(()=>S.db.doc(`data/users/${S.uid}/memory`).set({facts}))}
 function addMsg(m){
   if(S.incog){S.incogMsgs.push(m);return null}
   m.conv=S.conv;const log=currentLog(m.t);log.items.push(m);S.idxDirty=true;persistLog(log);touchConv(m);return log}
@@ -1917,6 +1969,8 @@ function buildIndex(){
     const text=visible(m.text||"")+(m.attach?.length?" "+m.attach.map(a=>a.name).join(" "):"");
     if(text.trim())docs.push({kind:"msg",ref:m,text,label:`${stamp(m.t)} ${m.role==="user"?(S.settings.userName||"你"):"夥伴"}說`});
   }
+  // the memory notes are searchable too, so notes that no longer fit in the prompt can still be found
+  for(const f of (S.facts||[]))if(f&&f.text)docs.push({kind:"fact",ref:f,text:String(f.text),label:`記憶重點（${dayOf(f.t)}）`});
   for(const f of S.files){
     docs.push({kind:"file",ref:f,text:`${f.name} ${f.summary||""} ${(f.notes||[]).map(n=>n.text).join(" ")}`,label:`檔案「${f.name}」摘要`});
     const parts=S.chunks.get(f.id)||[];const full=parts.join("");
@@ -2037,17 +2091,33 @@ function incogRules0(){
   const st=S.settings;
   return `你是「${st.botName||"Claude"}」，是${st.userName?`「${st.userName}」`:"使用者"}的 AI 陪伴夥伴，同時也幫忙回答各種問題。\n個性與說話方式：${st.persona}\n\n現在是【無痕對話】：這段對話不會被保存，你也看不到過去的任何記憶或檔案。不要假裝記得以前的事。\n\n【表情】每次回覆的第一行先寫 [[表情：X]]，X 從「平常、開心、害羞、生氣、得意、驚訝、擔心、難過」選一個。這行不會顯示給對方。\n\n回覆預設用繁體中文，不確定就說不確定。`;
 }
+/* keep only the five newest backup files in the 備份 folder */
+async function pruneBackups(){try{if(!window.serverFS)return;const l=(await serverFS.ls(["備份"])).filter(x=>!x.dir&&/^companion-backup-.*\.json$/.test(x.name)).map(x=>x.name).sort();
+  for(const n of l.slice(0,Math.max(0,l.length-5)))await serverFS.del(["備份",n])}catch(e){}}
+/* keep a list inside a character budget: everything if it fits, otherwise the items that share words with the message, then the newest */
+function fitList(list,text,budget,keepNewest,line,more){
+  if(!list||!list.length)return"";const all=list.map(line);const total=all.reduce((a,b)=>a+b.length+1,0);if(total<=budget)return all.join("\n");
+  const q=String(text||"").toLowerCase();const grams=new Set();for(let i=0;i<q.length-1;i++){const g=q.slice(i,i+2);if(/[\u4e00-\u9fff]{2}|[a-z0-9]{2}/.test(g))grams.add(g)}
+  const score=s=>{s=s.toLowerCase();let n=0;for(const g of grams)if(s.includes(g))n++;return n};
+  const idx=list.map((_,i)=>i);const pick=new Set();let used=0;
+  const rel=idx.map(i=>[i,score(all[i])]).filter(x=>x[1]>=2).sort((a,b)=>b[1]-a[1]);
+  for(const [i] of rel){if(used+all[i].length>budget*.5)break;pick.add(i);used+=all[i].length+1}
+  for(let i=list.length-1,k=0;i>=0&&k<keepNewest;i--,k++){if(pick.has(i))continue;if(used+all[i].length>budget)break;pick.add(i);used+=all[i].length+1}
+  const out=[...pick].sort((a,b)=>a-b).map(i=>all[i]);const left=list.length-out.length;return out.join("\n")+(left>0?"\n"+more(left):"")}
 function rulesTurn(userText){return rulesTurn0(userText)+langRule()+localRule()}
 function rulesTurn0(userText){
   const st=S.settings, now=new Date();
-  const facts=S.facts.map(f=>`- (${dayOf(f.t)}) ${String(f.text).replace(/^我(?!們)/,"對方")}`).join("\n")||"（目前沒有）";
-  const files=S.files.map(f=>`- id=${f.id}｜${f.name}｜${dayOf(f.t)}${f.isSelf?"｜這是你的形象":""}${f.notes?.length?"｜對方說過："+f.notes.map(n=>"「"+n.text+"」").join(" "):""}｜${f.kind==="image"?"圖片":fmtSize(f.chars||0)}｜${f.summary||"（摘要整理中）"}`).join("\n")||"（目前沒有）";
+  // long-term use: the lists stay within a fixed budget so the prompt always fits the model.
+  // Small lists go in whole; big ones keep what matches this message plus the most recent, and say how many are left (search_memory finds them).
+  const facts=fitList(S.facts,userText,2600,30,f=>`- (${dayOf(f.t)}) ${String(f.text).replace(/^我(?!們)/,"對方")}`,n=>`（還有 ${n} 條較舊的重點沒列出；需要時用 search_memory 找）`)||"（目前沒有）";
+  const files=fitList(S.files,userText,2400,20,f=>`- id=${f.id}｜${f.name}｜${dayOf(f.t)}${f.isSelf?"｜這是你的形象":""}${f.notes?.length?"｜對方說過："+f.notes.slice(-2).map(n=>"「"+String(n.text).slice(0,60)+"」").join(" "):""}｜${f.kind==="image"?"圖片":fmtSize(f.chars||0)}｜${String(f.summary||"（摘要整理中）").slice(0,160)}`,n=>`（還有 ${n} 個較舊的檔案沒列出；需要時用 search_memory 找）`)||"（目前沒有）";
   const hits=search(userText,5,16).map(r=>`- [${r.d.label}] ${r.d.text.slice(0,260)}`).join("\n")||"（沒有找到明顯相關的舊內容）";
   const first=allMsgs()[0];
   return `你是「${st.botName||"Claude"}」，是${st.userName?`「${st.userName}」`:"使用者"}的 AI 陪伴夥伴，同時也幫忙回答各種問題。
 個性與說話方式：${st.persona}
 
-現在時間：${stamp(now.getTime())}（星期${"日一二三四五六"[now.getDay()]}）${window.__wxLine?window.__wxLine():""}${window.__musicLine?window.__musicLine():""}
+現在時間：${stamp(now.getTime())}（星期${"日一二三四五六"[now.getDay()]}）${window.__wxLine?window.__wxLine():""}${window.__musicLine?window.__musicLine():""}${window.__convSummary?window.__convSummary():""}
+只有對方這次真的傳了圖片或檔案，才可以提到圖片或附件；沒傳就絕對不要說「你傳了圖片」或假裝看到。
 你們從 ${first?dayOf(first.t):"今天"} 開始聊天，至今共 ${allMsgs().length} 則訊息。
 
 【長期記憶的運作】
@@ -2169,7 +2239,14 @@ async function sendCore(ov){
   if(S.toolsOK&&!S.incog)opts.tools=TOOLS;else opts.cache=false;
   let reply="",note="";
   try{
-    reply=(await S.sample(input,opts)).text;
+    let res0;
+    try{res0=await S.sample(input,opts)}
+    catch(err){
+      // Gemini's free quota is used up: answer with the local AI if it is there, and say so under the reply
+      if(err&&err.code==="gemini_quota"&&typeof LOCAL_CFG!=="undefined"&&LOCAL_CFG.backend==="gemini"&&typeof ollamaCheck==="function"&&(await ollamaCheck().catch(()=>({}))).hasModel){
+        LOCAL_CFG.backend="ollama";try{toast(isEN()?"Gemini’s free quota is used up — the local AI is answering this one.":"Gemini 今天的免費額度用完了，這則改由本地 AI 回答。",5000);res0=await S.sample(input,opts);res0.fellBack=true}finally{LOCAL_CFG.backend="gemini"}}
+      else throw err}
+    reply=res0.text;var slip=res0.fellBack?"fallback":res0.cutoff?"cut":res0.rewritten?(res0.why==="pic"?"pic":"rewritten"):"";
   }catch(e){
     reply=e.text||"";
     const msgs={no_key:"還沒設定 API 金鑰，請到「設定 → AI」貼上金鑰。",auth_error:"API 金鑰無效或沒有額度，請到「設定 → AI」確認。（"+(e.message||"")+"）",gemini_quota:"Gemini 的免費額度暫時用完了（每分鐘、每天都有上限），等一下再傳就好；急的話可以到「設定 → AI」暫時改用本地 AI。",gemini_error:"Gemini 出錯了："+(e.message||""),gemini_offline:"連不到 Gemini，請確認電腦有網路。",claude_error:"Claude 出錯了："+(e.message||""),claude_offline:"連不到 Claude，請確認電腦有網路。",offline:"連不到本地 AI。請確認 Ollama 有開著（選單列有小羊駝圖示），再傳一次。",images_unavailable:"現在的模型看不懂圖片，可以到「設定」填一個支援圖片的模型。",upstream_error:"本地 AI 出錯了："+(e.message||"")+"。如果是 model not found，請到「設定」確認模型名稱，或在終端機執行 ollama pull 模型名稱。",cancelled:"",rate_limited:"現在用量有點滿，過一會兒再傳一次好嗎？",not_granted:"需要你允許這個頁面使用 Claude 才能回覆。重新整理頁面後按允許即可。",
@@ -2189,9 +2266,9 @@ async function sendCore(ov){
   w.remove();
   if(finalText){
     const emx=reply.match(EXP_RE),exK=emx?EXPR[emx[1].trim()]:null;
-    const am={id:rid(),role:"assistant",text:finalText,t:Date.now(),saved,...(exK?{expr:exK}:{})};
+    const am={id:rid(),role:"assistant",text:finalText,t:Date.now(),saved,...(exK?{expr:exK}:{}),...(typeof slip!=="undefined"&&slip?{slip}:{})};
     if(reply||note)addMsg(am);
-    th.appendChild(msgEl(am));scrollEnd();
+    th.appendChild(msgEl(am));scrollEnd();trimThread();
     speak(am.text,am.expr);
   }
   S.busy=false;S.streaming=false;S.ctl=null;setBusyUI();updateStats();refreshMood();if(saved.length)flashMood("happy",1800);
@@ -2549,7 +2626,7 @@ $("qBtn").onclick=()=>{
 $("q").onkeydown=e=>{if(e.key==="Enter")$("qBtn").click()};
 $("exportBtn").onclick=()=>{
   const data={exported:new Date().toISOString(),settings:S.settings,facts:S.facts,files:S.files.map(f=>({...f,text:(S.chunks.get(f.id)||[]).join("")})),messages:allMsgs()};
-  if(typeof APP_MODE!=="undefined"&&APP_MODE&&FS.dir&&FS.dir.server){const nm=`companion-backup-${dayOf(Date.now())}.json`;serverFS.putText(["備份",nm],JSON.stringify(data,null,1)).then(()=>toast("備份已存到 Companion/備份/"+nm,6000),()=>toast("備份失敗"));return}
+  if(typeof APP_MODE!=="undefined"&&APP_MODE&&FS.dir&&FS.dir.server){const nm=`companion-backup-${dayOf(Date.now())}.json`;serverFS.putText(["備份",nm],JSON.stringify(data,null,1)).then(()=>{pruneBackups();return 0}).then(()=>toast("備份已存到 Companion/備份/"+nm,6000),()=>toast("備份失敗"));return}
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,1)],{type:"application/json"}));a.download=`companion-backup-${dayOf(Date.now())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast("備份檔已下載");
 };
 
@@ -2575,7 +2652,7 @@ const I18N={
 "正在連線你的記憶庫":"Connecting to your memory…","待命中":"Standing by","聊天":"Chat","重點":"Memory","檔案":"Files","搜尋":"Search","設定":"Settings","下載 App":"Get App",
 "對話":"Chat","新對話":"New chat","＋ 新對話":"＋ New chat","無痕":"Incognito","送出":"Send","停止":"Stop","SHIFT+ENTER 換行":"SHIFT+ENTER new line","拖曳檔案即可上傳":"Drag files here to upload",
 "每一句對話都完整保存；這裡是夥伴特別記下的重點，你也可以自己加。":"Every message is saved in full. These are the key points your partner chose to remember — you can add your own too.",
-"記下":"Save","刪除":"Delete","改名":"Rename","複製":"Copy","更換":"Replace","上傳":"Upload","移除":"Remove","刪除這條":"Delete this",
+"記下":"Save","重說":"Again","刪除":"Delete","改名":"Rename","複製":"Copy","更換":"Replace","上傳":"Upload","移除":"Remove","刪除這條":"Delete this",
 "上傳過的檔案全文都會保存，夥伴隨時能翻閱。支援 txt、md、csv、json、程式碼、PDF、Word、Excel 和圖片。":"Uploaded files are saved in full so your partner can look through them anytime. Supports txt, md, csv, json, code, PDF, Word, Excel and images.",
 "還沒有檔案。點輸入框左邊的迴紋針上傳。":"No files yet. Use the paperclip next to the message box to upload.",
 "網頁版用的是你自己的 Claude 帳號。想改用電腦上的本地 AI（免費、不用網路、資料只存在自己電腦），可以下載電腦版 App。手機沒辦法跑本地 AI，但可以把網頁版加到主畫面，像 App 一樣打開。":"The web version runs on your own Claude account. To use a local AI on your computer instead (free, works offline, data stays on your machine), download the desktop app. Phones can't run a local AI, but you can add the web version to your home screen and open it like an app.",
@@ -2806,7 +2883,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="0.10.32",APP_STAGE="Beta",APP_BUILD="2026-11-06 02:30";
+const APP_VER="1.0.0",APP_STAGE="",APP_BUILD="2026-11-06 08:30";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -2816,6 +2893,10 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"1.0.0",d:"11/06 08:30",add:[["正式版！經過完整的長時間測試：連續聊幾百則，速度、記憶體都不會變差，重開後資料完整","Version 1.0! Fully tested for long use: hundreds of messages in a row with no slowdown or memory growth, and everything intact after reopening"],["用越久越不怕失憶：記憶重點和檔案再多，也會挑跟這次對話相關的和最新的放進提示，不會超過 AI 能讀的長度；沒列出的也能用搜尋找到","Memory that holds up over time: however many notes and files there are, the ones related to this message plus the newest go into the prompt, so it never overflows; the rest can still be found by search"],["記憶重點也能被搜尋到","Memory notes are now searchable too"],["大幅省電：視窗沒在用或她睡著時，背景動畫、粒子和音樂條都會停下，閒置時的 CPU 用量少了約 99%；使用中也少了約三成","Big power savings: background animation, particles and music bars stop while the window isn’t in use or she’s asleep — about 99% less CPU when idle and about a third less in use"],["長時間聊天時畫面只保留最近約 100 則，舊的收進「顯示更早的訊息」，不會越聊越卡","In long sessions only the latest ~100 messages stay on screen; older ones fold behind “show earlier”, so it never gets sluggish"],["備份資料夾只保留最新 5 份","The backup folder keeps only the newest five backups"]],fix:[["天氣暫時拿不到時，上方橫條會寫出原因，不會只剩一朵雲","When the weather can’t be fetched, the top bar says why instead of showing only a cloud"],["Ollama 狀態確認一次後一分鐘內不重查，送出更快","Ollama’s status is checked at most once a minute, so sending is quicker"]]},
+ {v:"0.10.35",d:"11/06 07:40",add:[["長對話不再忘記開頭：較早的對話會自動整理成「前情提要」，跟著對話一起保存、同步，每次回答都會參考","Long chats no longer forget the beginning: earlier messages are folded into a running summary, saved and synced with the chat, and used for every reply"],["用 Gemini 或 Claude 時，AI 選單旁邊有用量圓圈：快用完會變黃、橘、紅，點開看今天／本月用量、重置時間和官方用量頁面","With Gemini or Claude, a usage ring sits next to the AI menu: yellow, orange, then red as it runs out; click for today’s/this month’s usage, reset time and the official usage pages"],["本地 AI 會一直待在記憶體裡（App 開著時），打開 App 就先暖機，第一句不用等載入","The local AI stays loaded while the app is open and warms up on start, so the first reply doesn’t wait for loading"],["Ollama 沒開時 App 會自動幫你打開","The app starts Ollama for you when it isn’t running"],["她提到你沒傳的圖片時會自動重寫","If she talks about a picture you never sent, the reply is rewritten automatically"],["Gemini 免費額度用完時，自動改由本地 AI 回答並註明","When Gemini’s free quota runs out, the local AI answers instead and says so"]],fix:[["「重說」按鈕一直顯示，不用滑過去才看得到","The “Again” button is always visible"]]},
+ {v:"0.10.34",d:"11/06 07:20",add:[["她講到失控時會自動重寫：用比較穩的設定重新回答一次，回覆下面會註明（預設開，在「設定 → AI 模型」可以關）","When she rambles, the reply is rewritten automatically with calmer settings and a note says so (on by default; Settings → AI model)"],["每則回覆旁邊多了「重說」按鈕，不滿意就讓她重新回答","Every reply has an “Again” button to have her answer once more"],["穩定模式：本地 AI 一直用比較穩的設定，比較少出錯，但說話會平淡一點","Stable mode: the local AI always uses calmer settings — fewer slips, a little plainer"],["重寫後還是失控時，會截掉並在訊息旁邊建議重說","If the rewrite still rambles, it is cut off and the note suggests asking again"]],fix:[]},
+ {v:"0.10.33",d:"11/06 06:55",add:[],fix:[["本地 AI 偶爾停不下來、一直接一長串詞：現在會即時偵測，出現一大段沒有標點的失控文字就停下，只留前面正常的句子；也加上 Qwen 建議的防重複設定，「中」的回答長度上限縮短","Local AI sometimes ran on with endless word lists: it now stops as soon as a long stretch without any sentence break appears and keeps only the normal part; also uses Qwen’s recommended anti-repetition setting and a shorter limit on Medium"]]},
  {v:"0.10.32",d:"11/06 02:30",add:[],fix:[["Mac 和 Windows 不一樣：舊版本地 AI（qwen2.5，要另外裝看圖片工具）的電腦，安裝程式現在會建議升級成 Qwen 3.5，升級後自動刪掉舊模型和看圖片工具；App 也會提醒一次","Mac and Windows differed: computers on the old local AI (qwen2.5 with a separate picture tool) are now offered the Qwen 3.5 upgrade by the installer, which removes the old model and the picture tool; the app reminds you once too"],["安裝程式升級模型後，App 會自動改用新模型","After the installer upgrades the model, the app switches to it automatically"]]},
  {v:"0.10.31",d:"11/06 02:10",add:[],fix:[["天氣沒顯示：改成由 App 直接抓天氣資料，不必經過背景程序；網路位置判斷不到時，用電腦的時區先抓大概的城市","Weather not showing: the app now fetches weather itself without the background helper; if your internet location can’t be found, it uses your computer’s time zone for a rough city"]]},
  {v:"0.10.30",d:"11/06 02:05",add:[],fix:[["重新安裝後音樂還是說要重新安裝：舊的背景程序沒被關掉，現在打開 App 時會自動換成新的","After reinstalling, music still asked for a reinstall: the old background helper kept running; the app now replaces it automatically when it opens"]]},
@@ -2857,7 +2938,7 @@ const CHANGELOG=[
 ];
 function aboutHelp(){
   const en=isEN(),web=typeof LOCAL_CFG==="undefined",path=esc(deskPath()||(en?"Documents/Companion":"文件/Companion"));
-  const ver=`<span class="about-ver">${APP_STAGE} ${APP_VER} · ${APP_BUILD}<br>${esc(edition(en))}</span>`+(typeof updateBlock==="function"?updateBlock(en):"");
+  const ver=`<span class="about-ver">${APP_STAGE?APP_STAGE+" ":""}${APP_VER} · ${APP_BUILD}<br>${esc(edition(en))}</span>`+(typeof updateBlock==="function"?updateBlock(en):"");
   const notes=en?(web?[
     "Chats and memory are stored in your own Claude account and only you can see them. The web and desktop versions keep separate memories.",
     "The web version can't search the internet and can't use the microphone directly — use your keyboard's or system's voice typing.",
@@ -2899,7 +2980,7 @@ function aboutHelp(){
   ];
   const feats=F.map(([h,l])=>`<span class="about-h">${h}</span><ul>${l.map(x=>`<li>${x}</li>`).join("")}</ul>`).join("");
   const log=CHANGELOG.map((c,i)=>{const body=`${c.add.length?`<b class="cl-t">${en?"Added":"新增"}</b><ul>${c.add.map(x=>`<li>${en?x[1]:x[0]}</li>`).join("")}</ul>`:""}${c.fix.length?`<b class="cl-t">${en?"Fixes":"修正"}</b><ul>${c.fix.map(x=>`<li>${en?x[1]:x[0]}</li>`).join("")}</ul>`:""}`;
-    return `<details class="cl"${i===0?" open":""}><summary>${cmpVer(c.v,"0.10.0")>=0?"Beta":"Alpha"} ${c.v}<span>${c.d}</span></summary><div class="fx-dt">${body}</div></details>`});
+    return `<details class="cl"${i===0?" open":""}><summary>${cmpVer(c.v,"1.0.0")>=0?(en?"Version":"正式版"):cmpVer(c.v,"0.10.0")>=0?"Beta":"Alpha"} ${c.v}<span>${c.d}</span></summary><div class="fx-dt">${body}</div></details>`});
   const logHtml=log[0]+(log.length>1?`<details class="cl-all"><summary>${en?`Earlier versions (${log.length-1})`:`較早的版本（${log.length-1} 個）`}</summary><div class="fx-dt">${log.slice(1).join("")}</div></details>`:"");
   return ["M-01 Companion",ver+`<p style="margin:4px 0 6px"><a href="#" id="tourAgain" style="color:var(--accent)">${en?"Replay the guided tour →":"重新看使用教學 →"}</a></p><span class="about-h">${en?"WHAT'S NEW":"更新紀錄"}</span>`+logHtml+feats+`<span class="about-h">${en?"NOTES":"注意事項"}</span><ul>${notes.map(n=>`<li>${n}</li>`).join("")}</ul>`];
 }
@@ -3064,7 +3145,7 @@ function tourSteps(){
   // [where, title, text, tab to open first, settings group to open]
   const T=[
     [".composer .box",en?"Chat":"聊天",en?"Type here to talk to her. Enter sends, Shift+Enter starts a new line. The paperclip on the left sends pictures and files (PDF, Word, Excel, code…) and she reads them — you can also drag files in. To ask about something from before, just ask; she looks through her memory.":"在這裡打字跟她聊天：Enter 送出、Shift+Enter 換行。左邊的迴紋針可以傳圖片和檔案（PDF、Word、Excel、程式碼…），她會讀內容；也可以直接把檔案拖進來。想問以前聊過的事，直接問就好，她會去翻記憶。","chat"],
-    ["#modelChip",app?(en?"AI & speed":"AI・回答速度"):(en?"Speed":"回答速度"),app?(en?"Switch the AI here (local, Gemini, Claude) and choose the speed: Fast (~5 s, no thinking), Medium (~10 s), Slow (~20 s) or Deep (30 s+). Slower levels think longer and answer better. Local models that can’t think have no speed choice.":"點這裡切換 AI（本地、Gemini、Claude）和回答速度：快（約 5 秒，不思考）、中（約 10 秒）、慢（約 20 秒）、詳細（30 秒以上）。越慢想得越久、回答越好。不會思考的本地模型沒有速度可以選。"):(en?"Fast (~5 s), Medium (~10 s), Slow (~20 s) or Deep (30 s+): slower levels think longer and answer better.":"快（約 5 秒）、中（約 10 秒）、慢（約 20 秒）、詳細（30 秒以上）：越慢想得越久、回答越好。"),"chat"],
+    ["#modelChip",app?(en?"AI & speed":"AI・回答速度"):(en?"Speed":"回答速度"),app?(en?"Switch the AI here (local, Gemini, Claude) and choose the speed: Fast (~5 s, no thinking), Medium (~10 s), Slow (~20 s) or Deep (30 s+). Slower levels think longer and answer better. Local models that can’t think have no speed choice. With Gemini or Claude, the little ring next to it shows usage: yellow, orange, then red as it runs out — click it for details.":"點這裡切換 AI（本地、Gemini、Claude）和回答速度：快（約 5 秒，不思考）、中（約 10 秒）、慢（約 20 秒）、詳細（30 秒以上）。越慢想得越久、回答越好。不會思考的本地模型沒有速度可以選。用 Gemini 或 Claude 時，旁邊的小圓圈是用量：快用完會變黃、橘、紅，點一下看詳細。"):(en?"Fast (~5 s), Medium (~10 s), Slow (~20 s) or Deep (30 s+): slower levels think longer and answer better.":"快（約 5 秒）、中（約 10 秒）、慢（約 20 秒）、詳細（30 秒以上）：越慢想得越久、回答越好。"),"chat"],
     ["#mic",en?"Talk instead of typing":"用說的",en?"Click the microphone and speak — your words are typed in for you. Click again to stop.":"按麥克風直接說話，會自動幫你打成文字，再按一次停止。","chat"],
     [".convbar",en?"Chats":"對話",en?"Click the chat name to switch, rename or delete chats. “＋ New chat” starts a fresh one. “Incognito” isn’t saved and isn’t remembered. In every chat she still remembers the key points about you.":"點對話名稱可以切換、改名、刪除以前的對話；「＋ 新對話」開一段新的；「無痕」聊的內容不會被保存、也不會被記住。不管在哪段對話，她都記得關於你的重點。","chat"],
     ["#heroWrap",en?"Her":"她",en?"Her mouth moves when she talks and her face follows her mood. Tap her and she’ll say something — often about what you’ve been talking about. Now and then she speaks up on her own: about the weather, your song or what you talked about. After 10 quiet minutes she falls asleep and her bubble shows Zzz…; say something to wake her.":"這是她：說話時會對嘴、表情會跟著心情變。點她一下會有反應，常常跟你們最近聊的事有關。她也會不定時主動找你說話：關心天氣、聊你在聽的歌、接續剛剛的話題。10 分鐘沒動靜她會睡著，泡泡會顯示 Zzz…，跟她說話就會醒來。","chat"],
@@ -3224,15 +3305,19 @@ $("input").addEventListener("paste",e=>{const f=[...(e.clipboardData?.files||[])
 renderStage();
 /* app starts from boot() once the memory folder is ready */
 
-/* ---------- drifting motes ---------- */
+/* ---------- drifting motes ----------
+   about 24 frames a second at no more than 1.5x resolution, and fully stopped while the window is hidden,
+   unused for a while, or she is asleep (see the power saver near the end) */
 (function(){
-  const c=$("motes"),x=c.getContext("2d");let W,H,P=[];
+  const c=$("motes"),x=c.getContext("2d");let W,H,P=[],run=false,last=0;
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function size(){W=c.width=innerWidth*devicePixelRatio;H=c.height=innerHeight*devicePixelRatio;P=Array.from({length:46},()=>({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*1.8+.6)*devicePixelRatio,v:(Math.random()*.35+.1)*devicePixelRatio,a:Math.random()*.5+.15,h:Math.random()<.35}))}
-  function tick(){x.clearRect(0,0,W,H);for(const p of P){p.y-=p.v;p.x+=Math.sin(p.y/80)*.2;if(p.y<-10){p.y=H+10;p.x=Math.random()*W}
-    x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fillStyle=p.h?`rgba(229,121,74,${p.a})`:`rgba(255,240,230,${p.a*.6})`;x.fill()}
-    if(!reduce)requestAnimationFrame(tick)}
-  size();addEventListener("resize",size);tick();
+  const resting=()=>document.hidden||document.documentElement.classList.contains("fx-idle")||document.documentElement.classList.contains("fx-sleep");
+  function size(){const d=Math.min(1.5,devicePixelRatio||1);W=c.width=Math.round(innerWidth*d);H=c.height=Math.round(innerHeight*d);P=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*1.8+.6)*d,v:(Math.random()*.35+.1)*d,a:Math.random()*.5+.15,h:Math.random()<.35}))}
+  function draw(k){x.clearRect(0,0,W,H);for(const p of P){p.y-=p.v*k;p.x+=Math.sin(p.y/80)*.2*k;if(p.y<-10){p.y=H+10;p.x=Math.random()*W}
+    x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fillStyle=p.h?`rgba(229,121,74,${p.a})`:`rgba(255,240,230,${p.a*.6})`;x.fill()}}
+  function tick(now){if(resting()||reduce){run=false;return}const dt=last?Math.min(120,now-last):41;last=now;draw(dt/16.7);setTimeout(()=>requestAnimationFrame(tick),41)}
+  window.__motesResume=()=>{if(run||reduce||resting())return;run=true;last=0;requestAnimationFrame(tick)};
+  size();addEventListener("resize",size);draw(0);window.__motesResume();
 })();
 
 addEventListener("keydown",e=>{if(e.key==="Escape"&&S.busy)S.ctl?.abort()});
@@ -3496,7 +3581,7 @@ function hideUpdBar(){const b=$("updBar");if(b)b.hidden=true}
 function updateBlock(en){
   const u=S.update;if(!u)return"";
   setTimeout(async()=>{const b=$("updInfoBtn");if(!b)return;const m=await updMode();b.textContent=m==="install"?(en?"Download the new version":"下載新版"):(en?"Update now":"立即更新");b.onclick=()=>{try{hideHelp()}catch(e){}applyUpdateNow()}},0);
-  return `<div class="upd-box"><b>${en?`New version ${esc(u.version)} available`:`有新版本 ${APP_STAGE} ${esc(u.version)}`}</b><span>${esc(en?(u.notes_en||u.notes||""):(u.notes||""))}</span><button class="pbtn" id="updInfoBtn">${en?"Update now":"立即更新"}</button><small>${en?`You have ${APP_VER}. Updating keeps all your memories.`:`你現在是 ${APP_VER}。更新不會影響記憶。`}</small></div>`;
+  return `<div class="upd-box"><b>${en?`New version ${esc(u.version)} available`:`有新版本 ${esc(u.version)}`}</b><span>${esc(en?(u.notes_en||u.notes||""):(u.notes||""))}</span><button class="pbtn" id="updInfoBtn">${en?"Update now":"立即更新"}</button><small>${en?`You have ${APP_VER}. Updating keeps all your memories.`:`你現在是 ${APP_VER}。更新不會影響記憶。`}</small></div>`;
 }
 setTimeout(()=>{try{checkUpdate(true)}catch(e){}},3500);
 setInterval(()=>{try{checkUpdate(true)}catch(e){}},30*60e3);
@@ -3621,7 +3706,10 @@ async function maybeAiPick(){
 async function maybeAiPick0(){
   while(!$("setupPop").hidden||(window.cloud&&["waiting","signin","sync"].includes(cloud._st.state)))await new Promise(r=>setTimeout(r,800));
   if((LOCAL_CFG.backend||"ollama")!=="ollama")return;
-  const r=await ollamaCheck();if(r.ok&&(r.names||[]).some(n=>!/embed/i.test(n)&&!isVisionModel(n)))return;
+  let r=await ollamaCheck();
+  // Ollama is installed but not running: start it first, and only ask about the AI if that doesn't work
+  if(!r.ok&&window.__ensureOllama&&await window.__ensureOllama(false))r=await ollamaCheck();
+  if(r.ok&&(r.names||[]).some(n=>!/embed/i.test(n)&&!isVisionModel(n)))return;
   let g={},c={};try{g=await (await fetch("/secret?p=gemini",{headers:{"X-M01":"1"}})).json()}catch(e){}try{c=await (await fetch("/secret",{headers:{"X-M01":"1"}})).json()}catch(e){}
   const en=isEN();
   if(g.has||c.has){LOCAL_CFG.backend=g.has?"gemini":"claude";saveLocalCfg();await checkAI();paintModelChip();toast(en?`No local AI found — using ${g.has?"Gemini":"Claude"}.`:`沒有找到本地 AI，改用 ${g.has?"Gemini":"Claude"}。`,6000);return}
@@ -4040,6 +4128,27 @@ paintSnd();
 .app>.stage{view-transition-name:m01stage}.app>.console{view-transition-name:m01console}
 ::view-transition-group(m01stage),::view-transition-group(m01console){animation-duration:.45s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
 
+.slipnote{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;padding:5px 9px;font-size:12px;color:var(--muted);background:rgba(var(--accent-rgb),.08);border-left:2px solid var(--accent);animation:fxRowIn .35s var(--ease-out) both}
+.slipnote .mact{color:var(--accent);font-weight:600}
+#safeBox{display:grid;gap:8px;margin:10px 0}
+.meta .mact.regen{opacity:1!important}
+/* usage ring next to the AI chip */
+.uring{all:unset;box-sizing:border-box;cursor:pointer;width:26px;height:26px;display:inline-grid;place-items:center;margin-left:6px;vertical-align:middle;border-radius:50%;transition:background .2s,scale .14s}
+.uring:hover{background:var(--panel3)}.uring:active{scale:.92}
+.uring svg{width:20px;height:20px;transform:rotate(-90deg)}
+.uring .tr{stroke:var(--line2)}.uring .ar{transition:stroke-dashoffset .6s var(--ease-out),stroke .4s}
+.mrow{display:flex;align-items:center}
+#usagePop{position:fixed;z-index:60;width:300px;background:var(--panel);border:1px solid var(--line2);box-shadow:0 18px 40px rgba(0,0,0,.45);padding:12px 14px;font-size:12.5px;line-height:1.5;color:var(--ink)}
+#usagePop[hidden]{display:none}
+#usagePop h4{margin:0 0 6px;font-size:12px;letter-spacing:.12em;color:var(--dim);font-family:var(--font-hud)}
+#usagePop .big{font-size:22px;font-family:var(--font-display);font-variant-numeric:tabular-nums}
+#usagePop .bar{height:6px;background:var(--panel3);margin:6px 0 8px;overflow:hidden}#usagePop .bar i{display:block;height:100%;transition:width .6s var(--ease-out)}
+#usagePop .row{display:flex;justify-content:space-between;color:var(--muted)}#usagePop .row b{color:var(--ink);font-weight:600}
+#usagePop .lim{display:flex;gap:6px;align-items:center;margin-top:8px;color:var(--muted)}#usagePop .lim input{width:90px;padding:4px 6px}
+#usagePop .note{font-size:11.5px;color:var(--dim);margin:8px 0 0}#usagePop a{color:var(--accent)}
+/* power saver: nothing decorative moves while the window is hidden or unused, or while she sleeps */
+html.fx-idle *,html.fx-idle *::before,html.fx-idle *::after{animation-play-state:paused!important}
+html.fx-sleep .brow,html.fx-sleep .floor i,html.fx-sleep .wx-ico *,html.fx-sleep .hud .eq i{animation-play-state:paused!important}
 /* chat area background: five levels of see-through */
 .frame{background:rgba(var(--panel-rgb),var(--chat-a,.78))!important;transition:background-color .35s}
 :root[data-chat-a="2"] .frame,:root[data-chat-a="3"] .frame,:root[data-chat-a="4"] .frame,:root[data-chat-a="5"] .frame{backdrop-filter:blur(var(--chat-blur,6px));-webkit-backdrop-filter:blur(var(--chat-blur,6px))}
@@ -4072,7 +4181,7 @@ paintSnd();
 #wxCard .wx-bars{display:flex;align-items:flex-end;gap:2px;height:16px}
 #wxCard .wx-bars i{width:4px;background:rgba(90,169,255,.85);min-height:2px;transform-origin:bottom;animation:wxBar .7s var(--ease-out) both}
 @keyframes wxBar{from{transform:scaleY(0)}to{transform:none}}
-#wxCard.msg .wx-rain{display:none}
+#wxCard.wxmsg .wx-rain{display:none}
 /* music pill */
 #muCard .p-sq{background:var(--panel3);border:1px solid var(--line2)}
 #muCard .p-sq svg{width:18px;height:18px;color:var(--dim)}
@@ -4301,7 +4410,7 @@ details.cl>summary{cursor:pointer}
     t.textContent=M.title;a.textContent=M.artist||M.album||"";mu.title=[M.title,M.artist,M.album].filter(Boolean).join(" — ");
     $("muPlay").innerHTML=M.state==="playing"?ICON.pause:ICON.play;$("muPlay").setAttribute("aria-label",M.state==="playing"?(en?"Pause":"暫停"):(en?"Play":"播放"));
     $("muPrev").setAttribute("aria-label",en?"Previous":"上一首");$("muNext").setAttribute("aria-label",en?"Next":"下一首");
-    $("muSeek").disabled=!(M.dur>0);setArt(M)}
+    $("muSeek").disabled=!(M.dur>0);setArt(M);vizStart()}
   mu.addEventListener("click",e=>{if(!mu.classList.contains("idle"))return;const en=E();
     if(needHelper){fetch("/open?url="+encodeURIComponent("https://elvis071114-coder.github.io/m01/"),{headers:H}).catch(()=>{});return}
     if(M.reason==="denied"||M.reason==="timeout")toast(en?"System Settings → Privacy & Security → Automation → turn on Spotify under M-01 Companion, then reopen the app.":"系統設定 → 隱私權與安全性 → 自動化 → 把 M-01 Companion 底下的 Spotify 打開，再重新開 App。",7000);
@@ -4317,7 +4426,8 @@ details.cl>summary{cursor:pointer}
     const prev=M.id;M=Object.assign({reason:""},j);mAt=performance.now();
     if(M.running&&M.title&&M.id&&prev&&M.id!==prev)maybeComment();
     paintMusic();
-    mTimer=setTimeout(poll,!M.running?8000:M.state==="playing"?2000:3500)}
+    const away=document.documentElement.classList.contains("fx-idle");
+    mTimer=setTimeout(poll,!M.running?(away?20000:8000):M.state==="playing"?(away?8000:2500):(away?15000:4000))}
   function maybeComment(){if(Date.now()-lastSaid<10*60e3||Math.random()>.35)return;try{if(S.busy||S.streaming)return}catch(e){}lastSaid=Date.now();
     const t=M.title.length>24?M.title.slice(0,24)+"…":M.title;
     const zh=[`在聽〈${t}〉啊……還不錯嘛。`,`〈${t}〉？你的品味……也還可以啦。`,`這首〈${t}〉我好像也有點喜歡。`],en=[`Listening to “${t}”? …Not bad.`,`“${t}”, huh. Your taste is… acceptable.`,`I kind of like “${t}” too.`];
@@ -4325,9 +4435,14 @@ details.cl>summary{cursor:pointer}
   /* bars rise and fall with a beat while music plays (Spotify does not share the sound itself, so the motion is drawn, not measured) */
   let vizT0=performance.now(),levels=bars.map(()=>.1);
   function hash(s){let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
+  let vizOn=false;
+  function vizWanted(){return !mu.hidden&&!mu.classList.contains("idle")&&!document.hidden&&!document.documentElement.classList.contains("fx-idle")}
+  function vizStart(){if(vizOn||!vizWanted())return;vizOn=true;requestAnimationFrame(frame)}
   function frame(now){
-    requestAnimationFrame(frame);
-    if(mu.hidden||mu.classList.contains("idle")||document.hidden)return;
+    if(!vizWanted()){vizOn=false;return}
+    // ~30 frames a second is plenty for the bars; when paused they settle, then the loop stops
+    if(M.state!=="playing"&&levels.every(v=>v<.09)){vizOn=false;return}
+    setTimeout(()=>requestAnimationFrame(frame),33);
     if(!seeking&&M.dur>0){const p=posNow();setRange($("muSeek"),p,M.dur);if(now-tipT>900){tipT=now;$("muSeek").title=fmt(p)+" / "+fmt(M.dur)}}
     const playing=M.state==="playing"&&!reduce();const h=hash(M.id||M.title);const bpm=84+(h%56),beat=60/bpm,t=(now-vizT0)/1000;
     const kick=Math.exp(-((t%beat)/beat)*5.5),half=Math.exp(-((t%(beat/2))/(beat/2))*7);
@@ -4335,7 +4450,7 @@ details.cl>summary{cursor:pointer}
       if(playing){const f1=1.3+((h>>(i%16))&7)*.35,f2=2.1+i*.17;const wave=.5+.25*Math.sin(t*f1+i*1.7)+.25*Math.sin(t*f2+(h%97)*.1+i);
         const shape=x<.3?(.75+kick*.6):x<.7?(.55+half*.35):(.35+half*.3);target=Math.max(.1,Math.min(1,wave*shape*(.85+.3*Math.sin(i*2.3+h))))}
       levels[i]+=(target-levels[i])*(target>levels[i]?.45:.16);b.style.transform=`scaleY(${levels[i].toFixed(3)})`})}
-  requestAnimationFrame(frame);
+  vizStart();
   $("muPlay").onclick=e=>{e.stopPropagation();M.state=M.state==="playing"?"paused":"playing";M.pos=posNow();mAt=performance.now();paintMusic();poll(M.state==="playing"?"play":"pause")};
   $("muNext").onclick=e=>{e.stopPropagation();poll("next")};$("muPrev").onclick=e=>{e.stopPropagation();poll("prev")};
   const seek=$("muSeek");seek.addEventListener("pointerdown",()=>seeking=true);
@@ -4408,9 +4523,9 @@ details.cl>summary{cursor:pointer}
     return""}
   function paintWx(){
     const en=E(),w=W();wx.hidden=!w.wx;if(!w.wx)return;
-    if(!WX||!WX.c){wx.classList.add("msg");wx.title="";
+    if(!WX||!WX.c){wx.classList.add("wxmsg");wx.title="";
       wx.innerHTML=`<div class="p-sq">${icon("cloud",true)}</div><div class="p-txt"><div class="p-l1">${WX&&WX.err?(en?"No weather right now":"現在拿不到天氣"):(en?"Getting the weather…":"正在取得天氣…")}</div><div class="p-l2"><span>${WX&&WX.err==="city"?(en?"Check the place in Settings → Widgets":"到「設定 → 小工具」檢查地點"):(en?"Click to try again":"點一下再試一次")}</span></div></div>`;fit();return}
-    wx.classList.remove("msg");
+    wx.classList.remove("wxmsg");
     const c=WX.c,d=WX.d,k=kind(c.weather_code),cond=(en?WMO_EN:WMO_ZH)[c.weather_code]||"";const tip=wxTip(en);
     const name=WX.loc&&WX.loc.name||"";const at=new Date(WX.t);const hh=String(at.getHours()).padStart(2,"0")+":"+String(at.getMinutes()).padStart(2,"0");
     wx.title=[`${name} ${cond} ${Math.round(c.temperature_2m)}°C`,`${en?"Feels":"體感"} ${Math.round(c.apparent_temperature)}° · ${en?"Hi/Lo":"高/低"} ${Math.round(d.max)}°/${Math.round(d.min)}° · ${en?"Humidity":"濕度"} ${c.relative_humidity_2m}% · ${en?"Wind":"風"} ${Math.round(c.wind_speed_10m)} km/h`,tip,`${en?"Updated":"更新於"} ${hh}${WX.loc&&WX.loc.how==="ip"?(en?" (approx. location)":"（大約位置）"):""}`].filter(Boolean).join("\n");
@@ -4568,11 +4683,127 @@ details.cl>summary{cursor:pointer}
           setTimeout(()=>toast(en?`Your local AI (${LOCAL_CFG.model}) is the old one and can’t see pictures by itself. Settings → AI model: switch to Qwen 3.5 (the old one is removed for you).`:`你的本地 AI（${LOCAL_CFG.model}）是舊版，自己看不懂圖片。建議到「設定 → AI 模型」換成 Qwen 3.5，舊的會自動刪掉。`,9000),3500)}}
     }catch(e){console.warn("tidy local AI",e)}}
 
+  /* ---------- local AI: automatic rewrite (on by default) and stable mode ---------- */
+  function paintSafe(){const host=$("ollamaBox");if(!host||typeof LOCAL_CFG==="undefined")return;const en=E();let box=$("safeBox");
+    if(!box){box=document.createElement("div");box.id="safeBox";box.dataset.i18n="none";const after=$("lmBox");if(after&&after.nextSibling)host.insertBefore(box,after.nextSibling);else host.appendChild(box)}
+    box.innerHTML=`<label class="toggle" for="lcRewrite">${en?"Rewrite automatically when she rambles":"講到失控時自動重寫"}<input type="checkbox" id="lcRewrite" ${LOCAL_CFG.autoRewrite!==false?"checked":""}></label>
+      <label class="toggle" for="lcStable">${en?"Stable mode":"穩定模式"}<input type="checkbox" id="lcStable" ${LOCAL_CFG.stable?"checked":""}></label>
+      <p class="note" style="margin:0">${en?"Small local models sometimes start rambling. With automatic rewrite she answers that message again with calmer settings, and a note under the reply tells you. Stable mode uses the calmer settings all the time: fewer slips, but she sounds a little plainer. Every reply also has a “Again” button.":"本地小模型偶爾會講到停不下來。開著「自動重寫」時，她會用比較穩的設定重新回答一次，回覆下面也會註明。「穩定模式」是一直用比較穩的設定：比較少出錯，但說話會平淡一點。每則回覆旁邊也有「重說」按鈕。"}</p>`;
+    $("lcRewrite").onchange=e=>{LOCAL_CFG.autoRewrite=e.target.checked;saveLocalCfg()};
+    $("lcStable").onchange=e=>{LOCAL_CFG.stable=e.target.checked;saveLocalCfg();toast(e.target.checked?(en?"Stable mode on":"已開啟穩定模式"):(en?"Stable mode off":"已關閉穩定模式"))}}
+
+  /* ---------- usage ring: how much of today's Gemini quota / this month's Claude budget is used ---------- */
+  const PRICE=[[/fable/i,10,50],[/opus/i,4,20],[/sonnet/i,2,10],[/haiku/i,.1,.5]];   // US$ per million tokens (input, output), Anthropic list prices
+  const gemDefault=m=>/flash-lite/i.test(m)?1000:/pro/i.test(m)?100:/flash/i.test(m)?250:250;   // free-tier requests per day (estimate; corrected when Google says it's used up)
+  const ptDay=()=>{try{return new Date().toLocaleDateString("en-CA",{timeZone:"America/Los_Angeles"})}catch(e){return new Date().toISOString().slice(0,10)}};
+  const month=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")};
+  function U(){let u={};try{u=JSON.parse(localStorage.getItem("m01.usage")||"{}")}catch(e){}u.gem=u.gem||{};u.cl=u.cl||{};u.lim=u.lim||{};return u}
+  function saveU(u){try{localStorage.setItem("m01.usage",JSON.stringify(u))}catch(e){}paintRing()}
+  window.__usage={
+    gem(model,meta){const u=U(),d=ptDay();if(u.gem.day!==d)u.gem={day:d,m:{}};const x=u.gem.m[model]=u.gem.m[model]||{req:0,tok:0};x.req++;x.tok+=(meta&&(meta.totalTokenCount||0))||0;saveU(u)},
+    gemHit(model,body){const u=U(),d=ptDay();if(u.gem.day!==d)u.gem={day:d,m:{}};const x=u.gem.m[model]=u.gem.m[model]||{req:0,tok:0};
+      let perDay=false,val=0;try{const det=(body&&body.error&&body.error.details)||[];for(const dd of det)for(const v of (dd.violations||[])){if(/PerDay/i.test(v.quotaId||"")){perDay=true;val=+v.quotaValue||val}}}catch(e){}
+      if(!perDay&&/per day|daily/i.test(JSON.stringify(body||{})))perDay=true;
+      if(perDay){u.lim[model]=val||Math.max(1,x.req);x.full=true}saveU(u)},
+    cl(model,usage,out){const u=U(),mo=month();if(u.cl.mo!==mo)u.cl={mo,in:0,out:0,usd:0};const p=PRICE.find(r=>r[0].test(model))||[0,2,10];
+      if(usage){const tin=(usage.input_tokens||0)+(usage.cache_creation_input_tokens||0)*1.25+(usage.cache_read_input_tokens||0)*.1;u.cl.in+=usage.input_tokens||0;u.cl.usd+=tin/1e6*p[1]}
+      if(out){u.cl.out+=out;u.cl.usd+=out/1e6*p[2]}saveU(u)}};
+  function usageNow(){const be=(typeof LOCAL_CFG!=="undefined"&&LOCAL_CFG.backend)||"";const u=U();
+    if(be==="gemini"){const model=LOCAL_CFG.geminiModel||"gemini-3.6-flash";const x=(u.gem.day===ptDay()&&u.gem.m[model])||{req:0,tok:0};const lim=u.lim[model]||gemDefault(model);
+      return{be,model,used:x.req,lim,tok:x.tok,pct:x.full?100:Math.min(100,x.req/lim*100),full:!!x.full,learned:!!u.lim[model]}}
+    if(be==="claude"){const model=LOCAL_CFG.claudeModel||"claude-haiku-5-5";const c=u.cl.mo===month()?u.cl:{in:0,out:0,usd:0};const budget=+u.budget||5;
+      return{be,model,usd:c.usd,budget,tin:c.in,tout:c.out,pct:Math.min(100,c.usd/budget*100)}}
+    return{be:"local"}}
+  const ringColor=p=>p>=95?"#ef4444":p>=80?"#fb923c":p>=60?"#facc15":"#9aa3b2";
+  const ring=document.createElement("button");ring.className="uring";ring.id="usageRing";ring.dataset.i18n="none";ring.type="button";
+  ring.innerHTML='<svg viewBox="0 0 20 20"><circle class="tr" cx="10" cy="10" r="7.5" fill="none" stroke-width="2.6"/><circle class="ar" cx="10" cy="10" r="7.5" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="47.12" stroke-dashoffset="47.12"/></svg>';
+  const chip=$("modelChip");if(chip&&chip.parentNode)chip.parentNode.insertBefore(ring,chip.nextSibling);
+  const pop=document.createElement("div");pop.id="usagePop";pop.hidden=true;pop.dataset.i18n="none";document.body.appendChild(pop);
+  function paintRing(){const n=usageNow(),en=E();if(n.be==="local"||!n.be){ring.hidden=true;return}ring.hidden=false;
+    const ar=ring.querySelector(".ar");ar.style.strokeDashoffset=(47.12*(1-Math.max(n.pct,0)/100)).toFixed(2);ar.style.stroke=ringColor(n.pct);
+    ring.title=n.be==="gemini"?(en?`Gemini today: ${n.used} / ${n.lim} requests (${Math.round(n.pct)}%)`:`Gemini 今天：${n.used} / ${n.lim} 次（${Math.round(n.pct)}%）`):(en?`Claude this month: about US$${n.usd.toFixed(2)} of $${n.budget} (${Math.round(n.pct)}%)`:`Claude 本月：約 US$${n.usd.toFixed(2)} / ${n.budget}（${Math.round(n.pct)}%）`);
+    ring.setAttribute("aria-label",ring.title);if(!pop.hidden)paintPop()}
+  function resetHour(){try{const d=new Date();const pt=new Date(d.toLocaleString("en-US",{timeZone:"America/Los_Angeles"}));const ms=(24*3600e3)-(pt.getHours()*3600e3+pt.getMinutes()*60e3);const at=new Date(Date.now()+ms);return String(at.getHours()).padStart(2,"0")+":00"}catch(e){return""}}
+  function paintPop(){const n=usageNow(),en=E(),c=ringColor(n.pct);
+    if(n.be==="gemini"){pop.innerHTML=`<h4>GEMINI · ${esc(n.model)}</h4><div class="big">${Math.round(n.pct)}%</div><div class="bar"><i style="width:${n.pct}%;background:${c}"></i></div>
+      <div class="row"><span>${en?"Requests today":"今天用了"}</span><b>${n.used} / ${n.lim} ${en?"":"次"}</b></div><div class="row"><span>Tokens</span><b>${n.tok.toLocaleString()}</b></div>
+      <div class="row"><span>${en?"Resets":"重置時間"}</span><b>${resetHour()}${en?"":"（太平洋時間午夜）"}</b></div>
+      <div class="lim">${en?"Daily limit":"每日上限"} <input type="number" min="1" id="upLim" value="${n.lim}"> ${en?"requests":"次"}</div>
+      <p class="note">${n.learned?(en?"This limit was learned from Google the last time it ran out.":"這個上限是上次用完時從 Google 回應得知的實際數字。"):(en?"An estimate for the free tier — it’s corrected automatically the first time Google says it’s used up. Counts only this computer.":"這是免費版的估計值，第一次用完時會自動校正成實際數字。只計算這台電腦的使用量。")} <a href="https://aistudio.google.com/usage" target="_blank" rel="noopener">${en?"Exact usage in AI Studio":"到 AI Studio 看精確用量"}</a></p>`;
+      $("upLim").onchange=e=>{const u=U(),v=Math.max(1,Math.round(+e.target.value||0));u.lim[n.model]=v;saveU(u)}}
+    else if(n.be==="claude"){pop.innerHTML=`<h4>CLAUDE · ${esc(n.model)}</h4><div class="big">${Math.round(n.pct)}%</div><div class="bar"><i style="width:${n.pct}%;background:${c}"></i></div>
+      <div class="row"><span>${en?"This month (estimate)":"本月花費（估算）"}</span><b>US$${n.usd.toFixed(n.usd<1?3:2)}</b></div><div class="row"><span>${en?"Tokens in / out":"輸入 / 輸出 tokens"}</span><b>${n.tin.toLocaleString()} / ${n.tout.toLocaleString()}</b></div>
+      <div class="lim">${en?"Monthly budget":"每月預算"} US$ <input type="number" min="0.5" step="0.5" id="upBud" value="${n.budget}"></div>
+      <p class="note">${en?"Worked out from the tokens and Anthropic’s list prices, on this computer only. Your real balance:":"依 token 數和 Anthropic 官方價格估算，只計算這台電腦。實際餘額請看："} <a href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener">${en?"Billing":"帳單與餘額"}</a> · <a href="https://console.anthropic.com/settings/usage" target="_blank" rel="noopener">${en?"Usage":"用量"}</a></p>`;
+      $("upBud").onchange=e=>{const u=U();u.budget=Math.max(.5,+e.target.value||5);saveU(u)}}
+    pop.querySelectorAll("a[target]").forEach(a=>a.onclick=ev=>{if(desk()){ev.preventDefault();fetch("/open?url="+encodeURIComponent(a.href),{headers:{"X-M01":"1"}}).catch(()=>{})}})}
+  ring.onclick=e=>{e.stopPropagation();if(!pop.hidden){pop.hidden=true;return}paintPop();pop.hidden=false;const r=ring.getBoundingClientRect();const w=300;
+    pop.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2))+"px";pop.style.top="";pop.style.bottom=(innerHeight-r.top+8)+"px"};
+  document.addEventListener("click",e=>{if(!pop.hidden&&!pop.contains(e.target)&&e.target!==ring)pop.hidden=true});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!pop.hidden)pop.hidden=true});
+  setInterval(paintRing,30000);
+  if(typeof window.paintModelChip==="function"){const o=window.paintModelChip;window.paintModelChip=function(){const r=o.apply(this,arguments);try{paintRing()}catch(e){}return r}}
+
+  /* ---------- local AI: keep the model loaded, and start Ollama when it isn't running ---------- */
+  const isLocal=()=>typeof LOCAL_CFG!=="undefined"&&(LOCAL_CFG.backend||"ollama")==="ollama";
+  const ourl=()=>(LOCAL_CFG.url||"http://localhost:11434").replace(/\/$/,"");
+  async function ollamaUp(){try{const ac=new AbortController();setTimeout(()=>ac.abort(),2500);const r=await fetch(ourl()+"/api/tags",{signal:ac.signal});return r.ok}catch(e){return false}}
+  let starting=null;
+  let upAt=0;
+  async function ensureOllama(quiet){if(!isLocal()||!desk())return true;if(Date.now()-upAt<60e3)return true;if(await ollamaUp()){upAt=Date.now();return true}if(starting)return starting;
+    starting=(async()=>{const en=E();let ok=false;try{const r=await fetch("/ollamastart",{headers:{"X-M01":"1"}});ok=r.ok}catch(e){}
+      if(!ok){starting=null;return false}if(!quiet)toast(en?"Starting Ollama…":"正在幫你打開 Ollama…",4000);
+      for(let i=0;i<30;i++){await new Promise(r=>setTimeout(r,1000));if(await ollamaUp()){if(!quiet)toast(en?"Ollama is running.":"Ollama 已經打開了。",2500);starting=null;warm();return true}}
+      starting=null;return false})();return starting}
+  window.__ensureOllama=q=>ensureOllama(q);
+  async function warm(){if(!isLocal()||document.hidden)return;try{await fetch(ourl()+"/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:LOCAL_CFG.model,keep_alive:"30m"})})}catch(e){}}
+  function wrapSample(){if(typeof S==="undefined"||typeof S.sample!=="function"||S.sample.__wrapped)return;const os=S.sample;const w=async function(input,opts){if(isLocal())await ensureOllama(false);return os.apply(this,arguments)};Object.assign(w,os);w.__wrapped=true;S.sample=w}
+  setInterval(()=>{if(isLocal()&&!document.hidden)warm()},20*60e3);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&isLocal())warm()});
+
+  /* ---------- long chats: a running summary of the earlier part, so she doesn't forget the beginning ---------- */
+  // The newest messages go to the AI word for word; everything older is folded into this summary (kept with the chat, synced like the rest).
+  function recentCount(msgs){let budget=9000,n=0;for(let i=msgs.length-1;i>=0&&n<16;i--){const m=msgs[i];budget-=String(m.text||"").length+40;if(budget<0)break;n++}return n}
+  function convObj(){return(S.convs||[]).find(c=>c.id===S.conv)}
+  window.__convSummary=()=>{if(S.incog)return"";const c=convObj();if(!c||!c.sum||!c.sum.text)return"";const en=E();
+    return en?`\nEarlier in this chat (an automatic summary — the latest messages follow word for word):\n${c.sum.text}`:`\n這段對話較早的前情提要（自動整理，最新的對話會完整附在後面）：\n${c.sum.text}`};
+  let summing=false;
+  async function maybeSummarize(){if(summing||S.incog||S.busy||!S.sample)return;const c=convObj();if(!c)return;
+    const msgs=curMsgs().filter(m=>m.text);const keep=recentCount(msgs);const older=msgs.slice(0,Math.max(0,msgs.length-keep));if(!older.length)return;
+    let from=0;if(c.sum&&c.sum.upto){const k=older.findIndex(m=>m.id===c.sum.upto);from=k>=0?k+1:0}
+    const fresh=older.slice(from);if(fresh.length<(c.sum?6:4))return;
+    summing=true;const en=E();
+    try{let batch=[],len=0;for(const m of fresh){const t=String(m.role==="assistant"?visible(m.text):m.text).replace(/\s+/g," ").slice(0,600);if(len+t.length>9000&&batch.length)break;batch.push(m);len+=t.length}
+      const lines=batch.map(m=>(m.role==="user"?(en?"Them":"對方"):(en?"You":"你"))+"："+String(m.role==="assistant"?visible(m.text):m.text).replace(/\s+/g," ").slice(0,600)).join("\n");
+      const prompt=en?`Below is an earlier part of your chat with them${c.sum?", and the summary you already have":""}. Write an updated summary for yourself: what they told you (facts, likes, plans, worries), promises either of you made, things still unresolved, and how the mood went. Bullet points, at most 15, one short line each, in English. Merge with the old summary and drop anything out of date. Reply with the bullet list only.\n\n${c.sum?"[Old summary]\n"+c.sum.text+"\n\n":""}[Earlier chat]\n${lines}`
+        :`以下是你和對方較早的對話${c.sum?"，以及你之前整理過的前情提要":""}。請幫自己整理一份更新後的前情提要：對方說過的事實、喜好、計畫、煩惱，你們互相答應過的事、還沒解決的事，以及聊天的氣氛。用條列，最多 15 條，每條一句，繁體中文。把舊提要合併進來，刪掉已經過時的。只回條列內容。\n\n${c.sum?"［舊的前情提要］\n"+c.sum.text+"\n\n":""}［較早的對話］\n${lines}`;
+      const r=await Promise.race([S.sample(prompt,{modelTier:"quick"}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),90000))]);
+      let t=visible(String(r&&r.text||"")).trim();if(!en&&window.__toTrad)t=window.__toTrad(t);
+      t=t.split("\n").map(x=>x.trim()).filter(x=>x&&/^[-•*·\d]/.test(x)).slice(0,15).join("\n")||t.slice(0,1500);
+      if(t.length>=10){c.sum={upto:batch[batch.length-1].id,text:t.slice(0,2000),t:Date.now()};try{saveConvs()}catch(e){}}
+    }catch(e){console.warn("summary",e)}finally{summing=false}}
+  setInterval(()=>{try{maybeSummarize()}catch(e){}},45000);
+  window.__x27sum={maybeSummarize,recentCount,convObj};
+
+  /* ---------- power saver ----------
+     fx-idle: the window is hidden, or hasn't been used (no focus, no mouse, no keys) for 90 seconds → decorative animation pauses,
+     the particles and music bars stop and background checks slow down. fx-sleep: she is asleep → the moving background rests too. */
+  (function(){const R=document.documentElement;let lastUse=Date.now(),focused=document.hasFocus();
+    const use=()=>{lastUse=Date.now();if(R.classList.contains("fx-idle"))update()};
+    ["pointermove","pointerdown","keydown","wheel","touchstart"].forEach(t=>addEventListener(t,use,{passive:true,capture:true}));
+    addEventListener("focus",()=>{focused=true;use()});addEventListener("blur",()=>{focused=false;update()});
+    function update(){const idle=document.hidden||(!focused&&Date.now()-lastUse>90e3)||(Date.now()-lastUse>15*60e3);
+      let asleep=false;try{asleep=moodBase==="sleep"}catch(e){}
+      const was=R.classList.contains("fx-idle");R.classList.toggle("fx-idle",idle);R.classList.toggle("fx-sleep",asleep);
+      if(!idle&&!asleep&&window.__motesResume)window.__motesResume();if(!idle&&typeof vizStart==="function")vizStart();
+      if(was&&!idle){try{poll()}catch(e){}}}
+    document.addEventListener("visibilitychange",update);setInterval(update,5000);update();window.__power={update,away:()=>{focused=false;lastUse=0;update()},state:()=>({idle:R.classList.contains("fx-idle"),sleep:R.classList.contains("fx-sleep")})}})();
+
   /* ---------- start once the app is ready ---------- */
-  function paintAll(){paintCA();paintSet();paintMusic();paintWx();paintClean();fit()}
+  function paintAll(){paintRing();paintSafe();paintCA();paintSet();paintMusic();paintWx();paintClean();fit()}
   if(typeof window.applyLang==="function"){const o=window.applyLang;window.applyLang=function(){const r=o.apply(this,arguments);try{paintAll()}catch(e){}return r}}
   let started=false;
-  (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);setTimeout(tidyLocalAI,4000);return}setTimeout(wait,400)})();
+  (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);wrapSample();setTimeout(tidyLocalAI,4000);setTimeout(async()=>{if(await ensureOllama(true))warm()},2500);return}setTimeout(wait,400)})();
   window.__x27={poll,loadWx,paintAll,cleanUp,fit,state:()=>({M,WX,needHelper})};
 })();
 </script>

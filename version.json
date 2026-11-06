@@ -1,7 +1,7 @@
 {
- "version": "0.10.32",
- "notes": "Mac 和 Windows 一致：舊版本地 AI 會建議升級成 Qwen 3.5；修正天氣沒顯示、重新安裝後音樂還要重新安裝",
- "notes_en": "Mac and Windows now match: old local AI is offered the Qwen 3.5 upgrade; weather and music fixes",
+ "version": "1.0.0",
+ "notes": "正式版 1.0.0：長時間使用不失憶、更省電、更順；所有功能完整測試",
+ "notes_en": "Version 1.0.0: holds its memory over long use, uses far less power and stays smooth; every feature fully tested",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
