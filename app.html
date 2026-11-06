@@ -355,7 +355,7 @@ body.incog .frame{box-shadow:inset 0 0 0 2px #9d7bff}
 
 /* ---------- console-style boot / exit ---------- */
 #splash{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(var(--accent-rgb),.10),transparent 70%),#050506;cursor:pointer;transition:opacity .5s ease,visibility .5s}
-#splash.gone{opacity:0;visibility:hidden;pointer-events:none}
+#splash.gone{opacity:0;visibility:hidden;pointer-events:none}#splash.gone *{animation:none!important}
 .sp-inner{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
 .sp-logo{display:flex;align-items:center;gap:14px}
 .sp-logo .emblem{height:52px;font-size:28px;padding:0 24px 0 18px}
@@ -1637,7 +1637,7 @@ function msgEl(m){
   const meta=document.createElement("div");meta.className="meta";meta.innerHTML=`<span>${timeOf(m.t)}</span>`;
   if(m.role==="assistant"&&m.text){
     const cp=document.createElement("button");cp.textContent="複製";cp.onclick=()=>navigator.clipboard.writeText(visible(SP.body)).then(()=>toast("已複製"),()=>toast("無法複製"));meta.appendChild(cp);
-    const rg=document.createElement("button");rg.className="mact regen";rg.textContent="重說";rg.title="讓她重新回答這一則";rg.onclick=()=>regenTurn(m);meta.appendChild(rg);
+    const rg=document.createElement("button");rg.className="mact regen";rg.textContent="重說";rg.title=isEN()?"Let her answer this one again":"讓她重新回答這一則";rg.onclick=()=>regenTurn(m);meta.appendChild(rg);
     if(typeof fishReady==="function"&&fishReady()){const sp=document.createElement("button");sp.className="spk";sp.textContent="朗讀";sp.onclick=()=>{if(FISH.btn===sp){stopVoice();return}playVoice(m.text,sp,true,m.expr)};meta.appendChild(sp)}
     if(SP.urls.length){
       const sb=document.createElement("button");sb.className="srcbtn";sb.textContent="來源 ▸";sb.setAttribute("aria-expanded","false");
@@ -1713,7 +1713,7 @@ function scrollEnd(){const l=$("log");l.scrollTop=l.scrollHeight}
 function updateStats(){
   const n=allMsgs().length;
   $("sMsgs").textContent=n;$("sFiles").textContent=S.files.length;$("sFacts").textContent=S.facts.length;$("hMsgs").textContent=n;$("hFiles").textContent=S.files.length;$("hFacts").textContent=S.facts.length;
-  if(S.db){$("status").textContent=S.aiOK?(LOCAL_CFG.backend==="claude"?"Claude："+(LOCAL_CFG.claudeModel||"claude-haiku-5-5"):LOCAL_CFG.backend==="gemini"?"Gemini："+(LOCAL_CFG.geminiModel||"gemini-3.6-flash"):"本地 AI："+LOCAL_CFG.model):"記憶已連線・AI 未連線";$("onlineDot").classList.toggle("off",!S.aiOK)}
+  if(S.db){$("status").textContent=S.aiOK?(LOCAL_CFG.backend==="claude"?"Claude："+(LOCAL_CFG.claudeModel||"claude-haiku-5-5"):LOCAL_CFG.backend==="gemini"?"Gemini："+(LOCAL_CFG.geminiModel||"gemini-3.6-flash"):"本地 AI："+localName(LOCAL_CFG.model,isEN())):"記憶已連線・AI 未連線";$("onlineDot").classList.toggle("off",!S.aiOK)}
 }
 
 /* ---------- follow-ups: things she should ask about later ("明天考試" → asks how it went) ---------- */
@@ -2449,7 +2449,7 @@ $("mic").onclick=()=>{
   if(!SR){fallback();return}
   let got=false;
   try{
-    rec=new SR();rec.lang="zh-TW";rec.interimResults=true;rec.continuous=false;
+    rec=new SR();rec.lang=isEN()?"en-US":"zh-TW";rec.interimResults=true;rec.continuous=false;
     const base=$("input").value;
     rec.onresult=e=>{got=true;let t="";for(const r of e.results)t+=r[0].transcript;$("input").value=base+t;autosize();updateSend()};
     rec.onerror=e=>{if(e.error!=="aborted"&&e.error!=="no-speech")fallback();else if(e.error==="no-speech")toast("沒有聽到聲音，再按一次麥克風試試")};
@@ -2673,7 +2673,9 @@ function openSec(gid,focusSel){
 (function(){let open=[];try{open=JSON.parse(localStorage.getItem("m01.sgOpen")||"[]").slice(-1)}catch(e){}
   document.querySelectorAll("#pSet details.sgrp").forEach(d=>{if(open.includes(d.id))d.open=true;
     d.querySelector("summary").addEventListener("click",e=>{if(e.target.closest(".help"))e.preventDefault()});
-    d.addEventListener("toggle",()=>{if(d.open)document.querySelectorAll("#pSet details.sgrp[open]").forEach(o=>{if(o!==d)o.open=false});try{const o=[...document.querySelectorAll("#pSet details.sgrp")].filter(x=>x.open).map(x=>x.id);localStorage.setItem("m01.sgOpen",JSON.stringify(o))}catch(e){}
+    d.addEventListener("toggle",()=>{if(d.open){document.querySelectorAll("#pSet details.sgrp[open]").forEach(o=>{if(o!==d)o.open=false});
+        // the group above may have just closed: keep the one you opened at the top instead of letting it slide away
+        if(d.offsetParent)requestAnimationFrame(()=>paneScrollTo(d,false))}try{const o=[...document.querySelectorAll("#pSet details.sgrp")].filter(x=>x.open).map(x=>x.id);localStorage.setItem("m01.sgOpen",JSON.stringify(o))}catch(e){}
       if(d.open&&d.id==="g_ai"&&typeof paintBackend==="function")try{paintBackend()}catch(e){}})})})();
 function openTab(id){
   document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x.dataset.tab===id));
@@ -2801,7 +2803,7 @@ const I18N={
 "❌ 連不到 Ollama。請確認 Ollama 有開著。":"❌ Can't reach Ollama. Make sure it's running.","連不到 Ollama":"Can't reach Ollama",
 "那天沒有對話紀錄":"No chats that day","正在想":"Thinking",
 };
-Object.assign(I18N,{"看圖片工具（裝好後會自動填，通常不用改）":"Picture reader (filled in automatically)","清亮（預設）":"Clear (default)","機甲（舊版）":"Mecha (old default)","對話、記憶和角色圖存在這台裝置裡；用 Google 登入的話，也會自動同步到你自己的雲端。備份檔可以拿來保險，或搬到沒有登入的電腦。":"Chats, memory and character pictures are saved on this device; sign in with Google and they also sync to your own cloud. A backup file is extra insurance, or a way to move to a computer where you aren’t signed in.","記憶資料夾":"Memory folder","看圖模型（下載後會自動填好，通常不用改）":"Picture model (filled in automatically after download)","點一下分類就會展開；設定會自動儲存。": "Tap a group to open it. Settings save automatically.", "帳號與同步": "Account & sync", "用 Google 登入，換電腦、換手機都能接著聊": "Sign in with Google to continue on any computer or phone", "AI 模型": "AI model", "選 Gemini、本地 AI 或 Claude，設定金鑰": "Choose Gemini, local AI or Claude, and set keys", "語音": "Voice", "用 Fish Audio 讓她把回覆唸出來": "Have her read replies aloud with Fish Audio", "角色圖": "Character", "放角色的表情圖片（最少兩張）": "Her expression pictures (at least two)", "外觀與音效": "Look & sound", "介面風格、主題顏色、音效、左右版面": "Interface style, colour, sounds and layout", "個人化": "Personal", "語言、你的稱呼、她的名字和個性": "Language, your name, her name and personality", "記憶與資料": "Memory & data", "記憶資料夾、備份、還原、解除安裝": "Memory folder, backup, restore, uninstall", "備份、還原": "Backup and restore", "介面風格": "Interface style", "機甲（預設：深色、橘色）": "Mecha (default: dark, orange)", "可愛粉嫩": "Cute pink", "復古終端機": "Retro terminal", "淺色簡約": "Light & simple", "夜空霓虹": "Night neon", "音效風格": "Sound set", "機甲（預設）": "Mecha (default)", "柔和泡泡": "Soft bubbles", "復古 8-bit": "Retro 8-bit", "清脆木琴": "Wooden marimba", "科幻電子": "Sci-fi electronic", "試聽音效": "Play sounds", "版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。": "Layout: swap her and the chat left/right, or drag the divider in the middle to resize — it snaps at the middle and at a quarter.", "左右換邊": "Swap sides", "恢復預設版面": "Reset layout"});
+Object.assign(I18N,{"備份、還原、解除安裝":"Back up, restore, uninstall","讓她重新回答這一則":"Let her answer this one again","左右換邊":"Swap sides","看圖片工具（裝好後會自動填，通常不用改）":"Picture reader (filled in automatically)","清亮（預設）":"Clear (default)","機甲（舊版）":"Mecha (old default)","對話、記憶和角色圖存在這台裝置裡；用 Google 登入的話，也會自動同步到你自己的雲端。備份檔可以拿來保險，或搬到沒有登入的電腦。":"Chats, memory and character pictures are saved on this device; sign in with Google and they also sync to your own cloud. A backup file is extra insurance, or a way to move to a computer where you aren’t signed in.","記憶資料夾":"Memory folder","看圖模型（下載後會自動填好，通常不用改）":"Picture model (filled in automatically after download)","點一下分類就會展開；設定會自動儲存。": "Tap a group to open it. Settings save automatically.", "帳號與同步": "Account & sync", "用 Google 登入，換電腦、換手機都能接著聊": "Sign in with Google to continue on any computer or phone", "AI 模型": "AI model", "選 Gemini、本地 AI 或 Claude，設定金鑰": "Choose Gemini, local AI or Claude, and set keys", "語音": "Voice", "用 Fish Audio 讓她把回覆唸出來": "Have her read replies aloud with Fish Audio", "角色圖": "Character", "放角色的表情圖片（最少兩張）": "Her expression pictures (at least two)", "外觀與音效": "Look & sound", "介面風格、主題顏色、音效、左右版面": "Interface style, colour, sounds and layout", "個人化": "Personal", "語言、你的稱呼、她的名字和個性": "Language, your name, her name and personality", "記憶與資料": "Memory & data", "記憶資料夾、備份、還原、解除安裝": "Memory folder, backup, restore, uninstall", "備份、還原": "Backup and restore", "介面風格": "Interface style", "機甲（預設：深色、橘色）": "Mecha (default: dark, orange)", "可愛粉嫩": "Cute pink", "復古終端機": "Retro terminal", "淺色簡約": "Light & simple", "夜空霓虹": "Night neon", "音效風格": "Sound set", "機甲（預設）": "Mecha (default)", "柔和泡泡": "Soft bubbles", "復古 8-bit": "Retro 8-bit", "清脆木琴": "Wooden marimba", "科幻電子": "Sci-fi electronic", "試聽音效": "Play sounds", "版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。": "Layout: swap her and the chat left/right, or drag the divider in the middle to resize — it snaps at the middle and at a quarter.", "左右換邊": "Swap sides", "恢復預設版面": "Reset layout"});
 const I18N_RE=[
  [/^顯示更早的 (\d+) 則$/,"Show $1 earlier"],
  [/^已記下：(.+)$/s,"Noted: $1"],[/^你的方案不能用 (\S+)，已改用 (\S+)$/,"Your plan can't use $1 — switched to $2"],[/^(\S+) 現在不能用（免費額度用完或需要付費方案），已自動改用 (\S+)$/,"$1 isn't available right now (free quota used up or paid plan needed) — switched to $2"],[/^上網查：「(.*)」$/,"Searching the web: \"$1\""],[/^✅ 使用 Gemini（(.+)），金鑰 (.*)$/,"✅ Using Gemini ($1), key $2"],[/^(Gemini|Claude) 連線成功$/,"Connected to $1"],[/^❌ (?:金鑰無效或沒有額度|免費額度暫時用完|連不到（電腦有網路嗎？）|測試失敗)：(.*)$/s,"❌ Test failed: $1"],[/^✅ 使用 Claude（(.+)），金鑰 (.*)$/,"✅ Using Claude ($1), key $2"],[/^已儲存（(.+)），要換再貼新的$/,"Saved ($1) — paste a new one to replace"],[/^查天氣：(.*)$/,"Checking weather: $1"],[/^❌ (?:金鑰無效或餘額不足|連不到 Claude（電腦有網路嗎？）|測試失敗)：(.*)$/s,"❌ Test failed: $1"],[/^出錯了：(.*)$/s,"Something went wrong: $1"],
@@ -2813,7 +2815,7 @@ const I18N_RE=[
  [/^備份已存到 (.+)$/,"Backup saved to $1"],[/^已全部匯出到「(.+)」$/,"Everything exported to \"$1\""],[/^已還原 (\d+) 則訊息$/,"Restored $1 messages"],[/^已開始下載：(.+)$/,"Download started: $1"],
  [/^這個資料夾不能用：(.*)。請改選「文件」裡的資料夾。$/s,"That folder can't be used: $1. Choose one inside Documents."],[/^還原失敗：(.*)$/s,"Restore failed: $1"],
  [/^聽寫開啟中/,()=>"Dictation is starting — just speak. Press Fn or click elsewhere to stop. If nothing appears: click the message box and press Fn (🌐) twice."],
- [/^本地 AI：(.+)$/,"Local AI: $1"],[/^✅ 已連線，使用模型 (.+)$/,"✅ Connected, using model $1"],
+ [/^本地 AI：(.+)$/,(m,a)=>"Local AI: "+(LOCAL_NAME_EN[a]||a)],[/^✅ 已連線，使用模型 (\S+?)（(.+)）$/,(m,a,b)=>"✅ Connected, using "+(LOCAL_NAME_EN[a]||a)+" ("+b+")"],[/^✅ 已連線，使用模型 (.+)$/,"✅ Connected, using model $1"],
  [/^⚠️ Ollama 已連線，但還沒下載 (\S+)。請到「設定 → AI 模型」下載。$/,"⚠️ Ollama is connected but $1 isn't downloaded yet. Download it in Settings → AI."],
  [/^還沒下載模型 (\S+)，請到「設定 → AI 模型」下載。$/,"Model $1 isn't downloaded yet. Download it in Settings → AI."],
  [/^本地 AI 出錯了：(.*)$/s,"Local AI error: $1"],
@@ -2969,16 +2971,17 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="1.2.1",APP_STAGE="",APP_BUILD="2026-11-07 00:30";
+const APP_VER="2.2.1",APP_STAGE="",APP_BUILD="2026-11-07 02:00";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
   if(typeof LOCAL_CFG==="undefined")return en?"Web version":"網頁版";
   const os=/Windows/i.test(navigator.userAgent)?"Windows":/Mac/i.test(navigator.userAgent)?"Mac":"";
-  const b=LOCAL_CFG.backend||"ollama",m=b==="gemini"?"Gemini · "+(LOCAL_CFG.geminiModel||"gemini-3.6-flash"):b==="claude"?"Claude · "+(LOCAL_CFG.claudeModel||"claude-haiku-5-5"):(en?"Local AI · ":"本地 AI · ")+LOCAL_CFG.model;
+  const b=LOCAL_CFG.backend||"ollama",m=b==="gemini"?"Gemini · "+(LOCAL_CFG.geminiModel||"gemini-3.6-flash"):b==="claude"?"Claude · "+(LOCAL_CFG.claudeModel||"claude-haiku-5-5"):(en?"Local AI · ":"本地 AI · ")+localName(LOCAL_CFG.model,en);
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"2.2.1",d:"11/07 02:00",add:[["大優化：從頭到尾檢查過每個畫面、每個設定分類、五種介面風格、中英文、彈出選單和整套新手教學，沒有發現錯誤","The big tune-up: every screen, every settings group, all five styles, both languages, every pop-up and the whole guided tour were checked from start to finish, with no errors found"]],fix:[["設定分類打開時不會再跳走：打開一個分類時上面那個會收起來，原本畫面會跟著往下跑，現在會停在你打開的那個分類開頭","Settings groups no longer jump away: opening one closed the one above and the view slid past it — now it stays at the top of the group you opened"],["更省電：背景的漂浮光點畫面減少約七成的運算；視窗在背景 30 秒、或 5 分鐘沒碰，裝飾動畫就會暫停；開始畫面消失後它的動畫也會停","Lighter on the computer: the floating background dots take about 70% less work; decorative animation pauses after 30 seconds in the background or 5 minutes untouched; the start screen’s animation stops once it’s gone"],["本地模型在各處都顯示成輕量版／標準版／強力版（上方狀態、ⓘ、AI 設定），切換語言時 AI 選單也會跟著換","Local models are shown as Light / Standard / Powerful everywhere (top bar, ⓘ, AI settings), and the AI menu follows a language switch"],["英文介面裡殘留的中文都翻好了；麥克風在英文介面會聽英文","Leftover Chinese in the English interface is translated, and the microphone listens for English in the English interface"],["說明文字全面更新：解除安裝的位置和選項、音樂小工具（Windows 也支援 YouTube）、網頁版不再叫你改用本地 AI","Help text brought up to date: where uninstall is and what it offers, the music widget (YouTube too on Windows), and the web version no longer suggests the local AI"]]},
  {v:"1.2.1",d:"11/07 00:30",add:[],fix:[["說明文字更新：記憶同步、備份位置、本地 AI、音樂小工具和新手教學的說明改成跟現在的功能一致","Help text updated: memory sync, backup location, local AI, the music widget and the guided tour now match how the app works"]]},
  {v:"1.2.0",d:"11/06 23:30",add:[["本地 AI 可以全部下載起來，要用哪一個直接在聊天畫面下方的 AI 選單切換，會標示輕量版／標準版／強力版；設定裡只剩下載和刪除。一次按好幾個「下載」會排隊，一個接一個下載","Download any or all local AI models, then choose one from the AI menu under the chat (marked Light / Standard / Powerful); Settings now just downloads and deletes. Press Download on several and they queue up"],["App 更新改在 App 裡完成：會顯示下載進度、速度和剩下的時間，下載好自動安裝並重新打開，不會再跑到瀏覽器的下載資料夾","Updates happen inside the app: download progress, speed and time left, then it installs and reopens by itself — no more trips to the browser’s Downloads folder"]],fix:[["開始畫面點下去馬上有反應：資料在 App 打開時就先在背景準備好","The start screen answers your click right away: everything loads in the background as soon as the app opens"],["用量圓圈：滑鼠移上去就會顯示詳細用量，用本地 AI 時不會出現","Usage ring: hover to see the details; it’s hidden while using the local AI"],["Windows 音樂小工具會跟著正在播的東西（例如瀏覽器裡的 YouTube），上一首／暫停／下一首會控制它，也會盡量顯示影片的縮圖","Windows music widget follows whatever is playing (like YouTube in a browser): Previous / Pause / Next control it, and it shows the video’s picture when available"],["模型下載中不能用本地 AI；她回答時不能換 AI 或改 AI 設定，避免中途出錯","While a model downloads, local AI is paused; while she’s answering, the AI and its settings can’t be changed, so nothing breaks midway"]]},
  {v:"1.1.1",d:"11/06 22:30",add:[],fix:[["Windows 版打開更快：不再等本地 AI 開好才出現視窗；背景小幫手同時處理多件事，AI 回答、登入、天氣在等待時，其他功能不會卡住（Mac 也一樣）","Faster start on Windows: the window no longer waits for the local AI to start, and the background helper does several things at once, so nothing freezes while an AI reply, sign-in or weather lookup is on its way (same on Mac)"],["Windows 工作列的圖示變清楚了（第一次打開後就會換成清楚的版本）","The Windows taskbar icon is sharp now (it switches to the sharp one after the app opens)"],["文字字型改成背景載入，網路慢的時候畫面也會馬上出現","Fonts load in the background, so the screen shows up right away even on a slow connection"],["安裝包裡的說明改成簡短的中英對照，只說怎麼安裝和打開","The guide in the install package is now short and bilingual, covering just how to install and open the app"]]},
@@ -3038,7 +3041,7 @@ function aboutHelp(){
     `Memory is saved in <code>${path}</code>, and once you’re signed in with Google a copy syncs automatically to a hidden folder in your own Google Drive (only M-01 can read it). Don't edit the “_資料（請勿修改）” folder inside it.`,
     "With the local AI, the app starts Ollama for you. The first reply after starting can be slow while the model loads.",
     "A local model is small and can be wrong. Web results come with sources — check anything important yourself.",
-    "To uninstall, use Settings → Uninstall app. You choose whether your memory folder and chat model are removed too.",
+    "To uninstall: Settings → Memory & data → “Uninstall app”. You can choose to delete the local AI model too. Your memory stays (and in the cloud if you’re signed in with Google), so reinstalling picks up where you left off.",
     "Please only use character art and voices you made yourself or have permission to use — no voices imitating real people. Text read aloud is sent to Fish Audio."])
   :(web?[
     "對話和記憶存在你自己的 Claude 帳號，只有你看得到。網頁版和電腦版的記憶是分開的。",
@@ -3049,7 +3052,7 @@ function aboutHelp(){
     `記憶存在 <code>${path}</code>，登入 Google 後也會自動同步一份到你自己的 Google 雲端硬碟（隱藏資料夾，只有 M-01 讀得到）。裡面的「_資料（請勿修改）」資料夾不要動。`,
     "用本地 AI 時，App 會自己幫你打開 Ollama；剛打開時第一次回覆會比較慢（模型在載入）。",
     "本地 AI 比較小，可能會答錯；上網查到的資料會附來源，重要的事請自己點進去確認。",
-    "解除安裝：到「設定 → 解除安裝 App」，可以選要不要一起刪掉記憶資料夾和聊天模型。",
+    "解除安裝：到「設定 → 記憶與資料」按「解除安裝 App」，可以選要不要一起刪掉本地 AI 模型。記憶會留著（登入 Google 的話雲端也有一份），重新安裝就能接著用。",
     "角色圖和聲音請使用你自己做的或有授權的，不要用模仿真實人物的聲音；要唸的文字會傳給 Fish Audio 處理。"]);
   const F=en?[
     ["Chat & memory",["Remembers every conversation and file for good, and you can search all of it","Saves key points about you by itself — add, edit or delete them in Memory","Multiple chats, incognito mode, edit or delete your own messages"]],
@@ -3140,6 +3143,7 @@ async function probeGemini(force){
   return out;
 }
 /* local models are shown by size name (Light / Standard / Powerful) */
+var LOCAL_NAME_EN={"輕量版":"Light","標準版":"Standard","強力版":"Powerful"};
 function localName(id,en){const c=(typeof chatChoices==="function"?chatChoices(en):[]).find(x=>x[0]===id);return c?c[1]:String(id||"")}
 const localDownloading=()=>typeof bgPull!=="undefined"&&!!bgPull.job&&!bgPull.job.paused;
 window.__dlLock=()=>typeof LOCAL_CFG!=="undefined"&&(LOCAL_CFG.backend||"ollama")==="ollama"&&localDownloading();
@@ -3411,10 +3415,11 @@ renderStage();
   const c=$("motes"),x=c.getContext("2d");let W,H,P=[],run=false,last=0;
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
   const resting=()=>document.hidden||document.documentElement.classList.contains("fx-idle")||document.documentElement.classList.contains("fx-sleep");
-  function size(){const d=Math.min(1.5,devicePixelRatio||1);W=c.width=Math.round(innerWidth*d);H=c.height=Math.round(innerHeight*d);P=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*1.8+.6)*d,v:(Math.random()*.35+.1)*d,a:Math.random()*.5+.15,h:Math.random()<.35}))}
+  function size(){const d=1;   // tiny soft dots: drawing them at screen resolution costs a lot more and looks the same
+  W=c.width=Math.round(innerWidth*d);H=c.height=Math.round(innerHeight*d);P=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*1.8+.6)*d,v:(Math.random()*.35+.1)*d,a:Math.random()*.5+.15,h:Math.random()<.35}))}
   function draw(k){x.clearRect(0,0,W,H);for(const p of P){p.y-=p.v*k;p.x+=Math.sin(p.y/80)*.2*k;if(p.y<-10){p.y=H+10;p.x=Math.random()*W}
     x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fillStyle=p.h?`rgba(229,121,74,${p.a})`:`rgba(255,240,230,${p.a*.6})`;x.fill()}}
-  function tick(now){if(resting()||reduce){run=false;return}const dt=last?Math.min(120,now-last):41;last=now;draw(dt/16.7);setTimeout(()=>requestAnimationFrame(tick),41)}
+  function tick(now){if(resting()||reduce){run=false;return}const dt=last?Math.min(160,now-last):66;last=now;draw(dt/16.7);setTimeout(()=>requestAnimationFrame(tick),66)}   // ~15 frames a second is plenty for slow drifting dots
   window.__motesResume=()=>{if(run||reduce||resting())return;run=true;last=0;requestAnimationFrame(tick)};
   size();addEventListener("resize",size);draw(0);window.__motesResume();
 })();
@@ -4155,7 +4160,7 @@ async function checkAI(){
     S.aiOK=!!st.has;paintBackend();paintModelChip();
     $("aiState").textContent=st.has?`✅ 使用 Gemini（${LOCAL_CFG.geminiModel||"gemini-3.6-flash"}），金鑰 ••••${st.last4||""}`:"⚠️ 還沒貼上 Gemini API 金鑰。";
     $("gmKey").placeholder=st.has?`已儲存（••••${st.last4||""}），要換再貼新的`:"AIza…";
-    if(!S.aiOK)showBanner("還沒設定 Gemini API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。");else $("banner").hidden=true;
+    if(!S.aiOK)showBanner(window.GH_MODE?(isEN()?"No Gemini API key yet — paste one in Settings → AI.":"還沒設定 Gemini API 金鑰，請到「設定 → AI」貼上金鑰。"):"還沒設定 Gemini API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。");else $("banner").hidden=true;
     updateStats();return;
   }
   if(LOCAL_CFG.backend==="claude"){
@@ -4171,7 +4176,7 @@ async function checkAI(){
   if(r.ok&&!r.hasModel&&r.names&&r.names.length){const pick=["qwen3.5:9b","qwen3.5:4b","qwen3.5:27b","qwen3.5:latest","qwen2.5:7b","qwen2.5:3b","qwen2.5:latest","qwen2.5:1.5b"].find(n=>r.names.includes(n));
     if(pick&&pick!==LOCAL_CFG.model){LOCAL_CFG.model=pick;saveLocalCfg();$("lcModel").value=pick;paintModelChip();return checkAI()}}
   S.aiOK=r.ok&&r.hasModel;
-  $("aiState").textContent=!r.ok?"❌ 連不到 Ollama。請確認 Ollama 有開著。":r.hasModel?`✅ 已連線，使用模型 ${LOCAL_CFG.model}`:`⚠️ Ollama 已連線，但還沒下載 ${LOCAL_CFG.model}。請到「設定 → AI 模型」下載。`;
+  $("aiState").textContent=!r.ok?"❌ 連不到 Ollama。請確認 Ollama 有開著。":r.hasModel?`✅ 已連線，使用模型 ${localName(LOCAL_CFG.model,false)}（${LOCAL_CFG.model}）`:`⚠️ Ollama 已連線，但還沒下載 ${LOCAL_CFG.model}。請到「設定 → AI 模型」下載。`;
   if(!S.aiOK)showBanner(!r.ok?"沒有找到本地 AI（Ollama）。可以到「設定 → AI」改用免費的 Gemini，或安裝 Ollama 後下載模型。":`還沒下載模型 ${LOCAL_CFG.model}，請到「設定 → AI 模型」下載。`);else $("banner").hidden=true;
   updateStats();
 }
@@ -4393,7 +4398,7 @@ paintSnd();
   const L=(()=>{try{return Object.assign({split:0,swap:false},JSON.parse(localStorage.getItem("m01.layout")||"{}"))}catch(e){return{split:0,swap:false}}})();
   const app=document.querySelector(".app"),stage=document.querySelector(".app>.stage");
   const sp=document.createElement("div");sp.id="splitter";sp.dataset.i18n="none";sp.title=isEN()?"Drag to resize · double-click to reset":"拖曳調整大小・點兩下恢復";
-  sp.innerHTML=`<button class="sw" id="swapMini" aria-label="左右換邊" title="左右換邊">⇄</button>`;app.appendChild(sp);
+  sp.innerHTML=`<button class="sw" id="swapMini" aria-label="${isEN()?"Swap sides":"左右換邊"}" title="${isEN()?"Swap sides":"左右換邊"}">⇄</button>`;app.appendChild(sp);
   const saveL=()=>{try{localStorage.setItem("m01.layout",JSON.stringify(L))}catch(e){}};
   function placeSplit(){const ar=app.getBoundingClientRect(),r=stage.getBoundingClientRect();if(!ar.width||!r.width)return;sp.style.left=((L.swap?r.left:r.right)-ar.left)+"px"}
   window.applyLayout=function(){document.body.classList.toggle("swapped",!!L.swap);document.body.classList.toggle("split",!!L.split);if(L.split)app.style.setProperty("--split",L.split);requestAnimationFrame(placeSplit)};
@@ -5020,8 +5025,8 @@ details.cl>summary{cursor:pointer}
   function paintSet(){const en=E(),w=W(),d=desk();const wasOpen=DD.get.call(g);
     g.innerHTML=`<summary><span class="sg-t"><b>${en?"Widgets":"小工具"}</b><small>${en?"Music, weather, and her speaking up":"音樂、天氣、她主動說話"}</small></span><i class="sg-chev" aria-hidden="true"></i></summary>
       <div class="sgb">
-        <label class="toggle" for="wgMusic">${en?"Show what’s playing in Spotify":"顯示正在播放的音樂（Spotify）"}<input type="checkbox" id="wgMusic" ${w.music?"checked":""} ${d?"":"disabled"}></label>
-        <p class="note" style="margin:0">${d?(en?"Shows the song playing in the Spotify app on this computer in the top bar, with play/pause, previous/next and the progress bar. A free Spotify account works. On a Mac, click “OK” the first time it asks to control Spotify.":"顯示這台電腦 Spotify App 正在播的歌（在上方橫條），可以暫停、上下首、拖進度條。免費帳號也能用。Mac 第一次會問要不要讓 M-01 控制 Spotify，按「好」就可以。"):(en?"Only in the desktop app — the web version can’t see the Spotify app on your computer.":"只有 App 版能用：網頁版看不到你電腦上的 Spotify。")}</p>
+        <label class="toggle" for="wgMusic">${en?"Show what’s playing":"顯示正在播放的音樂"}<input type="checkbox" id="wgMusic" ${w.music?"checked":""} ${d?"":"disabled"}></label>
+        <p class="note" style="margin:0">${d?(/Mac/i.test(navigator.platform||"")?(en?"Shows the song playing in the Spotify app on this computer in the top bar, with play/pause, previous/next and the progress bar. A free Spotify account works. Click “OK” the first time it asks to control Spotify.":"顯示這台電腦 Spotify App 正在播的歌（在上方橫條），可以暫停、上下首、拖進度條。免費帳號也能用。第一次會問要不要讓 M-01 控制 Spotify，按「好」就可以。"):(en?"Shows whatever is playing on this computer in the top bar — Spotify, or YouTube in a browser — with play/pause, previous/next and the progress bar.":"顯示這台電腦正在播的東西（Spotify，或瀏覽器裡的 YouTube），在上方橫條，可以暫停、上下首、拖進度條。")):(en?"Only in the desktop app — the web version can’t see what’s playing on your computer.":"只有 App 版能用：網頁版看不到你電腦上正在播的東西。")}</p>
         <label class="toggle" for="wgChat">${en?"She starts talking to you now and then":"她會主動找你說話"}<input type="checkbox" id="wgChat" ${w.chat?"checked":""}></label>
         <p class="note" style="margin:0">${en?"While she’s awake and you’ve been quiet for a while, she sometimes says something in her bubble — about the weather, the song you’re playing or what you talked about. She falls asleep after 10 minutes without anything happening.":"她醒著、你一陣子沒說話時，偶爾會在泡泡裡主動說點什麼：天氣、你在聽的歌、剛剛聊的事。10 分鐘沒動靜她會睡著。"}</p>
         <label class="toggle" for="wgWx">${en?"Show the weather":"顯示天氣"}<input type="checkbox" id="wgWx" ${w.wx?"checked":""}></label>
@@ -5206,13 +5211,13 @@ details.cl>summary{cursor:pointer}
   window.__x27sum={maybeSummarize,recentCount,convObj};
 
   /* ---------- power saver ----------
-     fx-idle: the window is hidden, or hasn't been used (no focus, no mouse, no keys) for 90 seconds → decorative animation pauses,
+     fx-idle: the window is hidden, in the background for 30 seconds, or untouched for 5 minutes → decorative animation pauses,
      the particles and music bars stop and background checks slow down. fx-sleep: she is asleep → the moving background rests too. */
   (function(){const R=document.documentElement;let lastUse=Date.now(),focused=document.hasFocus();
     const use=()=>{lastUse=Date.now();if(R.classList.contains("fx-idle"))update()};
     ["pointermove","pointerdown","keydown","wheel","touchstart"].forEach(t=>addEventListener(t,use,{passive:true,capture:true}));
     addEventListener("focus",()=>{focused=true;use()});addEventListener("blur",()=>{focused=false;update()});
-    function update(){const idle=document.hidden||(!focused&&Date.now()-lastUse>90e3)||(Date.now()-lastUse>15*60e3);
+    function update(){const idle=document.hidden||(!focused&&Date.now()-lastUse>30e3)||(Date.now()-lastUse>5*60e3);
       let asleep=false;try{asleep=moodBase==="sleep"}catch(e){}
       const was=R.classList.contains("fx-idle");R.classList.toggle("fx-idle",idle);R.classList.toggle("fx-sleep",asleep);
       if(!idle&&!asleep&&window.__motesResume)window.__motesResume();if(!idle&&typeof vizStart==="function")vizStart();
@@ -5220,7 +5225,7 @@ details.cl>summary{cursor:pointer}
     document.addEventListener("visibilitychange",update);setInterval(update,5000);update();window.__power={update,away:()=>{focused=false;lastUse=0;update()},state:()=>({idle:R.classList.contains("fx-idle"),sleep:R.classList.contains("fx-sleep")})}})();
 
   /* ---------- start once the app is ready ---------- */
-  function paintAll(){paintRing();paintSafe();paintCA();paintSet();paintMusic();paintWx();paintClean();fit()}
+  function paintAll(){paintRing();paintSafe();paintCA();paintSet();paintMusic();paintWx();paintClean();try{if(typeof paintModelChip==="function")paintModelChip()}catch(e){}fit()}
   if(typeof window.applyLang==="function"){const o=window.applyLang;window.applyLang=function(){const r=o.apply(this,arguments);try{paintAll()}catch(e){}return r}}
   let started=false;
   (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);wrapSample();setTimeout(tidyLocalAI,4000);setTimeout(async()=>{if(await ensureOllama(true))warm()},2500);return}setTimeout(wait,400)})();

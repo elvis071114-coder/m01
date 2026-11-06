@@ -1,7 +1,7 @@
 {
- "version": "1.2.1",
- "notes": "1.2.1：說明文字更新（記憶同步、備份位置、本地 AI、音樂、新手教學）。按一下就能更新。",
- "notes_en": "1.2.1: help text updated (memory sync, backup location, local AI, music, guided tour). One-click update.",
+ "version": "2.2.1",
+ "notes": "2.2.1 大優化：每個畫面都檢查過、修好設定分類會跳走的問題、更省電、模型名稱一致、英文介面翻譯補齊、說明文字全面更新。按一下就能更新。",
+ "notes_en": "2.2.1, the big tune-up: every screen checked, settings groups no longer jump, lighter on the computer, consistent model names, full English translation, all help text up to date. One-click update.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
@@ -12,6 +12,6 @@
  "helper_win": "https://elvis071114-coder.github.io/m01/helper/server.ps1",
  "helper_win_sha": "75762b30be1e9cbdc92435ab27c25fc8be001977b44f3fd72d51f15c724ad329",
  "pkg": 2,
- "windows_sha": "8a7c3a61af5ea866137741738b76add42dd622c1a8006df500ac8d48c1d6b1f5",
- "mac_sha": "456fe3de5eb3f988ae3e44205d11df2118f42cc503219347901a6bb21b7fe4e6"
+ "windows_sha": "8c8fb11f19783903630b600fd3ae54642ec98b35c588c5b4732ef85322ce1ebf",
+ "mac_sha": "650cb8d88811913310dc74070b3e234fa7178c4cd9b09993196c1f0c4c0f677b"
 }
