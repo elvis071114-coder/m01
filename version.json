@@ -1,10 +1,10 @@
 {
- "version": "1.0.0",
- "notes": "正式版 1.0.0：長時間使用不失憶、更省電、更順；所有功能完整測試",
- "notes_en": "Version 1.0.0: holds its memory over long use, uses far less power and stays smooth; every feature fully tested",
+ "version": "1.1.0",
+ "notes": "1.1.0：模型可背景下載（可暫停、繼續，顯示剩餘時間）、第一次使用改成先登入 Google 再設定 AI、電腦建議更準、本地 AI 回得更快、安裝程式中英對照。這版需要重新安裝一次電腦版。",
+ "notes_en": "1.1.0: background model downloads (pause, continue, time left), first launch now signs in with Google then sets up an AI, better model suggestions, faster local replies, bilingual installer. Reinstall the desktop app once for this version.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
  "page": "https://elvis071114-coder.github.io/m01/app.html",
- "helper": 2
+ "helper": 6
 }

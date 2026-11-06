@@ -8,11 +8,11 @@
 
 - **網頁版**：https://elvis071114-coder.github.io/m01/
   - 用你自己的**免費 Gemini 金鑰**（到 [aistudio.google.com/apikey](https://aistudio.google.com/apikey) 用 Google 帳號建立）。
-  - 記憶存在你自己的瀏覽器裡。用 **Google 登入**（設定 → ACCOUNT）的話，會另外存一份到你自己 Google 雲端硬碟的隱藏資料夾，換手機、換電腦登入同一個帳號就能接著聊。
+  - 第一次打開要先用 **Google 帳號登入**，記憶會存在你的瀏覽器，並另外存一份到你自己 Google 雲端硬碟的隱藏資料夾，換手機、換電腦登入同一個帳號就能接著聊。
   - 手機可以把網頁「加到主畫面」，像 App 一樣打開。
 - **電腦版 App（Mac／Windows）**：在網頁版的「下載 App」分頁下載。
-  - 可以選用免費的本地 AI（Ollama，不用網路），也可以只用 Gemini 或 Claude。
-  - 一樣可以用 Google 登入，和網頁版、其他電腦同步。
+  - 第一次打開要先用 Google 登入，再設定至少一個 AI：免費的 Gemini、免費的本地 AI（Ollama，不用網路），或 Claude。
+  - 本地 AI 的模型可以背景下載，能暫停、繼續，會顯示還要多久；沒有 NVIDIA 顯示卡的電腦建議用 Gemini 或輕量版。
   - 會上網查資料、查天氣，可以用 Fish Audio 把回覆唸出來，記憶存在電腦裡的資料夾。
   - 有新版本時會自動提醒。
 
@@ -67,11 +67,11 @@ An AI companion with long-term memory. She remembers what you've said and the fi
 
 - **Web version**: https://elvis071114-coder.github.io/m01/
   - Uses your own **free Gemini key** (create one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey) with a Google account).
-  - Memory is stored in your own browser. **Sign in with Google** (Settings → Account) to keep a copy in a hidden folder of your own Google Drive and pick up on any phone or computer.
+  - On first launch you **sign in with Google**. Memory is stored in your browser, with a copy in a hidden folder of your own Google Drive, so you can pick up on any phone or computer.
   - On phones, “Add to Home Screen” to open it like an app.
 - **Desktop app (Mac / Windows)**: download it from the “Get App” tab of the web version.
-  - Optional free local AI (Ollama, works offline), or just Gemini / Claude.
-  - Sign in with Google to sync with the web version and your other computers.
+  - On first launch you sign in with Google, then set up at least one AI: free Gemini, the free local AI (Ollama, works offline), or Claude.
+  - Local models download in the background, with pause, continue and time left. On computers without an NVIDIA graphics card, Gemini or the Light model is recommended.
   - Looks things up on the web, checks the weather, can read replies aloud with Fish Audio, and saves memory to a folder on your computer.
   - Tells you when a new version is out.
 
