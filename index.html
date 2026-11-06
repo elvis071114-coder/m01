@@ -632,29 +632,6 @@ body.kb .tabs{padding-top:4px}
 .lm-ram{display:inline-flex;gap:6px}.lm-ram .sbtn{padding:4px 10px;font-size:12.5px}.lm-ram .sbtn.on{border-color:var(--accent);color:var(--accent)}
 .lm-card.rec{box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),.55)}.lm-rec{font-style:normal;font-size:11.5px;font-weight:700;margin-left:8px;padding:1px 8px;background:var(--accent);color:var(--accent-ink)}
 .lm-ca{display:flex;flex-direction:column;gap:6px}.lm-adv summary{cursor:pointer;font-size:13px;color:var(--muted)}.lm-adv .inline{margin:8px 0 6px}.lm-adv input{flex:1;min-width:0;padding:8px 10px;background:var(--panel2);border:1px solid var(--line2);color:var(--ink)}
-
-/* GitHub edition */
-#folderBtn,#unSec{display:none!important}
-.dl-card{display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:var(--panel2);border-left:3px solid var(--accent)}
-.dl-head{display:flex;flex-direction:column;gap:2px}.dl-head b{font-size:16px}.dl-head span{font-size:12.5px;color:var(--muted)}
-.dl-card ol,.dl-card ul{margin:0;padding-left:1.3em;font-size:13.5px;line-height:1.65}.dl-card details summary{cursor:pointer;color:var(--accent);font-size:13.5px}
-.dl-btn{align-self:flex-start;text-decoration:none;display:inline-block}
-.gh-cmp{width:100%;border-collapse:collapse;font-size:13px;line-height:1.45}.gh-cmp th,.gh-cmp td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-.gh-cmp thead th{color:var(--accent);font-size:12.5px}.gh-cmp tbody th{color:var(--muted);white-space:nowrap;width:1%}.gh-cmp .y{color:#8fd694}.gh-cmp .n{color:var(--dim)}
-#ghKey{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:20px;background:var(--scrim);backdrop-filter:blur(4px)}
-#ghKey[hidden]{display:none}
-#ghKey .g-card{width:min(470px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:22px 22px 18px;background:var(--card);border:1px solid var(--line2);border-left:4px solid var(--accent);box-shadow:0 20px 50px rgba(0,0,0,.6)}
-#ghKey .g-tag{font-family:var(--font-hud);font-size:11.5px;letter-spacing:.24em;color:var(--accent)}
-#ghKey h2{margin:8px 0 8px;font-size:21px}#ghKey p{margin:0 0 10px;font-size:14px;line-height:1.6;color:var(--muted)}
-#ghKey ol{margin:0 0 12px;padding-left:1.3em;font-size:14px;line-height:1.7}
-#ghKey input{width:100%;box-sizing:border-box;padding:11px 12px;font-size:16px;background:var(--panel2);color:var(--ink);border:1px solid var(--line2);margin-bottom:10px}
-#ghKey .g-acts{display:flex;flex-direction:column;gap:8px}
-#ghKey .g-acts button,#ghKey .g-acts a{padding:12px 14px;font-size:15px;font-weight:700;text-align:center;text-decoration:none;cursor:pointer}
-#ghKey .g-main{background:var(--accent);color:#111;border:none}#ghKey .g-sub{background:var(--panel);color:var(--ink);border:1px solid var(--line2)}
-#ghKey .g-skip{background:none;border:none;color:var(--muted);font-weight:400!important;font-size:13.5px!important}
-#ghKey .g-msg{min-height:1.2em;font-size:13px;color:var(--accent);margin:0 0 8px}
-#ghKey .g-acc{padding:12px 14px;margin:0 0 14px;background:var(--panel);border:1px solid var(--line2)}#ghKey .g-acc p{font-size:13.5px}
-#ghKey .g-hint{font-size:12.5px;color:var(--dim);margin-top:10px}
 </style>
 </head>
 <body>
@@ -701,7 +678,6 @@ body.kb .tabs{padding-top:4px}
         <button class="tab" style="--i:2" role="tab" data-tab="pFiles" aria-selected="false"><small>FILES</small>檔案</button>
         <button class="tab" style="--i:3" role="tab" data-tab="pSearch" aria-selected="false"><small>SEARCH</small>搜尋</button>
         <button class="tab" style="--i:4" role="tab" data-tab="pSet" aria-selected="false"><small>SYSTEM</small>設定</button>
-        <button class="tab" style="--i:5" role="tab" data-tab="pDl" aria-selected="false"><small>DOWNLOAD</small>下載 App</button>
       </div>
       <div class="body">
         <div class="convbar">
@@ -753,7 +729,6 @@ body.kb .tabs{padding-top:4px}
             <div class="inline"><input id="q" placeholder="搜尋所有對話與檔案"><button class="pbtn" id="qBtn">搜尋</button></div>
             <div id="qOut" style="display:flex;flex-direction:column;gap:6px"></div>
           </div>
-          <div class="pane" id="pDl" hidden data-i18n="none"></div>
           <div class="pane" id="pSet" hidden>
             <p class="note sg-intro">點一下分類就會展開；設定會自動儲存。</p>
             <details class="sgrp" id="g_acc"><summary><span class="sg-t"><b>帳號與同步</b><small>用 Google 登入，換電腦、換手機都能接著聊</small></span><i class="sg-chev" aria-hidden="true"></i></summary>
@@ -873,43 +848,10 @@ body.kb .tabs{padding-top:4px}
 <div id="tour" hidden data-i18n="none"><div class="tour-spot" id="tourSpot"></div><div class="tour-card" id="tourCard" role="dialog" aria-live="polite"><div class="tour-step" id="tourStep"></div><b id="tourTitle"></b><p id="tourText"></p><div class="tour-btns"><button id="tourSkip"></button><span></span><button id="tourPrev"></button><button id="tourNext" class="main"></button></div></div></div>
 <div id="toast" role="status"></div>
 <div id="hoverFx" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-<script>/* ===== GitHub edition: no local helper; Gemini is called straight from this browser ===== */
-window.GH_MODE=true;
-(function(){
-  const K="m01.gh.gkey",GB="https://generativelanguage.googleapis.com",of=window.fetch.bind(window);
-  const J=(o,st=200)=>new Response(JSON.stringify(o),{status:st,headers:{"Content-Type":"application/json"}});
-  const key=()=>{try{return localStorage.getItem(K)||""}catch(e){return""}};
-  window.fetch=async(u,o={})=>{
-    const url=typeof u==="string"?u:(u&&u.url)||"";
-    if(!url.startsWith("/"))return of(u,o);
-    const qi=url.indexOf("?"),path=qi<0?url:url.slice(0,qi),q=new URLSearchParams(qi<0?"":url.slice(qi+1)),m=String(o.method||"GET").toUpperCase();
-    if(path==="/secret"){
-      if(q.get("p")!=="gemini")return J({ok:true,has:false,last4:""});
-      if(m==="PUT"){const v=String(o.body||"").trim();try{v?localStorage.setItem(K,v):localStorage.removeItem(K)}catch(e){}return J({ok:true})}
-      if(m==="DELETE"){try{localStorage.removeItem(K)}catch(e){}return J({ok:true})}
-      const k=key();if(q.get("reveal")==="1")return J({ok:true,key:k});
-      return J({ok:true,has:!!k,last4:k.length>4?k.slice(-4):""});
-    }
-    if(path==="/gemini"){
-      const k=key();if(!k)return J({status:401,body:{error:{message:"no key"}}});
-      const model=String(q.get("model")||"gemini-3.6-flash").replace(/[^A-Za-z0-9.\-]/g,"");
-      try{const r=await of(GB+"/v1beta/models/"+model+":generateContent",{method:"POST",signal:o.signal,headers:{"Content-Type":"application/json","x-goog-api-key":k},body:o.body});
-        let b=null;try{b=await r.json()}catch(e){}return J({status:r.status,body:b})}
-      catch(e){if(e&&e.name==="AbortError")throw e;return J({status:0,body:null})}
-    }
-    if(path==="/getjson"){const t=q.get("url")||"";
-      if(/^https:\/\/(geocoding-api|api)\.open-meteo\.com\//.test(t)||/^https:\/\/get\.geojs\.io\/v1\/ip\/geo\.json$/.test(t)||/^https:\/\/api\.bigdatacloud\.net\/data\/reverse-geocode-client\?[\w=&.%-]*$/.test(t)){try{const r=await of(t);return J(await r.json())}catch(e){return J({error:true,reason:"unreachable"})}}
-      return J({error:true},403)}
-    if(/^\/(ping|search|fetch|battery|dictate|fishtts|open|reveal|setdata|uninstall|pick|fs|ls|music|musicart|sysinfo)(\/|$)/.test(path))return J({ok:false},404);
-    return of(u,o);
-  };
-})();
-</script>
 <script>/* ===== Local runtime: replaces Claude-hosted services with Ollama + browser storage ===== */
 (function(){
   const LS_CFG="m01.local.cfg";
   const cfg=Object.assign({url:"http://localhost:11434",model:"qwen3.5:9b",vision:"",ctx:12288},(()=>{try{return JSON.parse(localStorage.getItem(LS_CFG)||"{}")}catch(e){return{}}})());
-  if(window.GH_MODE)cfg.backend="gemini";
   window.LOCAL_CFG=cfg;
   window.saveLocalCfg=()=>{try{localStorage.setItem(LS_CFG,JSON.stringify(cfg))}catch(e){}};
 
@@ -1759,7 +1701,7 @@ async function maybeFollowUp(){
   try{
     if(S.followBusy||!S.db||!S.sample||S.busy||S.incog)return;
     if(!document.body.classList.contains("booted"))return;
-    const blocked=["tour","setupPop","gate","helpPop","ghKey"].some(id=>{const e=document.getElementById(id);return e&&!e.hidden});
+    const blocked=["tour","setupPop","gate","helpPop","aiPick"].some(id=>{const e=document.getElementById(id);return e&&!e.hidden});
     if(blocked||String($("input").value||"").trim()){if(followTries++<20)setTimeout(maybeFollowUp,6000);return}
     if(typeof LOCAL_CFG!=="undefined"&&!S.aiOK)return;
     await loadFollows();
@@ -2648,7 +2590,7 @@ const I18N={
 "靜音":"Mute","取消靜音":"Unmute","音量":"Volume","放開以上傳檔案":"Drop to upload","電量":"Battery","介面音效":"Interface sounds","介面音效開關":"Interface sounds","離開":"Exit","夥伴":"Partner",
 "無痕模式":"Incognito mode","對話說明":"Chat help","上傳檔案或圖片":"Upload a file or image","輸入訊息，或問我之前講過的事":"Type a message, or ask about anything we talked about","語音輸入":"Voice input",
 "聊天說明":"Chat help","說明":"Help","例如：喜歡喝珍珠奶茶、對花生過敏":"e.g. loves bubble tea, allergic to peanuts","搜尋所有對話與檔案":"Search all chats and files","例如：Elvis":"e.g. Elvis","自訂顏色":"Custom colour","開始":"Start","關閉說明":"Close help","統計":"Stats",
-"語言 Language":"Language 語言","。":".","請從 M-01 App 打開":"Please open this from the M-01 app","測試你的金鑰可以用哪些模型…":"Checking which models your key can use…","想一下…":"Thinking…","平常切換模型和思考程度，用聊天輸入框上方的按鈕就好；這裡是設定金鑰的地方。":"Switch models and thinking level with the button above the chat input; this is where API keys are set.","Gemini 3.6 Flash：建議，聰明又穩定":"Gemini 3.6 Flash: recommended, smart and steady","Gemini 3.8 Flash：最聰明，但免費額度最少":"Gemini 3.8 Flash: smartest, smallest free quota","Gemini 3.5 Flash-Lite：最快、免費次數最多":"Gemini 3.5 Flash-Lite: fastest, most free usage","思考程度":"Thinking","Gemini 3.5 Flash-Lite：免費額度多、速度快（預設）":"Gemini 3.5 Flash-Lite: more free usage, fast (default)","Gemini 3.8 Flash：比較聰明（可能需要付費方案）":"Gemini 3.8 Flash: smarter (may need a paid plan)","仔細想一想…":"Thinking it through…","Gemini 3.8 Flash 現在不能用（可能需要付費方案），已自動改用 3.5 Flash-Lite":"Gemini 3.8 Flash isn't available (may need a paid plan) — switched to 3.5 Flash-Lite","簡短：一兩句，回得快":"Short: a sentence or two, fast","一般（建議）":"Normal (recommended)","詳細：想清楚再回答，比較長":"Detailed: thinks it through, longer","儲值、建立金鑰，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", top up, create a key and paste it below — it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","設定會自動儲存":"Settings save automatically","✓ 已自動儲存":"✓ Saved","已套用（未登入，不會保存）":"Applied (not signed in, won't be saved)","已套用「傲嬌 Claude」說話風格":"Applied the \"Tsundere Claude\" style","改完會自動儲存並測試連線":"Changes save and test automatically","Gemini（Google：有免費額度，比本地聰明）":"Gemini (Google: free tier, smarter than local)","Claude（最聰明：需要 API 金鑰，按用量付費）":"Claude (smartest: needs an API key, pay per use)","Gemini API 金鑰":"Gemini API key","Gemini 模型":"Gemini model","Gemini 3.8 Flash：比較聰明（建議）":"Gemini 3.8 Flash: smarter (recommended)","Gemini 3.5 Flash-Lite：更快、免費額度比較多":"Gemini 3.5 Flash-Lite: faster, more free usage","⚠️ 還沒貼上 Gemini API 金鑰。":"⚠️ No Gemini API key yet.","還沒設定 Gemini API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Gemini API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 API 金鑰，請到「設定 → AI」貼上金鑰。":"No API key yet — add one in Settings → AI.","連不到 Gemini，請確認電腦有網路。":"Can't reach Gemini — is this computer online?","到":"Get a free key at","用 Google 帳號免費建立金鑰（Google AI Plus／Pro 訂閱是給 Gemini App 用的，跟 API 金鑰分開計算），貼到下面就會自動儲存並測試。免費額度每分鐘、每天有次數上限，用完等一下就會恢復。注意：免費方案的對話內容 Google 可能會拿去改進他們的產品。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。":"with your Google account (Google AI Plus/Pro subscriptions are for the Gemini app and are separate from API keys) and paste it below — it saves and tests itself. The free tier has per-minute and per-day limits that reset after a while. Note: on the free tier Google may use your conversations to improve its products. The key is stored only in this computer's app settings — never in the memory folder or backups.","，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", paste it below and it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","來源 ▸":"Sources ▸","來源 ▾":"Sources ▾","AI 來源":"AI source","本地 AI（Ollama：免費、資料不出電腦）":"Local AI (Ollama: free, data stays on this computer)","Claude（比較聰明：需要 API 金鑰，按用量付費）":"Claude (smarter: needs an API key, pay per use)","API 金鑰":"API key","Claude 模型":"Claude model","Haiku 5.5：快又便宜（估計每則不到 NT$0.1）":"Haiku 5.5: fast and cheap (est. under NT$0.1 per message)","Sonnet 5.5：比較聰明（估計每則 NT$0.5～1）":"Sonnet 5.5: smarter (est. NT$0.5–1 per message)","儲存並測試":"Save & test","刪除金鑰":"Delete key","測試中…":"Testing…","Claude 連線成功":"Connected to Claude","已刪除金鑰":"Key deleted","⚠️ 還沒貼上 Claude API 金鑰。":"⚠️ No Claude API key yet.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Claude API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰。":"No Claude API key yet — add one in Settings → AI.","連不到 Claude，請確認電腦有網路。":"Can't reach Claude — is this computer online?","把 M-01 App 從這台電腦移除。Ollama 本身不會被移除。":"Remove the M-01 app from this computer. Ollama itself is not removed.","一併刪除記憶資料（會移到垃圾桶，後悔還救得回來）":"Also delete memory data (moved to the Trash, so you can still get it back)","一併刪除記憶資料（會移到資源回收筒，後悔還救得回來）":"Also delete memory data (moved to the Recycle Bin, so you can still get it back)","一併刪除聊天模型（可以騰出 2～5GB）":"Also delete the chat model (frees 2–5GB)","解除安裝 App…":"Uninstall app…","需要 Anthropic 的 API 金鑰。它跟 claude.ai 的訂閱是分開計費的：到":"You need an Anthropic API key. It's billed separately from a claude.ai subscription: top up and create a key at","儲值、建立金鑰，再貼到下面。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", then paste it below. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","記憶資料夾":"Memory folder","版本資訊與注意事項":"Version & notes","新手教學":"Guided tour","下載 App":"Get App","一次放多張圖片或 zip":"Add many pictures or a zip","套用範例角色":"Use the sample character","可以一次選好幾張，或直接選整個 zip：檔名有表情名稱就會自動放到對的格子（例如 Eyes_open、Mouth_open、Happy，或 張眼、張嘴、開心）。也可以把一整批圖片拖到下面的格子區。":"Pick several pictures at once, or a whole zip: files named after an expression go into the right slot automatically (e.g. Eyes_open, Mouth_open, Happy). You can also drop a batch of pictures onto the slots below.","範例角色：角色靈感來自社群的 Claude娘 二創形象，圖片是用 AI 製作的。":"Sample character: inspired by the community’s “Claude-chan” fan personification; the images were made with AI.","她之後會主動問你的事。不想被問的可以刪掉。":"Things she’ll ask you about later. Delete any you don’t want her to bring up.","朗讀":"Read aloud","語音還沒設定。":"Voice isn't set up yet.","Fish Audio API 金鑰":"Fish Audio API key","貼上金鑰":"Paste your key","口音":"Accent","自動（中文回覆用中文聲音，英文回覆用英文聲音）":"Auto (Chinese voice for Chinese replies, English voice for English replies)","中文（一律用中文聲音）":"Chinese (always the Chinese voice)","英文（一律用英文聲音）":"English (always the English voice)","中文聲音（fish.audio 聲音網址或 ID）":"Chinese voice (fish.audio voice link or ID)","英文聲音（fish.audio 聲音網址或 ID）":"English voice (fish.audio voice link or ID)","口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，英文的聲音就是英文口音。所以下面可以各選一個。到 fish.audio 打開聲音的頁面，複製網址貼上；留空的話會用另一個欄位的聲音，兩個都空就用預設聲音。":"The accent comes from the voice: a Chinese voice sounds Chinese, an English voice sounds English — so you can pick one of each below. Open a voice page on fish.audio and paste its link; if one is empty the other is used, and if both are empty the default voice is used.","例如 https://fish.audio/m/…":"e.g. https://fish.audio/m/…","請用你自己建立、或主人明確允許使用的聲音。不要用模仿真實人物（聲優、藝人、網紅等）的聲音模型。":"Only use voices you made yourself or that the owner clearly allows. Don't use voice models that imitate real people (voice actors, celebrities, streamers…).","語音模型":"Voice model","S2.1 Pro Free：免費（有合理使用限制）":"S2.1 Pro Free: free (fair-use limits)","S2.1 Pro：付費，比較穩定（要先到 Fish Audio 儲值 API 額度）":"S2.1 Pro: paid, more reliable (needs Fish Audio API credit)","回覆完自動唸出來":"Read replies aloud automatically","語氣跟著表情變（開心、害羞、生氣…）":"Tone follows her expression (happy, shy, annoyed…)","試聽":"Test voice","打開資料夾":"Open folder","更換位置…":"Move…","Google 雲端硬碟備份教學":"Google Drive backup guide","編輯":"Edit","取消":"Cancel","更新":"Update","確定刪除？":"Delete?","編輯訊息":"Edit message","已刪除這則訊息和她的回覆":"Deleted this message and her reply","等她回完再編輯，或先按「停止」":"Wait until she finishes, or press Stop first","內容不能是空的":"The message can't be empty","她還在回覆中…按 Esc 或「停止」可以中斷":"She's still replying… press Esc or Stop to interrupt","上一則卡住了，已經重置，請再傳一次":"The last message got stuck and was reset — please send again","最初的對話":"First chat","無痕對話（不會保存）":"Incognito chat (not saved)","無痕模式：這段對話不會被保存，她也不會記住，也不會讀取你過去的記憶。關掉無痕就會回到一般對話。":"Incognito: this chat isn't saved, she won't remember it, and she won't read your past memories. Turn incognito off to go back.","橘":"Orange","藍":"Blue","綠":"Green","粉":"Pink","紫":"Purple","紅":"Red","黃":"Yellow","還沒有重點。聊天時提到重要的事，夥伴會自動記下。":"No notes yet. When something important comes up, your partner saves it automatically.",
+"語言 Language":"Language 語言","。":".","請從 M-01 App 打開":"Please open this from the M-01 app","測試你的金鑰可以用哪些模型…":"Checking which models your key can use…","想一下…":"Thinking…","平常切換模型和思考程度，用聊天輸入框上方的按鈕就好；這裡是設定金鑰的地方。":"Switch models and thinking level with the button above the chat input; this is where API keys are set.","Gemini 3.6 Flash：建議，聰明又穩定":"Gemini 3.6 Flash: recommended, smart and steady","Gemini 3.8 Flash：最聰明，但免費額度最少":"Gemini 3.8 Flash: smartest, smallest free quota","Gemini 3.5 Flash-Lite：最快、免費次數最多":"Gemini 3.5 Flash-Lite: fastest, most free usage","思考程度":"Thinking","Gemini 3.5 Flash-Lite：免費額度多、速度快（預設）":"Gemini 3.5 Flash-Lite: more free usage, fast (default)","Gemini 3.8 Flash：比較聰明（可能需要付費方案）":"Gemini 3.8 Flash: smarter (may need a paid plan)","仔細想一想…":"Thinking it through…","Gemini 3.8 Flash 現在不能用（可能需要付費方案），已自動改用 3.5 Flash-Lite":"Gemini 3.8 Flash isn't available (may need a paid plan) — switched to 3.5 Flash-Lite","簡短：一兩句，回得快":"Short: a sentence or two, fast","一般（建議）":"Normal (recommended)","詳細：想清楚再回答，比較長":"Detailed: thinks it through, longer","儲值、建立金鑰，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", top up, create a key and paste it below — it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","設定會自動儲存":"Settings save automatically","✓ 已自動儲存":"✓ Saved","已套用（未登入，不會保存）":"Applied (not signed in, won't be saved)","已套用「傲嬌 Claude」說話風格":"Applied the \"Tsundere Claude\" style","改完會自動儲存並測試連線":"Changes save and test automatically","Gemini（Google：有免費額度，比本地聰明）":"Gemini (Google: free tier, smarter than local)","Claude（最聰明：需要 API 金鑰，按用量付費）":"Claude (smartest: needs an API key, pay per use)","Gemini API 金鑰":"Gemini API key","Gemini 模型":"Gemini model","Gemini 3.8 Flash：比較聰明（建議）":"Gemini 3.8 Flash: smarter (recommended)","Gemini 3.5 Flash-Lite：更快、免費額度比較多":"Gemini 3.5 Flash-Lite: faster, more free usage","⚠️ 還沒貼上 Gemini API 金鑰。":"⚠️ No Gemini API key yet.","還沒設定 Gemini API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Gemini API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 API 金鑰，請到「設定 → AI」貼上金鑰。":"No API key yet — add one in Settings → AI.","連不到 Gemini，請確認電腦有網路。":"Can't reach Gemini — is this computer online?","到":"Get a free key at","用 Google 帳號免費建立金鑰（Google AI Plus／Pro 訂閱是給 Gemini App 用的，跟 API 金鑰分開計算），貼到下面就會自動儲存並測試。免費額度每分鐘、每天有次數上限，用完等一下就會恢復。注意：免費方案的對話內容 Google 可能會拿去改進他們的產品。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。":"with your Google account (Google AI Plus/Pro subscriptions are for the Gemini app and are separate from API keys) and paste it below — it saves and tests itself. The free tier has per-minute and per-day limits that reset after a while. Note: on the free tier Google may use your conversations to improve its products. The key is stored only in this computer's app settings — never in the memory folder or backups.","，貼到下面就會自動儲存並測試。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", paste it below and it saves and tests itself. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","來源 ▸":"Sources ▸","來源 ▾":"Sources ▾","AI 來源":"AI source","本地 AI（Ollama：免費、資料不出電腦）":"Local AI (Ollama: free, data stays on this computer)","Claude（比較聰明：需要 API 金鑰，按用量付費）":"Claude (smarter: needs an API key, pay per use)","API 金鑰":"API key","Claude 模型":"Claude model","Haiku 5.5：快又便宜（估計每則不到 NT$0.1）":"Haiku 5.5: fast and cheap (est. under NT$0.1 per message)","Sonnet 5.5：比較聰明（估計每則 NT$0.5～1）":"Sonnet 5.5: smarter (est. NT$0.5–1 per message)","儲存並測試":"Save & test","刪除金鑰":"Delete key","測試中…":"Testing…","Claude 連線成功":"Connected to Claude","已刪除金鑰":"Key deleted","⚠️ 還沒貼上 Claude API 金鑰。":"⚠️ No Claude API key yet.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰，或改回本地 AI。":"No Claude API key yet — add one in Settings → AI, or switch back to local AI.","還沒設定 Claude API 金鑰，請到「設定 → AI」貼上金鑰。":"No Claude API key yet — add one in Settings → AI.","連不到 Claude，請確認電腦有網路。":"Can't reach Claude — is this computer online?","把 M-01 App 從這台電腦移除。Ollama 本身不會被移除。":"Remove the M-01 app from this computer. Ollama itself is not removed.","一併刪除記憶資料（會移到垃圾桶，後悔還救得回來）":"Also delete memory data (moved to the Trash, so you can still get it back)","一併刪除記憶資料（會移到資源回收筒，後悔還救得回來）":"Also delete memory data (moved to the Recycle Bin, so you can still get it back)","一併刪除聊天模型（可以騰出 2～5GB）":"Also delete the chat model (frees 2–5GB)","解除安裝 App…":"Uninstall app…","需要 Anthropic 的 API 金鑰。它跟 claude.ai 的訂閱是分開計費的：到":"You need an Anthropic API key. It's billed separately from a claude.ai subscription: top up and create a key at","儲值、建立金鑰，再貼到下面。建議在那裡設定每月花費上限。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。對話內容會傳給 Anthropic 處理。":", then paste it below. Setting a monthly spend limit there is a good idea. The key is stored only in this computer's app settings — never in the memory folder or backups. Your chats are sent to Anthropic for processing.","記憶資料夾":"Memory folder","版本資訊與注意事項":"Version & notes","新手教學":"Guided tour","一次放多張圖片或 zip":"Add many pictures or a zip","套用範例角色":"Use the sample character","可以一次選好幾張，或直接選整個 zip：檔名有表情名稱就會自動放到對的格子（例如 Eyes_open、Mouth_open、Happy，或 張眼、張嘴、開心）。也可以把一整批圖片拖到下面的格子區。":"Pick several pictures at once, or a whole zip: files named after an expression go into the right slot automatically (e.g. Eyes_open, Mouth_open, Happy). You can also drop a batch of pictures onto the slots below.","範例角色：角色靈感來自社群的 Claude娘 二創形象，圖片是用 AI 製作的。":"Sample character: inspired by the community’s “Claude-chan” fan personification; the images were made with AI.","她之後會主動問你的事。不想被問的可以刪掉。":"Things she’ll ask you about later. Delete any you don’t want her to bring up.","朗讀":"Read aloud","語音還沒設定。":"Voice isn't set up yet.","Fish Audio API 金鑰":"Fish Audio API key","貼上金鑰":"Paste your key","口音":"Accent","自動（中文回覆用中文聲音，英文回覆用英文聲音）":"Auto (Chinese voice for Chinese replies, English voice for English replies)","中文（一律用中文聲音）":"Chinese (always the Chinese voice)","英文（一律用英文聲音）":"English (always the English voice)","中文聲音（fish.audio 聲音網址或 ID）":"Chinese voice (fish.audio voice link or ID)","英文聲音（fish.audio 聲音網址或 ID）":"English voice (fish.audio voice link or ID)","口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，英文的聲音就是英文口音。所以下面可以各選一個。到 fish.audio 打開聲音的頁面，複製網址貼上；留空的話會用另一個欄位的聲音，兩個都空就用預設聲音。":"The accent comes from the voice: a Chinese voice sounds Chinese, an English voice sounds English — so you can pick one of each below. Open a voice page on fish.audio and paste its link; if one is empty the other is used, and if both are empty the default voice is used.","例如 https://fish.audio/m/…":"e.g. https://fish.audio/m/…","請用你自己建立、或主人明確允許使用的聲音。不要用模仿真實人物（聲優、藝人、網紅等）的聲音模型。":"Only use voices you made yourself or that the owner clearly allows. Don't use voice models that imitate real people (voice actors, celebrities, streamers…).","語音模型":"Voice model","S2.1 Pro Free：免費（有合理使用限制）":"S2.1 Pro Free: free (fair-use limits)","S2.1 Pro：付費，比較穩定（要先到 Fish Audio 儲值 API 額度）":"S2.1 Pro: paid, more reliable (needs Fish Audio API credit)","回覆完自動唸出來":"Read replies aloud automatically","語氣跟著表情變（開心、害羞、生氣…）":"Tone follows her expression (happy, shy, annoyed…)","試聽":"Test voice","打開資料夾":"Open folder","更換位置…":"Move…","Google 雲端硬碟備份教學":"Google Drive backup guide","編輯":"Edit","取消":"Cancel","更新":"Update","確定刪除？":"Delete?","編輯訊息":"Edit message","已刪除這則訊息和她的回覆":"Deleted this message and her reply","等她回完再編輯，或先按「停止」":"Wait until she finishes, or press Stop first","內容不能是空的":"The message can't be empty","她還在回覆中…按 Esc 或「停止」可以中斷":"She's still replying… press Esc or Stop to interrupt","上一則卡住了，已經重置，請再傳一次":"The last message got stuck and was reset — please send again","最初的對話":"First chat","無痕對話（不會保存）":"Incognito chat (not saved)","無痕模式：這段對話不會被保存，她也不會記住，也不會讀取你過去的記憶。關掉無痕就會回到一般對話。":"Incognito: this chat isn't saved, she won't remember it, and she won't read your past memories. Turn incognito off to go back.","橘":"Orange","藍":"Blue","綠":"Green","粉":"Pink","紫":"Purple","紅":"Red","黃":"Yellow","還沒有重點。聊天時提到重要的事，夥伴會自動記下。":"No notes yet. When something important comes up, your partner saves it automatically.",
 "檢查中…":"Checking…","聊天模型（Ollama 模型名稱）":"Chat model (Ollama model name)","看圖模型（選填，留空就不看圖）":"Vision model (optional — leave empty to skip images)","Ollama 位址":"Ollama address","儲存並測試連線":"Save & test connection",
 "例如 gemma3:4b":"e.g. gemma3:4b",
 "記憶目前存在 App 裡。選「文件」裡的 Companion 資料夾，所有記憶就會存進去，再由 Google 雲端硬碟同步。":"Memory is currently stored inside the app. Choose the Companion folder in Documents and everything will be saved there, then synced by Google Drive.",
@@ -2864,20 +2806,16 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="0.10.32",APP_STAGE="Beta",APP_BUILD="2026-11-06 02:30";
+const APP_VER="0.10.29",APP_STAGE="Beta",APP_BUILD="2026-11-06 01:35";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
-  if(window.GH_MODE)return (en?"Web version (Gemini)":"網頁版（Gemini）")+" · "+(LOCAL_CFG.geminiModel||"gemini-3.6-flash");
   if(typeof LOCAL_CFG==="undefined")return en?"Web version":"網頁版";
   const os=/Windows/i.test(navigator.userAgent)?"Windows":/Mac/i.test(navigator.userAgent)?"Mac":"";
   const b=LOCAL_CFG.backend||"ollama",m=b==="gemini"?"Gemini · "+(LOCAL_CFG.geminiModel||"gemini-3.6-flash"):b==="claude"?"Claude · "+(LOCAL_CFG.claudeModel||"claude-haiku-5-5"):(en?"Local AI · ":"本地 AI · ")+LOCAL_CFG.model;
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
- {v:"0.10.32",d:"11/06 02:30",add:[],fix:[["Mac 和 Windows 不一樣：舊版本地 AI（qwen2.5，要另外裝看圖片工具）的電腦，安裝程式現在會建議升級成 Qwen 3.5，升級後自動刪掉舊模型和看圖片工具；App 也會提醒一次","Mac and Windows differed: computers on the old local AI (qwen2.5 with a separate picture tool) are now offered the Qwen 3.5 upgrade by the installer, which removes the old model and the picture tool; the app reminds you once too"],["安裝程式升級模型後，App 會自動改用新模型","After the installer upgrades the model, the app switches to it automatically"]]},
- {v:"0.10.31",d:"11/06 02:10",add:[],fix:[["天氣沒顯示：改成由 App 直接抓天氣資料，不必經過背景程序；網路位置判斷不到時，用電腦的時區先抓大概的城市","Weather not showing: the app now fetches weather itself without the background helper; if your internet location can’t be found, it uses your computer’s time zone for a rough city"]]},
- {v:"0.10.30",d:"11/06 02:05",add:[],fix:[["重新安裝後音樂還是說要重新安裝：舊的背景程序沒被關掉，現在打開 App 時會自動換成新的","After reinstalling, music still asked for a reinstall: the old background helper kept running; the app now replaces it automatically when it opens"]]},
  {v:"0.10.29",d:"11/06 01:35",add:[["她醒著的時候會主動找你說話：依天氣關心你、問你在做什麼、接續剛剛聊的事、說說你在聽的歌（設定 → 小工具可以關掉）","While awake she speaks up now and then: caring about you because of the weather, asking what you’re doing, following up on what you talked about, or commenting on your song (turn it off in Settings → Widgets)"],["睡著時，她說話的泡泡會顯示 Zzz…","While she sleeps, her speech bubble shows Zzz…"],["10 分鐘沒動靜才會睡著（原本 5 分鐘）","She now falls asleep after 10 quiet minutes (was 5)"],["設定 → 外觀與音效：聊天區背景透明度五段，預設中間","Settings → Look & sound: five levels of chat-area see-through, the middle one by default"],["新手教學補完整：天氣、音樂、語音輸入、語音、記憶與資料、離開都有介紹","The guided tour now covers everything: weather, music, voice input, voice, memory & data and leaving"]],fix:[["Windows 的 Spotify 封面：電腦給不出封面時，改用歌名和歌手到 iTunes 找","Spotify cover on Windows: when the computer gives none, it’s found on iTunes by song and artist"]]},
  {v:"0.10.28",d:"11/06 01:20",add:[["天氣和 Spotify 移到上方橫條，在時鐘兩邊左右對稱；橫條加寬一點","Weather and Spotify moved to the top bar, mirrored on both sides of the clock; the bar is a little taller"],["設定分類打開後放著不動，一陣子會自己收起來（正在打字時不會）","Settings groups close by themselves after a while untouched (not while you’re typing)"],["更新紀錄可以折疊：只展開最新一版，較早的版本收在一起","The update log folds: only the newest version is open, older ones are tucked away"],["本地 AI 的思考秒數改成依你的電腦實測：量出這台電腦寫回答要多久，剩下的時間才拿來思考","Local AI thinking time now adapts to your computer: it measures how long this computer takes to write an answer and uses the rest to think"]],fix:[["Spotify 封面不顯示：Mac 改用安全連線載入封面，Windows 讀不到時會換方法再試幾次，還是沒有就到 Spotify 找","Spotify cover not showing: on Mac it now loads over a secure link; on Windows it retries another way, and falls back to Spotify’s page"],["拿掉音樂的音量調整和天氣、音樂的收合按鈕","Removed the music volume control and the fold buttons on weather and music"]]},
  {v:"0.10.27",d:"11/06 01:40",add:[["全介面加上流暢動畫：設定分類展開收合、彈出選單、開關、提示、送出和收到訊息、換邊、切換主題","Smooth animation everywhere: settings groups, pop-ups, switches, notices, sending and receiving messages, swapping sides and changing themes"],["角色旁邊顯示 Spotify 正在播的歌：方形封面、暫停、上下首、拖進度條、調音量，還有跟著節奏跳動的音樂條（App 版，免費帳號也能用）","What Spotify is playing, next to her: square cover, pause, previous/next, a draggable progress bar, volume and bars that move to the beat (desktop app; free accounts work)"],["對面顯示你所在地的天氣：溫度、體感、接下來幾小時的降雨機率，會提醒你帶傘；點一下她會跟你說","The weather where you are on the other side: temperature, feels-like and the next hours’ chance of rain, with an umbrella reminder — tap it and she tells you"],["她聊天時也知道現在的天氣和你在聽的歌","She now knows the weather and the song you’re playing when you chat"],["設定新增「小工具」：開關音樂和天氣、設定天氣地點","New Settings → Widgets: turn music and weather on or off and set the weather location"],["自動清理舊版本留下、用不到的檔案（不會動到聊天和記憶）","Automatically removes leftovers from older versions (chats and memory are never touched)"]],fix:[["不再在資料夾裡另外寫一份對話副本","No more extra copies of chats written into the folder"]]},
@@ -2915,9 +2853,9 @@ const CHANGELOG=[
  {v:"0.8",d:"11/04",add:[["編輯／刪除自己的訊息、中英文介面、滑過特效與音效、版本資訊","Edit/delete your messages, Chinese/English UI, hover effects and sounds, version info"],["多個對話、無痕模式、音量滑桿、電量、自訂顏色、12 種表情","Multiple chats, incognito, volume slider, battery, custom colours, 12 expressions"]],fix:[]},
 ];
 function aboutHelp(){
-  const en=isEN(),web=typeof LOCAL_CFG==="undefined"||!!window.GH_MODE,path=esc(deskPath()||(en?"Documents/Companion":"文件/Companion"));
+  const en=isEN(),web=typeof LOCAL_CFG==="undefined",path=esc(deskPath()||(en?"Documents/Companion":"文件/Companion"));
   const ver=`<span class="about-ver">${APP_STAGE} ${APP_VER} · ${APP_BUILD}<br>${esc(edition(en))}</span>`+(typeof updateBlock==="function"?updateBlock(en):"");
-  let notes=en?(web?[
+  const notes=en?(web?[
     "Chats and memory are stored in your own Claude account and only you can see them. The web and desktop versions keep separate memories.",
     "The web version can't search the internet and can't use the microphone directly — use your keyboard's or system's voice typing.",
     "Her answers are AI-generated and can be wrong. Double-check anything important (health, money, legal).",
@@ -2939,8 +2877,6 @@ function aboutHelp(){
     "本地 AI 比較小，可能會答錯；上網查到的資料會附來源，重要的事請自己點進去確認。",
     "解除安裝：到「設定 → 解除安裝 App」，可以選要不要一起刪掉記憶資料夾和聊天模型。",
     "角色圖和聲音請使用你自己做的或有授權的，不要用模仿真實人物的聲音；要唸的文字會傳給 Fish Audio 處理。"]);
-  if(window.GH_MODE)notes=en?["Chats and memory are saved in this browser. Sign in with Google (Settings → Account) to keep a copy in your own Google Drive and pick up on any phone or computer; otherwise clearing browser data starts empty.","Your Gemini key is kept in this browser (and in your own Google Drive if you sign in), and is sent only to Google. On the free tier Google may use the chats to improve its products — don’t share anything private.","Her answers are AI-generated and can be wrong. Double-check anything important (health, money, legal).","No web search or voice here — the desktop app has those (Get App tab)."]
-    :["對話和記憶存在這個瀏覽器裡。到「設定 → ACCOUNT」用 Google 登入，就會另外存一份到你自己的 Google 雲端硬碟，換手機、換電腦登入都能接著聊；沒登入的話，清除瀏覽器資料就會是空的。","你的 Gemini 金鑰存在這個瀏覽器（有登入的話也會存在你自己的雲端），只會送到 Google。免費方案的對話內容 Google 可能拿去改進產品，私密的事不要講。","她的回答是 AI 產生的，可能會出錯；健康、金錢、法律這類重要的事請自己再確認。","這個網頁版不能上網查資料、沒有語音；電腦版 App 有（看「下載 App」分頁）。"];
   const F=en?[
     ["Chat & memory",["Remembers every conversation and file for good, and you can search all of it","Saves key points about you by itself — add, edit or delete them in Memory","Multiple chats, incognito mode, edit or delete your own messages"]],
     ["Files",["Send images, PDF, Word, Excel and text files — she reads them and can look things up later"]],
@@ -3075,26 +3011,22 @@ async function openModelPop(){
      :`<div class="mp-h">${en?"SPEED":"回答速度"}</div><div class="mp-note mp-why">${thinkNote(en)}</div>`;}
   if(typeof LOCAL_CFG!=="undefined"){
     const b=LOCAL_CFG.backend||"ollama";
-    let names=[];if(!window.GH_MODE)try{const r=await ollamaCheck();names=r.ok?r.names:[]}catch(e){}
+    let names=[];try{const r=await ollamaCheck();names=r.ok?r.names:[]}catch(e){}
     let gk={},ck={};try{gk=await (await fetch("/secret?p=gemini",{headers:{"X-M01":"1"}})).json()}catch(e){}try{ck=await (await fetch("/secret",{headers:{"X-M01":"1"}})).json()}catch(e){}
     const item=(be,id,name,desc,ok)=>{const cur=b===be&&(be==="ollama"?LOCAL_CFG.model===id:be==="gemini"?(LOCAL_CFG.geminiModel||"gemini-3.6-flash")===id:(LOCAL_CFG.claudeModel||"claude-haiku-5-5")===id);
       return `<button class="mp-i" data-be="${be}" data-id="${esc(id)}"${ok?"":" disabled"}><i class="ck">${cur?"✓":""}</i><span>${esc(name)}<small>${esc(desc)}</small></span></button>`};
     h+=`<div class="mp-h">${en?"MODEL":"模型"}</div>`;
-    if(!window.GH_MODE){
     h+=`<div class="mp-g">${en?"Local AI (free, offline)":"本地 AI（免費、不用網路）"}</div>`;
     const loc=[...new Set([LOCAL_CFG.model,...names.filter(n=>!/embed/i.test(n))])];
     h+=loc.map(n=>item("ollama",n,n,names.includes(n)?(en?"Installed on this computer":"已裝在這台電腦"):(en?"Not downloaded yet":"還沒下載"),names.includes(n))).join("");
-    }
     h+=`<div class="mp-g">Gemini ${gk.has?"":`<small style="color:var(--dim);font-weight:400">${en?"· no key yet":"· 還沒設定金鑰"}</small>`}</div>`;
     const av=gk.has?(LOCAL_CFG.gemAvail||{}):{};
     h+=`<div class="mp-note">${en?"Availability is tested with your own API key (Google AI Plus/Pro subscriptions are for the Gemini app, not API keys).":"能不能用，是用你的 API 金鑰實際測出來的（Google AI Plus／Pro 訂閱是給 Gemini App 用的，不影響 API）。"} <a href="#" id="mpRecheck">${en?"Re-check":"重新檢查"}</a></div>`;
     h+=GEMINI_MODELS.map(m=>{const a=av[m[0]];const tag=!gk.has?"":!a?(en?" · not checked yet":" · 還沒檢查"):a.ok===false?(en?" · ✗ not available on your plan":" · ✗ 你的方案目前不能用"):a.busy?(en?" · ✓ available (quota busy right now)":" · ✓ 可以用（目前額度暫時滿）"):(en?" · ✓ available with your key":" · ✓ 你的金鑰可以用");
       return item("gemini",m[0],m[1],(en?m[3]:m[2])+tag,!!gk.has&&!(a&&a.ok===false))}).join("");
-    if(!window.GH_MODE){
     h+=`<div class="mp-g">Claude ${ck.has?"":`<small style="color:var(--dim);font-weight:400">${en?"· no key yet":"· 還沒設定金鑰"}</small>`}</div>`;
     h+=CLAUDE_MODELS.map(m=>item("claude",m[0],m[1],en?m[3]:m[2],!!ck.has)).join("");
-    }
-    if(window.GH_MODE?!gk.has:(!gk.has||!ck.has))h+=`<button class="mp-link" id="mpKeys">${en?"Add an API key in Settings → AI →":"到「設定 → AI」貼上 API 金鑰 →"}</button>`;
+    if(!gk.has||!ck.has)h+=`<button class="mp-link" id="mpKeys">${en?"Add an API key in Settings → AI →":"到「設定 → AI」貼上 API 金鑰 →"}</button>`;
   }
 
   pop.innerHTML=h;pop.hidden=false;chip.setAttribute("aria-expanded","true");
@@ -3125,7 +3057,7 @@ try{paintModelChip()}catch(e){}
 
 /* ---------- one-time guided tour ---------- */
 function tourSteps(){
-  const en=isEN(),app=typeof LOCAL_CFG!=="undefined"&&!window.GH_MODE;
+  const en=isEN(),app=typeof LOCAL_CFG!=="undefined";
   // [where, title, text, tab to open first, settings group to open]
   const T=[
     [".composer .box",en?"Chat":"聊天",en?"Type here to talk to her. Enter sends, Shift+Enter starts a new line. The paperclip on the left sends pictures and files (PDF, Word, Excel, code…) and she reads them — you can also drag files in. To ask about something from before, just ask; she looks through her memory.":"在這裡打字跟她聊天：Enter 送出、Shift+Enter 換行。左邊的迴紋針可以傳圖片和檔案（PDF、Word、Excel、程式碼…），她會讀內容；也可以直接把檔案拖進來。想問以前聊過的事，直接問就好，她會去翻記憶。","chat"],
@@ -3198,7 +3130,7 @@ addEventListener("keydown",e=>{if($("tour").hidden)return;if(e.key==="Escape"){e
 function maybeTour(){
   let done=!!S.settings.tourDone;try{done=done||localStorage.getItem("m01.tourDone")==="1"}catch(e){}
   if(done)return;
-  const wait=()=>{if(($("ghKey")&&!$("ghKey").hidden)||!$("setupPop").hidden||(typeof aiPickPending!=="undefined"&&aiPickPending)||($("aiPick")&&!$("aiPick").hidden)){setTimeout(wait,600);return}startTour()};setTimeout(wait,700);
+  const wait=()=>{if(!$("setupPop").hidden||(typeof aiPickPending!=="undefined"&&aiPickPending)||($("aiPick")&&!$("aiPick").hidden)){setTimeout(wait,600);return}startTour()};setTimeout(wait,700);
 }
 
 /* ---------- hover: selection frame + soft tick ---------- */
@@ -3827,7 +3759,6 @@ function bootChime(){
 let booting=false;
 let appStarted=false;
 async function prepareStorage(){
-  if(window.GH_MODE){window.__ACTIVE_DB=window.__idbDB;return "idb"}
   if(/^https?:/.test(location.protocol)){
     for(let i=0;i<30;i++){let pg=null;try{pg=await serverFS.ping()}catch(e){}if(pg)return useServer(pg);if(i===2)$("spLog").textContent="CONNECTING…";await new Promise(r=>setTimeout(r,500))}
     const sp=$("splash");sp.classList.add("asking");const f=$("spFolder");f.hidden=false;
@@ -4426,27 +4357,19 @@ details.cl>summary{cursor:pointer}
     const drops=[15,24,33].map(x=>`<line class="drop" x1="${x}" y1="28" x2="${x-2}" y2="34" stroke="#5AA9FF" stroke-width="2.4" stroke-linecap="round"/>`).join("");
     if(k==="storm")return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(5,3,"#7E8796")}<path class="bolt" d="M25 24l-6 10h5l-3 9 9-12h-5l3-7z" fill="#FFD23D"/>${drops}</svg>`;
     return`<svg class="wx-ico" viewBox="0 0 48 48">${cloud(5,3,"#AEB6C3")}${drops}</svg>`}
-  /* weather data straight from the page first (works even with an older background helper), then through the helper */
-  async function wxJSON(u){
-    try{const ac=new AbortController();const t=setTimeout(()=>ac.abort(),7000);const r=await fetch(u,{signal:ac.signal,cache:"no-store"});clearTimeout(t);if(r.ok){const j=await r.json();if(j&&!j.error)return j}}catch(e){}
-    try{const j=await getJSON(u);if(j&&!j.error)return j}catch(e){}
-    return null}
   let WX=null,wxBusy=false,wxTimer=null;
   try{WX=JSON.parse(localStorage.getItem("m01.wx")||"null")}catch(e){}
   async function locate(){
     const w=W();
     if(w.city){const name=w.city.trim().replace(/臺/g,"台");const k=Object.keys(TW_CITIES).find(c=>name.includes(c));if(k)return{lat:TW_CITIES[k][0],lon:TW_CITIES[k][1],name:k,how:"city"};
-      const g=await wxJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=${E()?"en":"zh"}&format=json`).catch(()=>null);
+      const g=await getJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=${E()?"en":"zh"}&format=json`).catch(()=>null);
       if(g&&g.results&&g.results[0]){const x=g.results[0];return{lat:x.latitude,lon:x.longitude,name:x.name,how:"city"}}return{error:"city"}}
     if(w.precise&&navigator.geolocation){const p=await new Promise(ok=>{try{navigator.geolocation.getCurrentPosition(x=>ok(x),()=>ok(null),{timeout:9000,maximumAge:30*60e3})}catch(e){ok(null)}});
       if(p){const lat=+p.coords.latitude.toFixed(3),lon=+p.coords.longitude.toFixed(3);let name="";
-        const r=await wxJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${E()?"en":"zh"}`).catch(()=>null);
+        const r=await getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${E()?"en":"zh"}`).catch(()=>null);
         if(r)name=r.city||r.locality||r.principalSubdivision||"";return{lat,lon,name:window.__toTrad&&!E()?window.__toTrad(name):name,how:"gps"}}}
-    const ip=await wxJSON("https://get.geojs.io/v1/ip/geo.json").catch(()=>null);
+    const ip=await getJSON("https://get.geojs.io/v1/ip/geo.json").catch(()=>null);
     if(ip&&ip.latitude){return{lat:+(+ip.latitude).toFixed(3),lon:+(+ip.longitude).toFixed(3),name:ip.city||ip.region||ip.country||"",how:"ip"}}
-    let tz="";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}
-    const TZ={"Asia/Taipei":[25.033,121.5654,"台北","Taipei"],"Asia/Tokyo":[35.68,139.69,"東京","Tokyo"],"Asia/Hong_Kong":[22.32,114.17,"香港","Hong Kong"],"Asia/Shanghai":[31.23,121.47,"上海","Shanghai"],"Asia/Singapore":[1.35,103.82,"新加坡","Singapore"],"Asia/Seoul":[37.57,126.98,"首爾","Seoul"],"America/Los_Angeles":[34.05,-118.24,"洛杉磯","Los Angeles"],"America/New_York":[40.71,-74.01,"紐約","New York"],"Europe/London":[51.51,-0.13,"倫敦","London"]};
-    if(TZ[tz])return{lat:TZ[tz][0],lon:TZ[tz][1],name:E()?TZ[tz][3]:TZ[tz][2],how:"ip"};
     return{error:"loc"}}
   async function loadWx(force){
     clearTimeout(wxTimer);if(!W().wx){paintWx();return}
@@ -4454,7 +4377,7 @@ details.cl>summary{cursor:pointer}
     if(wxBusy)return;wxBusy=true;
     try{const L=await locate();
       if(L.error){WX=Object.assign(WX||{},{err:L.error});}
-      else{const f=await wxJSON(`https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`).catch(()=>null);
+      else{const f=await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`).catch(()=>null);
         if(f&&f.current&&f.daily){const hrs=[];const ht=f.hourly&&f.hourly.time||[];
           const i0=Math.max(0,ht.findIndex(t=>new Date(t)>=new Date(f.current.time.slice(0,13)+":00")));
           for(let i=i0;i<i0+8&&i<ht.length;i++)hrs.push({h:+ht[i].slice(11,13),p:f.hourly.precipitation_probability[i]||0});
@@ -4613,118 +4536,14 @@ details.cl>summary{cursor:pointer}
     box.querySelectorAll("button").forEach(b=>b.onclick=()=>{const n=+b.dataset.n;S.settings.chatA=n;applyCA(n);saveSettingsQuiet();try{playSfx("press",.35)}catch(e){}});
     applyCA(S.settings.chatA||localStorage.getItem("m01.chatA")||3)}
 
-  /* ---------- local AI: keep Mac and Windows the same ----------
-     If the chosen model is gone but a Qwen 3.5 model is installed (for example the installer just upgraded it), use that one.
-     When the chat model sees pictures by itself, an old separate picture tool is no longer needed and is removed.
-     Still on an old model? Suggest the upgrade once per version. */
-  async function tidyLocalAI(){
-    try{if(!desk()||typeof LOCAL_CFG==="undefined"||(LOCAL_CFG.backend||"ollama")!=="ollama"||typeof ollamaCheck!=="function")return;
-      const c=await ollamaCheck();if(!c||!c.ok)return;const names=c.names||[],en=E();
-      const q35=names.filter(n=>/^qwen3\.5:(4b|9b|27b)$/.test(n));
-      if(!c.hasModel&&q35.length){let rec="";try{const d=await deviceInfo();const r=recommendModel(d);rec=r&&r.model||""}catch(e){}
-        const pick=q35.includes(rec)?rec:["qwen3.5:9b","qwen3.5:4b","qwen3.5:27b"].find(x=>q35.includes(x));
-        LOCAL_CFG.model=pick;saveLocalCfg();try{paintModelChip()}catch(e){}toast(en?`Local AI is now ${pick}.`:`本地 AI 已改用 ${pick}。`,4000)}
-      if(typeof chatSeesPictures==="function"&&chatSeesPictures(LOCAL_CFG.model)){
-        const tools=names.filter(n=>typeof isVisionModel==="function"&&isVisionModel(n));
-        for(const t of tools){try{await fetch(LOCAL_CFG.url.replace(/\/$/,"")+"/api/delete",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:t})})}catch(e){}}
-        if(LOCAL_CFG.vision){LOCAL_CFG.vision="";saveLocalCfg()}}
-      else if(!q35.length&&/^qwen2\.5/i.test(LOCAL_CFG.model||"")){
-        const k="m01.upgradeHint";let last="";try{last=localStorage.getItem(k)||""}catch(e){}
-        if(last!==APP_VER){try{localStorage.setItem(k,APP_VER)}catch(e){}
-          setTimeout(()=>toast(en?`Your local AI (${LOCAL_CFG.model}) is the old one and can’t see pictures by itself. Settings → AI model: switch to Qwen 3.5 (the old one is removed for you).`:`你的本地 AI（${LOCAL_CFG.model}）是舊版，自己看不懂圖片。建議到「設定 → AI 模型」換成 Qwen 3.5，舊的會自動刪掉。`,9000),3500)}}
-    }catch(e){console.warn("tidy local AI",e)}}
-
   /* ---------- start once the app is ready ---------- */
   function paintAll(){paintCA();paintSet();paintMusic();paintWx();paintClean();fit()}
   if(typeof window.applyLang==="function"){const o=window.applyLang;window.applyLang=function(){const r=o.apply(this,arguments);try{paintAll()}catch(e){}return r}}
   let started=false;
-  (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);setTimeout(tidyLocalAI,4000);return}setTimeout(wait,400)})();
+  (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);return}setTimeout(wait,400)})();
   window.__x27={poll,loadWx,paintAll,cleanUp,fit,state:()=>({M,WX,needHelper})};
 })();
 </script>
 <!--/x27-->
-<script>
-/* ===== GitHub edition: page pieces ===== */
-(function(){
-  if(!window.GH_MODE)return;
-  const en=()=>isEN();
-  // hide the desktop-only settings (voice, memory folder, other AI sources)
-  const secs=[...document.querySelectorAll("#pSet .sec")];
-  const hideFrom=(label,stops)=>{const s=secs.find(x=>x.textContent.trim().startsWith(label));if(!s)return;let n=s;
-    while(n){if(n!==s&&n.classList&&n.classList.contains("sec")&&stops.some(u=>n.textContent.trim().startsWith(u)))break;const nx=n.nextElementSibling;n.hidden=true;n.style.display="none";n=nx}};
-  ["g_voice","folderSub"].forEach(id=>{const e=document.getElementById(id);if(e){e.hidden=true;e.style.display="none"}});
-  {const d=document.querySelector("#g_data .sg-t small");if(d)d.textContent="備份、還原";}
-  try{[...$("aiBackend").options].forEach(o=>{if(o.value!=="gemini")o.remove()})}catch(e){}
-  {const lab=document.querySelector('label[for="aiBackend"]');if(lab){lab.hidden=true;lab.style.display="none"}}
-  const aiHelp=document.querySelector('#pSet .help[data-help="localai"]');if(aiHelp)aiHelp.dataset.help="ghai";
-  HELP.ghai=["Gemini 金鑰","<ol><li>用 Google 帳號打開 <a href=\"https://aistudio.google.com/apikey\">aistudio.google.com/apikey</a>，按 Create API key。</li><li>複製金鑰，貼到下面的欄位，會自動儲存並測試。</li><li>免費額度每分鐘、每天有上限，用完等一下就會恢復。</li><li>金鑰只存在這個瀏覽器，只會送到 Google。</li></ol>"];
-  HELP_EN.ghai=["Gemini key","<ol><li>Open <a href=\"https://aistudio.google.com/apikey\">aistudio.google.com/apikey</a> with a Google account and press Create API key.</li><li>Copy it and paste it below — it saves and tests automatically.</li><li>The free tier has per-minute and per-day limits; wait a bit and it recovers.</li><li>The key stays in this browser and is only sent to Google.</li></ol>"];
-  const paintNotes=()=>{
-    const gb=$("geminiBox");const p=gb&&gb.querySelector("p.note");
-    if(p)p.innerHTML=en()?'Get a free key at <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> with a Google account and paste it below — it saves and tests automatically. The free tier has per-minute and per-day limits. The key stays only in this browser and is sent only to Google; on the free tier Google may use chats to improve its products.'
-      :'用 Google 帳號到 <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> 免費建立金鑰，貼到下面就會自動儲存並測試。免費額度每分鐘、每天有次數上限，用完等一下就會恢復。金鑰只存在這個瀏覽器裡，只會送到 Google；免費方案的對話內容 Google 可能會拿去改進產品。';
-    const dn=[...document.querySelectorAll("#pSet .note")].find(x=>/記憶資料夾裡|存在這台裝置裡|memory folder above|saved on this device/i.test(x.textContent)||x.dataset.ghData);
-    if(dn){dn.dataset.ghData="1";dn.textContent=en()?"Chats, memory and character images are saved in this browser only. Download a backup now and then — clearing browser data or switching phones starts empty. A backup can be imported into the desktop app too.":"對話、記憶和角色圖只存在這個瀏覽器裡。記得偶爾下載備份：清除瀏覽器資料或換手機，就會是空的。備份檔也可以匯入電腦版 App。"}
-  };
-  // download page
-  const BASE="downloads/";
-  window.renderGhDl=()=>{const E=en(),p=$("pDl");if(!p)return;
-    p.innerHTML=`<div class="sec">DOWNLOAD</div>
-    <p class="note">${E?"This web version runs on your own free Gemini key and keeps memory in this browser. The desktop app can also run a free local AI (works offline), look things up on the web, read replies aloud and save memory to a folder on your computer.":"這個網頁版用你自己的免費 Gemini 金鑰，記憶存在這個瀏覽器裡。電腦版 App 還可以用免費的本地 AI（不用網路）、上網查資料、用語音唸出回覆，記憶存在你電腦的資料夾。"}</p>
-    <table class="gh-cmp"><thead><tr><th></th><th>${E?"This web version":"這個網頁版"}</th><th>${E?"Desktop app":"電腦版 App"}</th></tr></thead><tbody>
-    <tr><th>${E?"AI":"AI"}</th><td>Gemini</td><td>${E?"Local AI (free), Gemini or Claude":"本地 AI（免費）、Gemini 或 Claude"}</td></tr>
-    <tr><th>${E?"Web search":"上網查資料"}</th><td class="n">✗</td><td class="y">✓</td></tr>
-    <tr><th>${E?"Voice":"語音朗讀"}</th><td class="n">✗</td><td class="y">✓ Fish Audio</td></tr>
-    <tr><th>${E?"Memory":"記憶存在哪"}</th><td>${E?"This browser":"這個瀏覽器"}</td><td>${E?"A folder on your computer":"電腦裡的資料夾"}</td></tr>
-    <tr><th>${E?"Phone":"手機"}</th><td class="y">✓</td><td class="n">✗</td></tr></tbody></table>
-    <div class="dl-card"><div class="dl-head"><b>Mac</b><span>${E?"Optional local AI (needs Ollama, 16GB memory recommended) — or just Gemini / Claude":"可選本地 AI（要裝 Ollama、建議 16GB 記憶體）或只用 Gemini／Claude"}</span></div>
-      <a class="pbtn dl-btn" href="${BASE}M-01-Companion-Mac.zip" download>${E?"Download for Mac":"下載 Mac 版"}</a>
-      <ol>${E?'<li>(Only for the local AI) install Ollama from <a href="https://ollama.com/download">ollama.com/download</a>.</li><li>Unzip the download.</li><li>Open Terminal, type <code>bash</code> and a space, drag in “安裝 M-01 Companion.command”, press Enter.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB), 3 = no local AI (Gemini / Claude only).</li>':'<li>（想用本地 AI 才需要）先到 <a href="https://ollama.com/download">ollama.com/download</a> 安裝 Ollama。</li><li>解壓縮下載的 zip。</li><li>打開「終端機」，輸入 <code>bash</code> 加一個空格，把「安裝 M-01 Companion.command」拖進去，按 Enter。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB），3 = 不要本地 AI（只用 Gemini／Claude）。</li>'}</ol>
-      <details><summary>${E?"Troubleshooting":"遇到問題怎麼辦"}</summary><ul>${E?"<li>“Developer cannot be verified”: don’t double-click — use Terminal as in step 3.</li><li>“先看我.txt” in the zip has the full guide.</li>":"<li>出現「無法驗證開發者」：不要點兩下，照第 3 步用終端機執行。</li><li>zip 裡的「先看我.txt」有完整說明。</li>"}</ul></details></div>
-    <div class="dl-card"><div class="dl-head"><b>Windows</b><span>${E?"Optional local AI (needs Ollama, 16GB memory recommended) — or just Gemini / Claude":"可選本地 AI（要裝 Ollama、建議 16GB 記憶體）或只用 Gemini／Claude"}</span></div>
-      <a class="pbtn dl-btn" href="${BASE}M-01-Companion-Windows.zip" download>${E?"Download for Windows":"下載 Windows 版"}</a>
-      <ol>${E?'<li>(Only for the local AI) install Ollama from <a href="https://ollama.com/download/windows">ollama.com/download/windows</a>.</li><li>Right-click the zip → “Extract All”.</li><li>Double-click “install.bat”. If “Windows protected your PC” appears, click “More info” → “Run anyway”.</li><li>Pick a model when asked: 1 = standard (~4.7GB, recommended), 2 = light (~1.9GB), 3 = no local AI (Gemini / Claude only).</li>':'<li>（想用本地 AI 才需要）先到 <a href="https://ollama.com/download/windows">ollama.com/download/windows</a> 安裝 Ollama。</li><li>在 zip 上按右鍵 →「全部解壓縮」。</li><li>按兩下「install.bat」。出現「Windows 已保護您的電腦」時，按「其他資訊」→「仍要執行」。</li><li>安裝時會問要哪個模型：1 = 標準版（約 4.7GB，建議），2 = 輕量版（約 1.9GB），3 = 不要本地 AI（只用 Gemini／Claude）。</li>'}</ol>
-      <details><summary>${E?"Troubleshooting":"遇到問題怎麼辦"}</summary><ul>${E?"<li>install.bat flashes and closes: Shift + right-click in the folder → “Open PowerShell here”, run <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>.</li><li>“先看我.txt” in the zip has the full guide.</li>":"<li>install.bat 一閃就消失：在資料夾按住 Shift 再按右鍵 →「在這裡開啟 PowerShell」，執行 <code>powershell -ExecutionPolicy Bypass -File .\\install.ps1</code>。</li><li>zip 裡的「先看我.txt」有完整說明。</li>"}</ul></details></div>
-    <div class="dl-card"><div class="dl-head"><b>${E?"Sample character":"範例角色圖"}</b><span>${E?"12 expressions · transparent PNG · about 15MB":"12 種表情 · 去背 PNG · 約 15MB"}</span></div>
-      <a class="pbtn dl-btn" href="${BASE}M-01-sample-character.zip" download>${E?"Download sample character":"下載範例角色圖"}</a>
-      <p class="note" style="margin:0">${E?"For the desktop app: in Settings press “Use the sample character”, or pick this zip with “Add many pictures or a zip”. In this web version just press “Use the sample character” in Settings. Inspired by the community’s “Claude-chan” fan personification; made with AI.":"電腦版可以在「設定」按「套用範例角色」，或用「一次放多張圖片或 zip」直接選這個 zip。網頁版直接在「設定」按「套用範例角色」就好。角色靈感來自社群的 Claude娘 二創形象，用 AI 製作。"}</p></div>
-    <p class="note">${E?"Phones: add this page to your Home Screen (Share → Add to Home Screen) to open it like an app.":"手機：把這個網頁「加到主畫面」，就能像 App 一樣打開。"}</p>`;
-  };
-  // first-run key screen
-  const box=document.createElement("div");box.id="ghKey";box.hidden=true;box.dataset.i18n="none";document.body.appendChild(box);
-  let skipped=false;
-  window.showGhKey=force=>{if(skipped&&!force)return;const E=en();
-    box.innerHTML=`<div class="g-card" role="dialog" aria-modal="true"><div class="g-tag">SETUP</div><h2>${E?"Add your free Gemini key":"先設定免費的 Gemini 金鑰"}</h2>
-      <p>${E?"She answers using your own Gemini key — it’s free and takes about two minutes:":"她是用你自己的 Gemini 金鑰回答的，免費，大約兩分鐘就好："}</p>
-      <ol><li>${E?'Open <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> and sign in with Google.':'打開 <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a>，用 Google 帳號登入。'}</li><li>${E?"Press <b>Create API key</b> and copy it.":"按 <b>Create API key</b>，複製金鑰。"}</li><li>${E?"Paste it here:":"貼到這裡："}</li></ol>
-      <input id="ghKeyIn" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…">
-      <p class="g-msg" id="ghKeyMsg"></p>
-      <div class="g-acts"><button class="g-main" id="ghKeySave">${E?"Save and start":"儲存並開始"}</button><a class="g-sub" href="https://aistudio.google.com/apikey">${E?"Open Google AI Studio →":"打開 Google AI Studio →"}</a><button class="g-skip" id="ghKeySkip">${E?"Just look around for now":"先隨便看看"}</button></div>
-      <p class="g-hint">${E?"The key stays only in this browser and is sent only to Google. On the free tier Google may use chats to improve its products — don’t share anything private.":"金鑰只存在這個瀏覽器，只會送到 Google。免費方案的對話內容 Google 可能拿去改進產品，私密的事不要講。"}</p></div>`;
-    box.hidden=false;
-    const inp=$("ghKeyIn"),msg=$("ghKeyMsg");
-    if(window.cloud&&!cloud.signedIn()){const gb=document.createElement("div");gb.className="g-acc";gb.innerHTML=`<p style="margin:0 0 8px">${E?"Used M-01 before (on another computer or phone)? Sign in with Google to bring your memories and key back.":"在別台電腦或手機用過 M-01？用 Google 登入，就能把記憶和金鑰帶回來。"}</p><button class="g-sub" id="ghGoogle" style="width:100%">${E?"Sign in with Google":"用 Google 登入"}</button>`;
-      box.querySelector(".g-card h2").insertAdjacentElement("afterend",gb);
-      $("ghGoogle").onclick=async()=>{box.hidden=true;await cloud.signIn();if(await needKey())showGhKey(true)}}
-    $("ghKeySkip").onclick=()=>{skipped=true;box.hidden=true;if(typeof maybeTour==="function")maybeTour()};
-    $("ghKeySave").onclick=async()=>{const k=inp.value.trim();if(!/^AIza[0-9A-Za-z_\-]{20,}$/.test(k)){msg.textContent=E?"That doesn’t look like a Gemini key (it starts with AIza).":"這看起來不像 Gemini 金鑰（應該是 AIza 開頭）。";return}
-      msg.textContent=E?"Checking your key…":"測試金鑰中…";$("ghKeySave").disabled=true;
-      await fetch("/secret?p=gemini",{method:"PUT",headers:{"X-M01":"1"},body:k});LOCAL_CFG.backend="gemini";saveLocalCfg();
-      let ok=false,why="";try{const r=await (await fetch("/gemini?model="+encodeURIComponent(LOCAL_CFG.geminiModel||"gemini-3.6-flash"),{method:"POST",headers:{"X-M01":"1","Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:"hi"}]}]})})).json();ok=r.status===200||r.status===429;why=r.status}catch(e){why=0}
-      $("ghKeySave").disabled=false;
-      if(!ok){msg.textContent=why===0?(E?"Can’t reach Google — check your connection and try again.":"連不到 Google，確認網路後再試一次。"):(E?"Google didn’t accept this key. Copy it again from AI Studio.":"Google 不接受這把金鑰，請到 AI Studio 重新複製一次。");return}
-      box.hidden=true;try{await probeGemini(true)}catch(e){}try{await checkAI();paintModelChip()}catch(e){}toast(E?"Gemini is ready!":"Gemini 設定好了！");if(typeof maybeTour==="function")maybeTour()};
-    inp.addEventListener("keydown",e=>{if(e.key==="Enter")$("ghKeySave").click()});
-  };
-  const needKey=async()=>{try{const j=await (await fetch("/secret?p=gemini")).json();return !j.has}catch(e){return true}};
-  // weather works here too (Open-Meteo allows browsers)
-  try{if(typeof TOOLS!=="undefined"&&typeof getWeather==="function"&&!TOOLS.some(t=>t.name==="get_weather"))TOOLS.push({name:"get_weather",description:"查某個地點現在的天氣和未來 3 天預報。對方問天氣、要不要帶傘、冷不冷時一定要先用這個工具，不要自己猜。台灣縣市直接用中文（例如：桃園、台北）；其他地方請用英文地名（例如 Tokyo）。",inputSchema:{type:"object",properties:{location:{type:"string"}},required:["location"]},execute:async({location})=>{showTool(`查天氣：${location}`);return await getWeather(String(location||""))}})}catch(e){}
-  paintNotes();renderGhDl();
-  const ob=new MutationObserver(()=>{});ob.observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
-  new MutationObserver(()=>{paintNotes();renderGhDl();if(!box.hidden)showGhKey(true)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
-  const wait=async()=>{if(!document.body.classList.contains("booted")){setTimeout(wait,500);return}if(await needKey())showGhKey(false)};
-  setTimeout(wait,1200);
-})();
-</script>
 </body>
 </html>
