@@ -1,7 +1,7 @@
 {
- "version": "1.4.2",
- "notes": "1.4.2：修正記憶標記少一個括號時沒被記住、還被唸出來的問題；極高畫質加上打光和紋理，光澤調柔和。安裝程式有更新，會在背景重新安裝。",
- "notes_en": "1.4.2: fixes memory markers with a missing bracket not being saved and being read aloud; Ultra quality gets lighting and texture with a softer sheen. The installer changed, so it reinstalls in the background.",
+ "version": "1.4.3",
+ "notes": "1.4.3：極高畫質重做，打光直接畫進角色圖，更有立體感，還會微微轉向滑鼠；修正換表情時留下黑色／藍色的手影和閃出黑灰色方格；她忘了記你說的新事情時會自動補記。",
+ "notes_en": "1.4.3: Ultra quality redone with lighting painted into the character for more depth, and she turns slightly toward your pointer; fixes a black/blue ghost hand and grey squares when her expression changed; new things you say about yourself are saved even if she forgets to note them.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",

@@ -645,17 +645,9 @@ body.kb .tabs{padding-top:4px}
   background:radial-gradient(closest-side,rgba(0,0,0,.75),rgba(0,0,0,.35) 55%,transparent);filter:blur(2px);opacity:0;transition:opacity .4s}
 /* a faint pool of light on the floor, so the dark contact shadow reads on dark themes too */
 .hshadow::before{content:"";position:absolute;inset:-60% -35%;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),.06) 60%,transparent);z-index:-1}
-.hlight,.hdust,.sheen,.hkey,.hshade,.htex{position:absolute;pointer-events:none;opacity:0;transition:opacity .5s}
+.hlight,.hdust{position:absolute;pointer-events:none;opacity:0;transition:opacity .5s}
 .hlight{left:50%;bottom:76px;width:min(70%,520px);aspect-ratio:1;transform:translate(-50%,18%);border-radius:50%;background:radial-gradient(closest-side,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),.07) 55%,transparent);filter:blur(10px)}
 .hdust{inset:8% 14% 76px}.hdust i{position:absolute;bottom:0;width:4px;height:4px;border-radius:50%;background:rgba(var(--accent-rgb),.9);box-shadow:0 0 8px rgba(var(--accent-rgb),.9);opacity:0}
-.sheen,.hkey,.hshade,.htex{inset:0;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:50% 100%;mask-position:50% 100%;
-}
-.sheen{background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.04) 42%,rgba(255,255,255,.11) 50%,rgba(255,255,255,.04) 58%,transparent 70%) no-repeat;background-size:300% 100%;background-position:120% 0}
-/* lighting: warm key light from the upper left plus a little floor bounce in the theme colour (colour-dodge keeps line art dark), cooler shade lower right */
-.hkey{mix-blend-mode:color-dodge;background:radial-gradient(110% 65% at 20% 6%,rgb(44,34,22),#000 62%);background:radial-gradient(110% 65% at 20% 6%,rgb(44,34,22),transparent 62%),radial-gradient(90% 28% at 50% 102%,color-mix(in srgb,rgb(var(--accent-rgb)) 24%,#000),transparent 70%),#000}
-.hshade{mix-blend-mode:multiply;background:linear-gradient(128deg,rgba(255,255,255,0) 48%,rgba(165,162,195,.42) 100%)}
-/* fine grain so flat colours look painted rather than flat */
-.htex{mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.4 -.2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px 180px}
 @media (max-width:820px){.hshadow{bottom:0}.hlight{bottom:0}.hdust{bottom:0}}
 /* low: as light as possible */
 html[data-gfx="low"] .sprite{animation:none!important}html[data-gfx="low"] #heroWrap.talking .sprite{animation:talkbob .36s ease-in-out infinite!important}
@@ -672,18 +664,17 @@ html[data-gfx="high"] .rig.shift,html[data-gfx="ultra"] .rig.shift{animation:idl
 @keyframes weightShift{0%,100%{translate:0 0;scale:1}40%{translate:4px 1px;scale:1.004 .996}70%{translate:-1px 0;scale:.998 1.002}}
 @keyframes shadowBreath{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(.95,.92);opacity:.7}}
 /* ultra: rim light, back light, drifting light motes, key lighting, fine grain, a soft sheen on the picture */
-html[data-gfx="ultra"] .sprite img.on{filter:drop-shadow(0 0 1.5px rgba(var(--accent-rgb),.6)) drop-shadow(0 0 10px rgba(var(--accent-rgb),.18)) drop-shadow(0 10px 18px rgba(0,0,0,.34))}
+html[data-gfx="ultra"] .sprite img.on{filter:drop-shadow(0 0 1px rgba(var(--accent-rgb),.5)) drop-shadow(0 0 14px rgba(var(--accent-rgb),.16)) drop-shadow(0 14px 20px rgba(0,0,0,.36))}
+/* lighting is baked into the pictures; perspective lets her turn slightly toward the pointer */
+html[data-gfx="ultra"] #heroWrap{perspective:1600px;perspective-origin:50% 40%}
 html[data-gfx="ultra"] .hshadow::before{background:radial-gradient(closest-side,rgba(var(--accent-rgb),.32),rgba(var(--accent-rgb),.09) 60%,transparent)}
 html[data-gfx="ultra"] .hlight{opacity:1;animation:backLight 6s ease-in-out infinite}
 html[data-gfx="ultra"] .hdust{opacity:1}html[data-gfx="ultra"] .hdust i{animation:dust 7s linear infinite}
-html[data-gfx="ultra"] .sheen{opacity:1;animation:sheen 12s ease-in-out infinite}
-html[data-gfx="ultra"] .hkey,html[data-gfx="ultra"] .hshade{opacity:1}html[data-gfx="ultra"] .htex{opacity:.3}
 @keyframes backLight{0%,100%{opacity:.75;transform:translate(-50%,18%) scale(1)}50%{opacity:1;transform:translate(-50%,18%) scale(1.05)}}
 @keyframes dust{0%{transform:translate(0,0);opacity:0}12%{opacity:.8}70%{opacity:.5}100%{transform:translate(var(--dx,10px),-260px);opacity:0}}
-@keyframes sheen{0%,62%{background-position:120% 0}86%,100%{background-position:-20% 0}}
 /* never move while the window rests, and honour "reduce motion" */
-html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust i,html.fx-idle .sheen,html.fx-sleep .rig{animation-play-state:paused!important}
-@media (prefers-reduced-motion:reduce){.rig,.hshadow,.hlight,.hdust i,.sheen{animation:none!important}}
+html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust i,html.fx-sleep .rig{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){.rig,.hshadow,.hlight,.hdust i{animation:none!important}}
 
 /* GitHub edition */
 #folderBtn,#unSec{display:none!important}
@@ -2310,7 +2301,8 @@ function rulesTurn0(userText){
 ${typeof WEB_OK!=="undefined"&&WEB_OK?"- 回答事實性問題（新聞、時事、價格、規定、數據、日期、人物或產品現況、你不確定的知識）時，先用 web_search 查證，需要細節再用 web_fetch 讀原文；問天氣一定用 get_weather。用自己的話簡短回答，不要整段照抄。回答最後另起一行寫「來源：」，只列出工具真的查到的網址。\n- 查不到或沒有網路時，要明說「我現在沒辦法查證」，並標出哪些內容不確定。":"- 你現在不能上網。回答事實性、可能過時的問題時，要提醒對方這是你記得的內容、可能已經過時。"}
 - 不確定就說不確定，寧可少說也不要說錯。
 
-當對方提到值得長期記住的新資訊（例如：個人背景、喜好與厭惡、重要的人、計畫、約定、重要事件、健康或生活上的注意事項），請在回覆的「最後一行」加上：[[記住：一句簡短的事實]]（前後都是兩個方括號，一定要用 ]] 結尾），可以有多行，每行一條。已經在重點記憶裡的不要重複。這些標記不會顯示給對方。${typeof followRules==="function"?followRules():""}
+當對方提到值得長期記住的新資訊（例如：個人背景、喜好與厭惡、重要的人、計畫、約定、重要事件、健康或生活上的注意事項），請在回覆的「最後一行」加上：[[記住：一句簡短的事實]]（前後都是兩個方括號，一定要用 ]] 結尾），可以有多行，每行一條。對方第一次說到的個人資訊（例如出生地、住哪、學校、生日、家人）一定要記。已經在重點記憶裡的不要重複。這些標記不會顯示給對方。
+對方告訴你關於自己的事時（例如「我是美國出生的」），先正確理解那句話本身的意思再回應，不要誤會成別的事。${typeof followRules==="function"?followRules():""}
 
 【回覆風格】
 - 預設用繁體中文（對方用其他語言時跟著對方）。
@@ -2457,13 +2449,57 @@ async function sendCore(ov){
   if(finalText){
     const emx=reply.match(EXP_RE),exK=emx?EXPR[emx[1].trim()]:null;
     const am={id:rid(),role:"assistant",text:finalText,t:Date.now(),saved,...(exK?{expr:exK}:{}),...(typeof slip!=="undefined"&&slip?{slip}:{})};
-    if(reply||note)addMsg(am);
-    th.appendChild(msgEl(am));scrollEnd();trimThread();
+    let amLog=null;if(reply||note)amLog=addMsg(am);
+    const amEl=msgEl(am);th.appendChild(amEl);scrollEnd();trimThread();
     speak(am.text,am.expr);
+    if(reply&&!note&&!S.incog&&typeof memCatch==="function")setTimeout(()=>memCatch(text,am,amLog,amEl),300);
   }
   S.busy=false;S.streaming=false;S.ctl=null;setBusyUI();updateStats();refreshMood();if(saved.length)flashMood("happy",1800);
   // file summaries after reply (one at a time)
   for(const a of att){const f=S.files.find(x=>x.id===a.fileId);if(f&&!f.summary&&(f.kind!=="image"||a.blob)&&!a.dupOf)await summarizeFile(f,a.preview||"",a.blob)}
+}
+/* ---------- memory safety net ----------
+   The chat model is asked to mark new facts with [[記住：…]], but it sometimes forgets (it once answered "I was born in
+   the US" without saving it). After each reply a quick second pass reads what the person said and saves anything new
+   about them that wasn't marked, so remembering never depends on the chat model alone. */
+const MEMCATCH_HINT=/[我咱俺]|\b(i|i'm|im|i've|i'd|my|me|mine|we|our|us)\b|生日|住在|喜歡|討厭|過敏|學校|上班|工作|家人|爸|媽|哥|姊|姐|弟|妹|朋友|男友|女友|老婆|老公|寵物|養/i;
+const memNorm=t=>String(t).toLowerCase().replace(/^(對方|他|她|they|the user)\s*/i,"").replace(/[\s，。、,.!！?？:：;；「」『』"'()（）\-]/g,"");
+let memCatchBusy=false;
+async function memCatch(userText,am,log,el){
+  userText=String(userText||"").trim();
+  if(memCatchBusy||!S.sample||S.incog||userText.length<3||!MEMCATCH_HINT.test(userText))return;
+  memCatchBusy=true;
+  try{
+    const en=isEN(),ms=curMsgs(),at=ms.indexOf(am);let prev="";
+    for(let j=(at<0?ms.length:at)-2;j>=0;j--)if(ms[j]&&ms[j].role==="assistant"){prev=visible(ms[j].text||"").slice(0,300);break}
+    const known=S.facts.slice(-120).map(f=>"- "+f.text).join("\n")||"（目前沒有）";
+    const now=(am.saved||[]).map(x=>"- "+x).join("\n");
+    const prompt=`你是記憶整理員，不是聊天對象，不要用角色的語氣。判斷「對方剛說的話」裡，有沒有值得長期記住、而且還沒記下來的新資訊。
+值得記：對方的背景（出生地、住哪、年紀、學校、工作）、喜好與厭惡、重要的人、寵物、計畫與約定、重要事件、健康或生活上的注意事項。
+不要記：問句、打招呼、閒聊、一時的狀態（要去睡、肚子餓、現在很累）、已經記住或意思相同的事、AI 說的話、你自己推測的事。
+只記對方明確說出的。每條寫成一句簡短的事實，用「對方」當主詞，${en?"用英文寫（主詞用 They）":"用繁體中文"}。
+
+已經記住的：
+${known}${now?"\n這次已經記下：\n"+now:""}
+
+${prev?"她上一句說："+prev+"\n":""}對方剛說的話：${userText.slice(0,1500)}
+
+有新的就一行一條（最多 3 條），前面不要加任何符號；沒有就只回「無」。`;
+    const r=await Promise.race([S.sample([{role:"user",content:prompt}],{modelTier:"quick",cache:false}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),40000))]);
+    const have=S.facts.map(f=>memNorm(f.text)).concat((am.saved||[]).map(memNorm));
+    const added=[];
+    for(let line of visible(String(r&&r.text||"")).split("\n")){
+      line=line.replace(/^[\s\-*•·>\d.、)）]+/,"").trim();if(!en)line=toTraditional(line);
+      if(!line||/^(無|没有|沒有|none|no)\b|^無[。.]?$/i.test(line)||/[?？]$/.test(line)||line.length<4||line.length>160)continue;
+      const n=memNorm(line);if(!n||have.some(h=>h&&(h===n||h.includes(n)||n.includes(h))))continue;
+      have.push(n);added.push(line);if(added.length>=3)break}
+    if(!added.length||S.incog)return;
+    for(const f of added)S.facts.push({id:rid(),text:f.slice(0,300),t:Date.now()});
+    saveFacts();renderFacts();updateStats();
+    am.saved=[...(am.saved||[]),...added];if(log)persistLog(log);
+    if(el&&el.isConnected)for(const f of added){const n=document.createElement("div");n.className="memnote";n.textContent="已記下："+f;el.appendChild(n)}
+  }catch(e){console.warn("memory catch",e)}
+  finally{memCatchBusy=false}
 }
 function setBusyUI(){
   if(S.busy&&!S.busySince)S.busySince=Date.now();if(!S.busy)S.busySince=0;
@@ -2592,7 +2628,7 @@ function renderStage(){
     const box=document.createElement("div");box.className="sprite";box.id="sprite";box.dataset.frame="idle";
     for(const [k] of SLOTS){if(!sp[k])continue;const im=document.createElement("img");im.dataset.k=k;im.alt=k==="idle"?"夥伴":"";im.src=srcOf(sp[k],k);
       im.onerror=()=>{if(im.dataset.f)return;im.dataset.f=1;if(sp[k].url)im.src=sp[k].url};box.appendChild(im)}
-    rig.appendChild(box);box.insertAdjacentHTML("beforeend",`<div class="hshade"></div><div class="hkey"></div><div class="htex"></div><div class="sheen"></div>`);w.appendChild(rig);setTimeout(()=>{try{paintSheen()}catch(e){}},50);
+    rig.appendChild(box);w.appendChild(rig);setTimeout(()=>{try{litApply()}catch(e){}},60);
     w.insertAdjacentHTML("beforeend",`<div class="thought">···</div><div class="sparks">${[[12,18],[82,14],[8,52],[88,46]].map(([x,y])=>`<span style="position:absolute;left:${x}%;top:${y}%">${SPARK}</span>`).join("")}</div>`);
   }
   applyMood();scheduleBlink();
@@ -2779,14 +2815,143 @@ function applyGfx(g){document.documentElement.dataset.gfx=g;const sel=$("gfxSel"
 function gfxNote(g){const en=isEN();return ({low:en?"Lightest: no breathing, shadows or background effects — best for older computers.":"最省資源：沒有呼吸、陰影和背景特效，適合比較舊的電腦。",
   medium:en?"Breathing and a soft shadow under her.":"會呼吸，腳下有柔和的陰影。",
   high:en?"She sways naturally and shifts her weight when idle, with a shadow that breathes with her and more depth.":"沒事時會自然晃動、偶爾換重心，陰影跟著呼吸，畫面更有立體感。",
-  ultra:en?"Everything in High, plus lighting, fine texture, a rim light, a soft back light, drifting light motes and a gentle sheen. Uses the most graphics power.":"高的全部效果，再加上打光、細緻紋理、輪廓光、背光、飄浮的光點和柔和的光澤。最吃顯示卡。"})[g]}
-// the sheen is masked to the character's own shape, so it follows the current picture
-function paintSheen(){const im=document.querySelector("#sprite img.on")||document.querySelector('#sprite img[data-k="idle"]');if(!im)return;
-  const u=`url("${String(im.currentSrc||im.src).replace(/"/g,"%22")}")`;document.querySelectorAll("#heroWrap .sheen,#heroWrap .hkey,#heroWrap .hshade,#heroWrap .htex").forEach(sh=>{if(sh.dataset.u!==u){sh.dataset.u=u;sh.style.webkitMaskImage=u;sh.style.maskImage=u}})}
+  ultra:en?"Everything in High, plus anime-style lighting painted into every picture (shadow side, warm key light, a rim light in the theme colour), a back light, drifting light motes, and she turns slightly toward your pointer. Uses the most graphics power.":"高的全部效果，再加上畫進每張圖裡的動畫風打光（暗部、暖色主光、主題色輪廓光）、背光、飄浮的光點，她還會微微轉向你的滑鼠，更有立體感。最吃顯示卡。"})[g]}
+// Ultra lighting is painted into each picture's own pixels (no layers on top), so it always matches the
+// expression on screen and can't flash: the old masked layers lagged behind expression changes and showed grey squares.
+function litPixels(p,W,H,acc){
+  const N=W*H,A=new Float32Array(N),INK=new Float32Array(N);
+  let x0=W,y0=H,x1=0,y1=0;
+  for(let y=0,i=0;y<H;y++)for(let x=0;x<W;x++,i++){const a=p[i*4+3]/255;A[i]=a;
+    if(a>.1){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+    const l=(.299*p[i*4]+.587*p[i*4+1]+.114*p[i*4+2])/255;INK[i]=a*Math.min(1,Math.max(0,(.36-l)/.2))}
+  if(x1<=x0||y1<=y0)return p;
+  const fh=y1-y0;
+  // half-resolution copies for the wide blurs (4x cheaper, invisible after blurring)
+  const W2=Math.ceil(W/2),H2=Math.ceil(H/2),N2=W2*H2,A2=new Float32Array(N2);
+  for(let y=0;y<H2;y++)for(let x=0;x<W2;x++){const X=Math.min(W-1,x*2),Y=Math.min(H-1,y*2);
+    A2[y*W2+x]=(A[Y*W+X]+A[Y*W+Math.min(W-1,X+1)]+A[Math.min(H-1,Y+1)*W+X]+A[Math.min(H-1,Y+1)*W+Math.min(W-1,X+1)])/4}
+  function blur(src,w,h,r){r=Math.max(1,r|0);const d=2*r+1,n=w*h,t=new Float32Array(n),o=new Float32Array(n);o.set(src);
+    for(let pass=0;pass<3;pass++){
+      for(let y=0;y<h;y++){const b=y*w;let s=0;for(let k=-r;k<=r;k++)s+=o[b+Math.min(w-1,Math.max(0,k))];
+        for(let x=0;x<w;x++){t[b+x]=s/d;s+=o[b+Math.min(w-1,x+r+1)]-o[b+Math.max(0,x-r)]}}
+      for(let x=0;x<w;x++){let s=0;for(let k=-r;k<=r;k++)s+=t[Math.min(h-1,Math.max(0,k))*w+x];
+        for(let y=0;y<h;y++){o[y*w+x]=s/d;s+=t[Math.min(h-1,y+r+1)*w+x]-t[Math.max(0,y-r)*w+x]}}}
+    return o}
+  const big2=blur(A2,W2,H2,fh*.02),mid2=blur(A2,W2,H2,fh*.0075);
+  const edge=blur(A,W,H,Math.max(2,fh*.0045)),ink=blur(INK,W,H,Math.max(1,fh*.0018));
+  const up=(m,x,y)=>{const fx=Math.min(W2-1.001,x/2),fy=Math.min(H2-1.001,y/2),ix=fx|0,iy=fy|0,ax=fx-ix,ay=fy-iy,i=iy*W2+ix;
+    return (m[i]*(1-ax)+m[i+1]*ax)*(1-ay)+(m[i+W2]*(1-ax)+m[i+W2+1]*ax)*ay};
+  // height field: broad dome over the body + local volume for hair locks, sleeves and folds
+  const Hh=new Float32Array(N);
+  for(let y=0,i=0;y<H;y++)for(let x=0;x<W;x++,i++)if(A[i]>.004)Hh[i]=Math.sqrt(up(big2,x,y))*.55+Math.sqrt(up(mid2,x,y))*.45;
+  const kN=fh*.013;
+  let L=[-.5,-.62,.6];{const n=Math.hypot(...L);L=L.map(v=>v/n)}      // key light: upper left, in front
+  const ar=acc[0]/255,ag=acc[1]/255,ab=acc[2]/255;
+  const ss=(a,b,v)=>{const t=Math.min(1,Math.max(0,(v-a)/(b-a)));return t*t*(3-2*t)};
+  for(let y=1;y<H-1;y++){const vy=Math.min(1,Math.max(0,(y-y0)/fh));
+   for(let x=1;x<W-1;x++){const i=y*W+x,a=A[i];if(a<.004)continue;
+    let nx=(Hh[i-1]-Hh[i+1])*kN,ny=(Hh[i-W]-Hh[i+W])*kN,nz=1;const nl=Math.hypot(nx,ny,nz);nx/=nl;ny/=nl;nz/=nl;
+    const dif=nx*L[0]+ny*L[1]+nz*L[2]-L[2];                       // >0 turned to the light, <0 away from it
+    const lineK=Math.max(INK[i],Math.min(1,ink[i]*1.4)),prot=1-lineK*.92;  // line art stays crisp and dark
+    let r=p[i*4]/255,g=p[i*4+1]/255,b=p[i*4+2]/255;
+    // cel shadow: a clean-edged shadow shape on the side away from the light, cool and a little purple
+    const cel=ss(.012,.05,-dif),soft=Math.min(1,Math.max(0,-dif)*2.2);
+    const sh=Math.min(.62,cel*.44+soft*.17+vy*vy*.07)*prot;
+    r*=1-sh*.32;g*=1-sh*.36;b*=1-sh*.16;
+    // ambient occlusion tucked against the line art
+    const ao=Math.max(0,ink[i]-INK[i])*.3*prot;r*=1-ao;g*=1-ao;b*=1-ao*.8;
+    // key light: warm, soft
+    const hi=Math.min(.2,ss(.0,.09,dif)*.2)*prot;
+    r=1-(1-r)*(1-hi);g=1-(1-g)*(1-hi*.88);b=1-(1-b)*(1-hi*.66);
+    // small specular glint
+    let rz=Math.max(0,2*(nx*L[0]+ny*L[1]+nz*L[2])*nz-L[2]);rz*=rz;rz*=rz;rz*=rz;rz*=rz;  // ^16
+    const spv=rz*.1*prot;r+=spv;g+=spv;b+=spv;
+    // rim light in the theme colour: a thin band just inside the silhouette on the right / lower edges
+    const ef=1-Math.min(1,edge[i]*1.15),facing=Math.max(0,nx*.9-ny*.2+.08);
+    const rim=Math.min(1,ss(.08,.42,ef)*facing*3.2)*.7*prot;
+    r=1-(1-r)*(1-rim*ar);g=1-(1-g)*(1-rim*ag);b=1-(1-b)*(1-rim*ab);
+    // floor bounce in the theme colour near her feet
+    const fb=ss(.84,1,vy)*Math.max(0,ny*2)*.35*prot;
+    r=1-(1-r)*(1-fb*ar);g=1-(1-g)*(1-fb*ag);b=1-(1-b)*(1-fb*ab);
+    p[i*4]=Math.min(255,r*255+.5);p[i*4+1]=Math.min(255,g*255+.5);p[i*4+2]=Math.min(255,b*255+.5);
+  }}
+  return p;
+}
+const LIT={map:new Map(),urls:new Set(),gen:0,t:0,worker:null,wfail:false,ak:""};
+function litAcc(){const v=getComputedStyle(document.documentElement).getPropertyValue("--accent-rgb").trim().split(/[\s,]+/).map(Number);return v.length>=3&&v.slice(0,3).every(n=>n>=0&&n<=255)?v.slice(0,3):[217,119,87]}
+function litKeyOf(src){src=String(src||"");return src.length+":"+src.slice(0,120)+src.slice(-120)}
+function litWorker(){if(LIT.worker||LIT.wfail)return LIT.worker;
+  try{const u=URL.createObjectURL(new Blob([litPixels.toString()+";onmessage=e=>{const d=e.data;try{const p=litPixels(d.p,d.w,d.h,d.acc);postMessage({id:d.id,p},[p.buffer])}catch(err){postMessage({id:d.id,err:String(err)})}}"],{type:"text/javascript"}));LIT.worker=new Worker(u)}catch(e){LIT.wfail=true}
+  return LIT.worker}
+// runs in a background thread when the page allows it, otherwise right here
+function litRun(p,w,h,acc){return new Promise((ok,no)=>{
+  const here=()=>{try{ok(litPixels(p,w,h,acc))}catch(e){no(e)}};const wk=litWorker();if(!wk)return here();
+  const id=Math.random();let done=false;
+  const fin=()=>{done=true;clearTimeout(t);wk.removeEventListener("message",on);wk.removeEventListener("error",bad)};
+  const bad=()=>{if(done)return;fin();LIT.wfail=true;LIT.worker=null;try{wk.terminate()}catch(e){}here()};
+  const on=e=>{if(!e.data||e.data.id!==id)return;fin();e.data.err?no(new Error(e.data.err)):ok(e.data.p)};
+  const t=setTimeout(bad,25000);wk.addEventListener("message",on);wk.addEventListener("error",bad);
+  try{wk.postMessage({id,p:p.slice(),w,h,acc})}catch(e){bad()}})}
+async function litMake(src,acc){
+  const im=new Image();im.decoding="async";
+  if(/^https?:/i.test(src)&&!src.startsWith(location.origin))im.crossOrigin="anonymous";
+  im.src=src;await im.decode();
+  const NW=im.naturalWidth,NH=im.naturalHeight;if(!NW||!NH)throw new Error("empty picture");
+  const sc=Math.min(1,1400/Math.max(NW,NH)),W=Math.max(1,Math.round(NW*sc)),H=Math.max(1,Math.round(NH*sc));
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const cx=cv.getContext("2d",{willReadFrequently:true});
+  cx.imageSmoothingQuality="high";cx.drawImage(im,0,0,W,H);
+  const id=cx.getImageData(0,0,W,H);                          // a picture from another site can't be read: keep the original
+  const out=await litRun(id.data,W,H,acc);id.data.set(out);cx.putImageData(id,0,0);
+  let blob=await new Promise(ok=>cv.toBlob(ok,"image/webp",.96));if(!blob||blob.type!=="image/webp")blob=await new Promise(ok=>cv.toBlob(ok,"image/png"));
+  if(!blob)throw new Error("encode");return URL.createObjectURL(blob)}
+function litSwap(im,url){return new Promise(ok=>{const t=new Image();t.src=url;(t.decode?t.decode():Promise.resolve()).catch(()=>{}).then(()=>{if(im.isConnected)im.src=url;ok()})})}
+async function litApplyNow(){
+  const box=$("sprite");const gen=++LIT.gen;if(!box)return;
+  const imgs=[...box.querySelectorAll("img")],want=document.documentElement.dataset.gfx==="ultra";
+  if(!want){imgs.forEach(im=>{if(im.dataset.o&&LIT.urls.has(im.src))im.src=im.dataset.o});return}
+  const acc=litAcc(),ak=acc.join(",");
+  const rank={idle:0,talk:1,blink:2},cur=box.querySelector("img.on");
+  imgs.sort((a,b)=>(a===cur?-1:b===cur?1:(rank[a.dataset.k]??3)-(rank[b.dataset.k]??3)));
+  const core=[];
+  for(const im of imgs){
+    if(gen!==LIT.gen)return;
+    const orig=LIT.urls.has(im.src)?im.dataset.o:im.getAttribute("src");if(!orig)continue;im.dataset.o=orig;
+    const key=ak+"|"+litKeyOf(orig);let url=LIT.map.get(key);
+    if(url===undefined){try{url=await litMake(orig,acc)}catch(e){url=null;console.warn("lighting",e)}LIT.map.set(key,url);if(url)LIT.urls.add(url);
+      await new Promise(r=>setTimeout(r,30))}
+    if(gen!==LIT.gen||document.documentElement.dataset.gfx!=="ultra")return;
+    if(!url||im.src===url)continue;
+    // the pictures used for talking and blinking switch over together, so her lighting never flickers mid-sentence
+    if(rank[im.dataset.k]!==undefined||im===cur){core.push([im,url]);if(core.length<imgs.filter(x=>rank[x.dataset.k]!==undefined||x===cur).length)continue;
+      await Promise.all(core.splice(0).map(([a,u])=>litSwap(a,u)))}
+    else await litSwap(im,url)}
+  if(core.length)await Promise.all(core.splice(0).map(([a,u])=>litSwap(a,u)));
+  // free pictures lit for an old theme colour
+  if(LIT.ak&&LIT.ak!==ak){const used=new Set([...document.querySelectorAll("#sprite img")].map(x=>x.src));
+    for(const [k,u] of LIT.map)if(!k.startsWith(ak+"|")&&!used.has(u)){if(u){URL.revokeObjectURL(u);LIT.urls.delete(u)}LIT.map.delete(k)}}
+  LIT.ak=ak}
+function litApply(){clearTimeout(LIT.t);LIT.t=setTimeout(()=>{litApplyNow().catch(e=>console.warn("lighting",e))},120)}
+// kept under the old name: other code calls it whenever the picture set or quality changes
+function paintSheen(){litApply()}
+// re-light when the theme colour changes
+try{let lastAcc="";new MutationObserver(()=>{const a=document.documentElement.style.getPropertyValue("--accent-rgb");if(a!==lastAcc){lastAcc=a;litApply()}}).observe(document.documentElement,{attributes:true,attributeFilter:["style"]})}catch(e){}
+// Ultra: she turns very slightly toward your pointer, with real perspective, and drifts gently on her own
+(function(){let tx=0,ty=0,cx=0,cy=0,last=0,run=false;
+  const ok=()=>document.documentElement.dataset.gfx==="ultra"&&!document.hidden&&!document.documentElement.classList.contains("fx-idle")&&!matchMedia("(prefers-reduced-motion:reduce)").matches;
+  addEventListener("pointermove",e=>{const w=$("heroWrap");if(!w)return;const r=w.getBoundingClientRect();if(!r.width)return;
+    tx=Math.max(-1,Math.min(1,(e.clientX-(r.left+r.width/2))/(innerWidth*.5)));ty=Math.max(-1,Math.min(1,(e.clientY-(r.top+r.height*.4))/(innerHeight*.6)));last=performance.now();kick()},{passive:true});
+  function kick(){if(!run&&ok()){run=true;requestAnimationFrame(step)}}
+  function step(t){const rig=document.querySelector("#heroWrap .rig");
+    if(!ok()||!rig){run=false;if(rig)rig.style.rotate="";return}
+    let gx=tx,gy=ty;if(t-last>4000){gx=Math.sin(t/5200)*.35;gy=Math.sin(t/7100)*.18}   // no pointer for a while: a slow, natural drift
+    cx+=(gx-cx)*.045;cy+=(gy-cy)*.045;
+    const ay=cx*4.5,ax=-cy*2.2,ang=Math.hypot(ax,ay);
+    rig.style.rotate=ang<.02?"":`${(ax/ang).toFixed(4)} ${(ay/ang).toFixed(4)} 0 ${ang.toFixed(3)}deg`;
+    requestAnimationFrame(step)}
+  setInterval(kick,1500);document.addEventListener("visibilitychange",kick)})();
 // every so often she shifts her weight a little (High and Ultra)
 setInterval(()=>{const g=document.documentElement.dataset.gfx,r=document.querySelector("#heroWrap .rig");if(!r||!(g==="high"||g==="ultra")||document.hidden||document.documentElement.classList.contains("fx-idle"))return;
   try{if(S.busy||moodBase==="sleep")return}catch(e){}if(Math.random()<.45){r.classList.remove("shift");void r.offsetWidth;r.classList.add("shift");setTimeout(()=>r.classList.remove("shift"),1700)}},5200);
-document.addEventListener("load",e=>{if(e.target&&e.target.closest&&e.target.closest("#sprite"))paintSheen()},true);
 applyGfx(gfxLevel());
 if(typeof window.applyLang==="function"){const _al=window.applyLang;window.applyLang=function(){const r=_al.apply(this,arguments);try{const n=$("gfxNote");if(n)n.textContent=gfxNote(gfxLevel())}catch(e){}return r}}
 function saveSettingsQuiet(){if(S.db){const s=JSON.parse(JSON.stringify(S.settings));queueWrite(()=>S.base.set(s))}}
@@ -3099,7 +3264,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="1.4.2",APP_STAGE="",APP_BUILD="2026-11-07 03:00";
+const APP_VER="1.4.3",APP_STAGE="",APP_BUILD="2026-11-07 03:30";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -3110,6 +3275,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"1.4.3",d:"11/07 03:30",add:[["極高畫質重做：打光直接畫進每張角色圖（動畫風的暗部、左上暖色主光、主題色輪廓光、腳下反光），線條保持清楚、顏色不會變淡；她還會微微轉向你的滑鼠，沒動時會自己輕輕擺動，更有立體感","Ultra quality redone: the lighting is now painted into every character picture (anime-style shadow side, warm key light from the upper left, a rim light in the theme colour, floor bounce), with crisp lines and no washed-out colours; she also turns slightly toward your pointer and drifts gently on her own for more depth"],["記憶多一層保險：她回覆後會再檢查一次你剛說的話，有關於你的新事情（像出生地、學校、喜好）但她忘了記，就會自動補記下來","A memory safety net: after each reply she double-checks what you just said, and if there was something new about you (like where you were born, your school or what you like) that she forgot to note, it gets saved automatically"]],fix:[["極高畫質：換表情時，舊表情的手（例如揮手）會變成黑色或藍色的影子留在畫面上","Ultra quality: when her expression changed, the hand from the previous picture (like the waving one) stayed on screen as a black or blue shadow"],["極高畫質：換表情的瞬間有時會閃出黑灰色的方格","Ultra quality: black-and-grey squares sometimes flashed when her expression changed"],["你說了關於自己的事（例如「我是美國出生的」）時，她有時會誤會成別的意思，也沒有記下來","When you said something about yourself (like “I was born in the US”), she sometimes misread it and didn’t save it"]]},
  {v:"1.4.2",d:"11/07 03:00",add:[["極高畫質：角色多了打光（左上暖光、右下暗部、腳下映出主題色）和細緻的紋理，看起來更有立體感","Ultra quality: the character now has lighting (warm light from the upper left, shade lower right, the theme colour reflected from the floor) and fine texture for more depth"]],fix:[["AI 有時把記憶標記少寫一個括號（像「[[記住：…]」），結果沒被記住，還直接顯示出來、被語音唸出來。現在少括號、單括號、全形括號都認得","When the AI wrote a memory marker with a missing bracket (like “[[記住：…]”), it wasn’t saved and was shown and read aloud instead. Missing, single and full-width brackets are all recognised now"],["極高畫質：掠過角色身上的光澤調暗、變柔和，輪廓光也調淡一點","Ultra quality: the sheen across the character is dimmer and softer, and the rim light is a little lighter"],["重新安裝時會清掉舊的 App 內更新檔，資訊頁不會再顯示舊版本號","Reinstalling now clears old in-app update files, so the info page no longer shows an old version number"]]},
  {v:"1.4.1",d:"11/07 02:30",add:[["角色畫質：低／中／高／極高（設定 → 外觀與音效）。高：沒事時會自然晃動、偶爾換重心，腳下有跟著呼吸的陰影；極高：再加上輪廓光、背光、飄浮光點和掠過畫面的光澤。低最省資源","Character quality: Low / Medium / High / Ultra (Settings → Look & sound). High: she sways naturally and shifts her weight when idle, with a shadow that breathes with her; Ultra adds a rim light, back light, drifting light motes and a sheen. Low uses the least power"]],fix:[["音樂只支援 Spotify：瀏覽器裡的 YouTube 沒辦法從外面穩定控制，所以不再顯示（Mac 和 Windows 都一樣）","Music is Spotify only: YouTube in a browser can’t be controlled reliably from outside, so it’s no longer shown (Mac and Windows)"],["按暫停／播放馬上有反應，不會再跳回原本的狀態；Mac 上不再卡住其他功能","Play / Pause answers right away and no longer flips back; on a Mac it no longer holds up the rest of the app"],["更快發現音樂變化：換歌約 2 秒內、打開 Spotify 約 5 秒內就會顯示","Notices music changes sooner: a new song within about 2 seconds, Spotify opening within about 5"]]},
  {v:"1.3.1",d:"11/07 02:00",add:[["大優化：從頭到尾檢查過每個畫面、每個設定分類、五種介面風格、中英文、彈出選單和整套新手教學，沒有發現錯誤","The big tune-up: every screen, every settings group, all five styles, both languages, every pop-up and the whole guided tour were checked from start to finish, with no errors found"]],fix:[["設定分類打開時不會再跳走：打開一個分類時上面那個會收起來，原本畫面會跟著往下跑，現在會停在你打開的那個分類開頭","Settings groups no longer jump away: opening one closed the one above and the view slid past it — now it stays at the top of the group you opened"],["更省電：背景的漂浮光點畫面減少約七成的運算；視窗在背景 30 秒、或 5 分鐘沒碰，裝飾動畫就會暫停；開始畫面消失後它的動畫也會停","Lighter on the computer: the floating background dots take about 70% less work; decorative animation pauses after 30 seconds in the background or 5 minutes untouched; the start screen’s animation stops once it’s gone"],["本地模型在各處都顯示成輕量版／標準版／強力版（上方狀態、ⓘ、AI 設定），切換語言時 AI 選單也會跟著換","Local models are shown as Light / Standard / Powerful everywhere (top bar, ⓘ, AI settings), and the AI menu follows a language switch"],["英文介面裡殘留的中文都翻好了；麥克風在英文介面會聽英文","Leftover Chinese in the English interface is translated, and the microphone listens for English in the English interface"],["說明文字全面更新：解除安裝的位置和選項、網頁版不再叫你改用本地 AI","Help text brought up to date: where uninstall is and what it offers, and the web version no longer suggests the local AI"]]},
