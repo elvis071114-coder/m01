@@ -19,7 +19,7 @@ $GTokUrl = 'https://oauth2.googleapis.com/token'; if ($env:M01_GTOKEN_URL) { $GT
 $GSecret = ''
 foreach ($gf in @((Join-Path (Split-Path -Parent $WebRoot) 'gclient.txt'), (Join-Path $env:LOCALAPPDATA 'M-01 Companion\app\gclient.txt'))) { if ($gf -and (Test-Path -LiteralPath $gf)) { $GSecret = ([IO.File]::ReadAllText($gf)).Trim(); if ($GSecret) { break } } }
 $WebOvr = Join-Path $env:LOCALAPPDATA 'M-01 Companion\web'
-$HV = 8   # helper version: the page asks for a reinstall when a newer helper is needed
+$HV = 9   # helper version: the page asks for a reinstall when a newer helper is needed
 function Page-Ver([string]$t) { $m = [regex]::Match([string]$t, 'const APP_VER="(\d+)\.(\d+)\.(\d+)"'); if ($m.Success) { return ([int]$m.Groups[1].Value)*1000000 + ([int]$m.Groups[2].Value)*1000 + [int]$m.Groups[3].Value }; return 0 }
 $DataMark = [regex]::Unescape('_\u8cc7\u6599\uff08\u8acb\u52ff\u4fee\u6539\uff09')
 if (-not (Test-Path $DataDir)) { New-Item -ItemType Directory -Path $DataDir -Force | Out-Null }
@@ -83,23 +83,21 @@ function Media-Init {
   } catch { $script:MediaOk = $false }
   return $script:MediaOk
 }
-# which player to show: whatever is playing right now wins (YouTube in a browser, Spotify, ...).
-# When nothing plays, stay on the one shown before, so Play resumes the same thing.
+# which Spotify window to show: the one playing wins; when nothing plays, stay on the one shown before.
 $script:MediaSid = ''
 function Media-Playing($x) { try { return ([string]$x.GetPlaybackInfo().PlaybackStatus -eq 'Playing') } catch { return $false } }
 function Media-Session {
-  $all = @($script:MediaMgr.GetSessions() | Where-Object { $_ })
+  # Spotify only: browsers (YouTube) don't reliably accept play/pause from outside, so they aren't shown
+  $all = @($script:MediaMgr.GetSessions() | Where-Object { $_ -and ([string]$_.SourceAppUserModelId -match 'Spotify') })
   if ($all.Count -eq 0) { $script:MediaSid = ''; return $null }
   $pick = $null
   $playing = @($all | Where-Object { Media-Playing $_ })
   if ($playing.Count -gt 0) {
     $pick = $playing | Where-Object { [string]$_.SourceAppUserModelId -eq $script:MediaSid } | Select-Object -First 1
-    if (-not $pick) { $cur = $script:MediaMgr.GetCurrentSession(); if ($cur -and (Media-Playing $cur)) { $pick = $cur } }
     if (-not $pick) { $pick = $playing | Where-Object { [string]$_.SourceAppUserModelId -match 'Spotify' } | Select-Object -First 1 }
     if (-not $pick) { $pick = $playing[$playing.Count - 1] }
   } else {
     if ($script:MediaSid) { $pick = $all | Where-Object { [string]$_.SourceAppUserModelId -eq $script:MediaSid } | Select-Object -First 1 }
-    if (-not $pick) { $pick = $script:MediaMgr.GetCurrentSession() }
     if (-not $pick) { $pick = $all | Where-Object { [string]$_.SourceAppUserModelId -match 'Spotify' } | Select-Object -First 1 }
     if (-not $pick) { $pick = $all[0] }
   }
@@ -172,7 +170,7 @@ function Media-State([string]$cmd, [string]$val) {
     'prev'   { $done = Await-Op ($s.TrySkipPreviousAsync()) ([bool]) }
     'seek'   { if ($val -match '^\d+(\.\d+)?$') { $done = Await-Op ($s.TryChangePlaybackPositionAsync([int64]([double]$val * 10000000))) ([bool]) } }
   }
-  if ($cmd -ne 'get' -and $cmd -ne 'vol') { Start-Sleep -Milliseconds 300; $s = Media-Session; if (-not $s) { return '{"ok":true,"app":"","running":false}' } }
+  if ($cmd -ne 'get' -and $cmd -ne 'vol') { if ($cmd -eq 'next' -or $cmd -eq 'prev') { Start-Sleep -Milliseconds 250 } else { Start-Sleep -Milliseconds 60 }; $s = Media-Session; if (-not $s) { return '{"ok":true,"app":"","running":false}' } }
   $p = $null; try { $p = Await-Op ($s.TryGetMediaPropertiesAsync()) ([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionMediaProperties]) } catch { $p = $null }
   $title = ''; $artist = ''; $album = ''
   if ($p) { $title = [string]$p.Title; $artist = [string]$p.Artist; $album = [string]$p.AlbumTitle }

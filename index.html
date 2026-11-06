@@ -638,6 +638,45 @@ body.kb .tabs{padding-top:4px}
 .lm-ram{display:inline-flex;gap:6px}.lm-ram .sbtn{padding:4px 10px;font-size:12.5px}.lm-ram .sbtn.on{border-color:var(--accent);color:var(--accent)}
 .lm-card.rec{box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),.55)}.lm-rec{font-style:normal;font-size:11.5px;font-weight:700;margin-left:8px;padding:1px 8px;background:var(--accent);color:var(--accent-ink)}
 .lm-ca{display:flex;flex-direction:column;gap:6px}.lm-adv summary{cursor:pointer;font-size:13px;color:var(--muted)}.lm-adv .inline{margin:8px 0 6px}.lm-adv input{flex:1;min-width:0;padding:8px 10px;background:var(--panel2);border:1px solid var(--line2);color:var(--ink)}
+/* ---------- character quality: low / medium / high / ultra ---------- */
+.rig{position:relative;height:100%;width:100%;max-width:640px;display:grid;place-items:end center;transform-origin:50% 100%}
+.rig .sprite{max-width:none}
+.hshadow{position:absolute;left:50%;bottom:calc(76px - 10px);width:min(44%,300px);height:26px;transform:translateX(-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(0,0,0,.75),rgba(0,0,0,.35) 55%,transparent);filter:blur(2px);opacity:0;transition:opacity .4s}
+/* a faint pool of light on the floor, so the dark contact shadow reads on dark themes too */
+.hshadow::before{content:"";position:absolute;inset:-60% -35%;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),.06) 60%,transparent);z-index:-1}
+.hlight,.hdust,.sheen{position:absolute;pointer-events:none;opacity:0;transition:opacity .5s}
+.hlight{left:50%;bottom:76px;width:min(70%,520px);aspect-ratio:1;transform:translate(-50%,18%);border-radius:50%;background:radial-gradient(closest-side,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),.07) 55%,transparent);filter:blur(10px)}
+.hdust{inset:8% 14% 76px}.hdust i{position:absolute;bottom:0;width:4px;height:4px;border-radius:50%;background:rgba(var(--accent-rgb),.9);box-shadow:0 0 8px rgba(var(--accent-rgb),.9);opacity:0}
+.sheen{inset:0;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:50% 100%;mask-position:50% 100%;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.28) 48%,rgba(255,255,255,.05) 55%,transparent 62%) no-repeat;background-size:300% 100%;background-position:120% 0}
+@media (max-width:820px){.hshadow{bottom:0}.hlight{bottom:0}.hdust{bottom:0}}
+/* low: as light as possible */
+html[data-gfx="low"] .sprite{animation:none!important}html[data-gfx="low"] #heroWrap.talking .sprite{animation:talkbob .36s ease-in-out infinite!important}
+html[data-gfx="low"] .floor i,html[data-gfx="low"] .rings,html[data-gfx="low"] .glow{animation:none!important;display:none}
+html[data-gfx="low"] #motes{display:none}
+/* medium: breathing + a soft contact shadow */
+html[data-gfx="medium"] .hshadow,html[data-gfx="high"] .hshadow,html[data-gfx="ultra"] .hshadow{opacity:.85}
+/* high: natural idle sway, a shadow that breathes with her, depth */
+html[data-gfx="high"] .rig,html[data-gfx="ultra"] .rig{animation:idleSway 7.3s ease-in-out infinite}
+html[data-gfx="high"] .hshadow,html[data-gfx="ultra"] .hshadow{animation:shadowBreath 4s ease-in-out infinite}
+html[data-gfx="high"] .sprite img.on,html[data-gfx="ultra"] .sprite img.on{filter:drop-shadow(0 10px 16px rgba(0,0,0,.32))}
+html[data-gfx="high"] .rig.shift,html[data-gfx="ultra"] .rig.shift{animation:idleSway 7.3s ease-in-out infinite,weightShift 1.6s ease-in-out}
+@keyframes idleSway{0%,100%{transform:rotate(0) translateX(0)}30%{transform:rotate(.7deg) translateX(1.5px)}70%{transform:rotate(-.6deg) translateX(-1.5px)}}
+@keyframes weightShift{0%,100%{translate:0 0;scale:1}40%{translate:4px 1px;scale:1.004 .996}70%{translate:-1px 0;scale:.998 1.002}}
+@keyframes shadowBreath{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(.95,.92);opacity:.7}}
+/* ultra: rim light, back light, drifting light motes, a soft sheen on the picture */
+html[data-gfx="ultra"] .sprite img.on{filter:drop-shadow(0 0 2px rgba(var(--accent-rgb),.8)) drop-shadow(0 0 10px rgba(var(--accent-rgb),.25)) drop-shadow(0 10px 18px rgba(0,0,0,.34))}
+html[data-gfx="ultra"] .hshadow::before{background:radial-gradient(closest-side,rgba(var(--accent-rgb),.32),rgba(var(--accent-rgb),.09) 60%,transparent)}
+html[data-gfx="ultra"] .hlight{opacity:1;animation:backLight 6s ease-in-out infinite}
+html[data-gfx="ultra"] .hdust{opacity:1}html[data-gfx="ultra"] .hdust i{animation:dust 7s linear infinite}
+html[data-gfx="ultra"] .sheen{opacity:1;animation:sheen 9s ease-in-out infinite}
+@keyframes backLight{0%,100%{opacity:.75;transform:translate(-50%,18%) scale(1)}50%{opacity:1;transform:translate(-50%,18%) scale(1.05)}}
+@keyframes dust{0%{transform:translate(0,0);opacity:0}12%{opacity:.8}70%{opacity:.5}100%{transform:translate(var(--dx,10px),-260px);opacity:0}}
+@keyframes sheen{0%,62%{background-position:120% 0}86%,100%{background-position:-20% 0}}
+/* never move while the window rests, and honour "reduce motion" */
+html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust i,html.fx-idle .sheen,html.fx-sleep .rig{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){.rig,.hshadow,.hlight,.hdust i,.sheen{animation:none!important}}
 
 /* GitHub edition */
 #folderBtn,#unSec{display:none!important}
@@ -820,6 +859,8 @@ body.kb .tabs{padding-top:4px}
             <details class="sgrp" id="g_look"><summary><span class="sg-t"><b>外觀與音效</b><small>介面風格、主題顏色、音效、左右版面</small></span><i class="sg-chev" aria-hidden="true"></i></summary>
             <div class="sgb">
             <label class="field" for="themeSel">介面風格<select id="themeSel"><option value="mecha">機甲（預設：深色、橘色）</option><option value="pink">可愛粉嫩</option><option value="terminal">復古終端機</option><option value="light">淺色簡約</option><option value="neon">夜空霓虹</option></select></label>
+            <label class="field" for="gfxSel">角色畫質<select id="gfxSel"><option value="low">低</option><option value="medium">中</option><option value="high">高</option><option value="ultra">極高</option></select></label>
+            <p class="note" id="gfxNote" data-i18n="none" style="margin:-4px 0 4px"></p>
             <label class="field" for="accentPick">主題顏色
               <div class="swatches" id="swatches"><input type="color" id="accentPick" value="#ff7a3d" aria-label="自訂顏色"></div></label>
             <label class="field" for="sndSet">音效風格<select id="sndSet"><option value="clean">清亮（預設）</option><option value="mecha">機甲（舊版）</option><option value="bubble">柔和泡泡</option><option value="retro">復古 8-bit</option><option value="wood">清脆木琴</option><option value="scifi">科幻電子</option></select></label>
@@ -2537,11 +2578,12 @@ function renderStage(){
     w.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="7" r="4"/><path d="M4 22c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><b>角色圖尚未設定</b><p>放一張嘴巴閉上、一張嘴巴張開的圖，她說話時就會在這裡對嘴、晃動。</p><button class="pbtn" id="goSprites">前往設定</button></div>`;
     $("goSprites").onclick=()=>openSec("g_char");
   }else{
-    w.insertAdjacentHTML("beforeend",`<div class="glow"></div><div class="rings"><i></i><i></i><i></i></div>`);
+    w.insertAdjacentHTML("beforeend",`<div class="hlight"></div><div class="hshadow"></div><div class="glow"></div><div class="rings"><i></i><i></i><i></i></div><div class="hdust">${[[18,0,10],[34,1.6,-14],[52,3.1,8],[66,4.4,-6],[80,5.6,16],[42,2.4,-18]].map(([x,d,dx])=>`<i style="left:${x}%;animation-delay:${d}s;--dx:${dx}px"></i>`).join("")}</div>`);
+    const rig=document.createElement("div");rig.className="rig";
     const box=document.createElement("div");box.className="sprite";box.id="sprite";box.dataset.frame="idle";
     for(const [k] of SLOTS){if(!sp[k])continue;const im=document.createElement("img");im.dataset.k=k;im.alt=k==="idle"?"夥伴":"";im.src=srcOf(sp[k],k);
       im.onerror=()=>{if(im.dataset.f)return;im.dataset.f=1;if(sp[k].url)im.src=sp[k].url};box.appendChild(im)}
-    w.appendChild(box);
+    rig.appendChild(box);box.insertAdjacentHTML("beforeend",`<div class="sheen"></div>`);w.appendChild(rig);setTimeout(()=>{try{paintSheen()}catch(e){}},50);
     w.insertAdjacentHTML("beforeend",`<div class="thought">···</div><div class="sparks">${[[12,18],[82,14],[8,52],[88,46]].map(([x,y])=>`<span style="position:absolute;left:${x}%;top:${y}%">${SPARK}</span>`).join("")}</div>`);
   }
   applyMood();scheduleBlink();
@@ -2719,6 +2761,25 @@ async function loadSprites(){
   }catch(e){console.warn("sprites",e)}
 }
 $("presetBtn").onclick=()=>{$("persona").value=CLAUDE_PERSONA;if(["","小憶","瞬光"].includes($("botName").value.trim()))$("botName").value="Claude";autoSaveProfile();toast("已套用「傲嬌 Claude」說話風格")};
+/* ---------- character quality (per computer): low / medium / high / ultra ---------- */
+const GFX_KEY="m01.gfx";
+function gfxLevel(){let g="";try{g=localStorage.getItem(GFX_KEY)||""}catch(e){}if(!/^(low|medium|high|ultra)$/.test(g))g=matchMedia("(max-width:820px)").matches?"medium":"high";return g}
+function applyGfx(g){document.documentElement.dataset.gfx=g;const sel=$("gfxSel");if(sel)sel.value=g;const n=$("gfxNote");if(n)n.textContent=gfxNote(g);
+  if(g==="low"){try{const c=$("motes");c.getContext("2d").clearRect(0,0,c.width,c.height)}catch(e){}}else if(window.__motesResume)window.__motesResume();
+  paintSheen()}
+function gfxNote(g){const en=isEN();return ({low:en?"Lightest: no breathing, shadows or background effects — best for older computers.":"最省資源：沒有呼吸、陰影和背景特效，適合比較舊的電腦。",
+  medium:en?"Breathing and a soft shadow under her.":"會呼吸，腳下有柔和的陰影。",
+  high:en?"She sways naturally and shifts her weight when idle, with a shadow that breathes with her and more depth.":"沒事時會自然晃動、偶爾換重心，陰影跟著呼吸，畫面更有立體感。",
+  ultra:en?"Everything in High, plus a rim light, a soft back light, drifting light motes and a sheen across the picture. Uses the most graphics power.":"高的全部效果，再加上輪廓光、背光、飄浮的光點和掠過畫面的光澤。最吃顯示卡。"})[g]}
+// the sheen is masked to the character's own shape, so it follows the current picture
+function paintSheen(){const sh=document.querySelector("#heroWrap .sheen"),im=document.querySelector("#sprite img.on")||document.querySelector('#sprite img[data-k="idle"]');if(!sh||!im)return;
+  const u=`url("${String(im.currentSrc||im.src).replace(/"/g,"%22")}")`;if(sh.dataset.u!==u){sh.dataset.u=u;sh.style.webkitMaskImage=u;sh.style.maskImage=u}}
+// every so often she shifts her weight a little (High and Ultra)
+setInterval(()=>{const g=document.documentElement.dataset.gfx,r=document.querySelector("#heroWrap .rig");if(!r||!(g==="high"||g==="ultra")||document.hidden||document.documentElement.classList.contains("fx-idle"))return;
+  try{if(S.busy||moodBase==="sleep")return}catch(e){}if(Math.random()<.45){r.classList.remove("shift");void r.offsetWidth;r.classList.add("shift");setTimeout(()=>r.classList.remove("shift"),1700)}},5200);
+document.addEventListener("load",e=>{if(e.target&&e.target.closest&&e.target.closest("#sprite"))paintSheen()},true);
+applyGfx(gfxLevel());
+if(typeof window.applyLang==="function"){const _al=window.applyLang;window.applyLang=function(){const r=_al.apply(this,arguments);try{const n=$("gfxNote");if(n)n.textContent=gfxNote(gfxLevel())}catch(e){}return r}}
 function saveSettingsQuiet(){if(S.db){const s=JSON.parse(JSON.stringify(S.settings));queueWrite(()=>S.base.set(s))}}
 /* scroll only inside the settings pane (scrollIntoView would also shift the whole page) */
 function paneScrollTo(el,smooth=true){const pane=el&&el.closest(".pane");if(!pane)return;const d=el.getBoundingClientRect().top-pane.getBoundingClientRect().top-8;try{pane.scrollBy({top:d,behavior:smooth?"smooth":"auto"})}catch(e){pane.scrollTop+=d}}
@@ -2861,7 +2922,7 @@ const I18N={
 "❌ 連不到 Ollama。請確認 Ollama 有開著。":"❌ Can't reach Ollama. Make sure it's running.","連不到 Ollama":"Can't reach Ollama",
 "那天沒有對話紀錄":"No chats that day","正在想":"Thinking",
 };
-Object.assign(I18N,{"備份、還原、解除安裝":"Back up, restore, uninstall","讓她重新回答這一則":"Let her answer this one again","左右換邊":"Swap sides","看圖片工具（裝好後會自動填，通常不用改）":"Picture reader (filled in automatically)","清亮（預設）":"Clear (default)","機甲（舊版）":"Mecha (old default)","對話、記憶和角色圖存在這台裝置裡；用 Google 登入的話，也會自動同步到你自己的雲端。備份檔可以拿來保險，或搬到沒有登入的電腦。":"Chats, memory and character pictures are saved on this device; sign in with Google and they also sync to your own cloud. A backup file is extra insurance, or a way to move to a computer where you aren’t signed in.","記憶資料夾":"Memory folder","看圖模型（下載後會自動填好，通常不用改）":"Picture model (filled in automatically after download)","點一下分類就會展開；設定會自動儲存。": "Tap a group to open it. Settings save automatically.", "帳號與同步": "Account & sync", "用 Google 登入，換電腦、換手機都能接著聊": "Sign in with Google to continue on any computer or phone", "AI 模型": "AI model", "選 Gemini、本地 AI 或 Claude，設定金鑰": "Choose Gemini, local AI or Claude, and set keys", "語音": "Voice", "用 Fish Audio 讓她把回覆唸出來": "Have her read replies aloud with Fish Audio", "角色圖": "Character", "放角色的表情圖片（最少兩張）": "Her expression pictures (at least two)", "外觀與音效": "Look & sound", "介面風格、主題顏色、音效、左右版面": "Interface style, colour, sounds and layout", "個人化": "Personal", "語言、你的稱呼、她的名字和個性": "Language, your name, her name and personality", "記憶與資料": "Memory & data", "記憶資料夾、備份、還原、解除安裝": "Memory folder, backup, restore, uninstall", "備份、還原": "Backup and restore", "介面風格": "Interface style", "機甲（預設：深色、橘色）": "Mecha (default: dark, orange)", "可愛粉嫩": "Cute pink", "復古終端機": "Retro terminal", "淺色簡約": "Light & simple", "夜空霓虹": "Night neon", "音效風格": "Sound set", "機甲（預設）": "Mecha (default)", "柔和泡泡": "Soft bubbles", "復古 8-bit": "Retro 8-bit", "清脆木琴": "Wooden marimba", "科幻電子": "Sci-fi electronic", "試聽音效": "Play sounds", "版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。": "Layout: swap her and the chat left/right, or drag the divider in the middle to resize — it snaps at the middle and at a quarter.", "左右換邊": "Swap sides", "恢復預設版面": "Reset layout"});
+Object.assign(I18N,{"角色畫質":"Character quality","低":"Low","中":"Medium","高":"High","極高":"Ultra","備份、還原、解除安裝":"Back up, restore, uninstall","讓她重新回答這一則":"Let her answer this one again","左右換邊":"Swap sides","看圖片工具（裝好後會自動填，通常不用改）":"Picture reader (filled in automatically)","清亮（預設）":"Clear (default)","機甲（舊版）":"Mecha (old default)","對話、記憶和角色圖存在這台裝置裡；用 Google 登入的話，也會自動同步到你自己的雲端。備份檔可以拿來保險，或搬到沒有登入的電腦。":"Chats, memory and character pictures are saved on this device; sign in with Google and they also sync to your own cloud. A backup file is extra insurance, or a way to move to a computer where you aren’t signed in.","記憶資料夾":"Memory folder","看圖模型（下載後會自動填好，通常不用改）":"Picture model (filled in automatically after download)","點一下分類就會展開；設定會自動儲存。": "Tap a group to open it. Settings save automatically.", "帳號與同步": "Account & sync", "用 Google 登入，換電腦、換手機都能接著聊": "Sign in with Google to continue on any computer or phone", "AI 模型": "AI model", "選 Gemini、本地 AI 或 Claude，設定金鑰": "Choose Gemini, local AI or Claude, and set keys", "語音": "Voice", "用 Fish Audio 讓她把回覆唸出來": "Have her read replies aloud with Fish Audio", "角色圖": "Character", "放角色的表情圖片（最少兩張）": "Her expression pictures (at least two)", "外觀與音效": "Look & sound", "介面風格、主題顏色、音效、左右版面": "Interface style, colour, sounds and layout", "個人化": "Personal", "語言、你的稱呼、她的名字和個性": "Language, your name, her name and personality", "記憶與資料": "Memory & data", "記憶資料夾、備份、還原、解除安裝": "Memory folder, backup, restore, uninstall", "備份、還原": "Backup and restore", "介面風格": "Interface style", "機甲（預設：深色、橘色）": "Mecha (default: dark, orange)", "可愛粉嫩": "Cute pink", "復古終端機": "Retro terminal", "淺色簡約": "Light & simple", "夜空霓虹": "Night neon", "音效風格": "Sound set", "機甲（預設）": "Mecha (default)", "柔和泡泡": "Soft bubbles", "復古 8-bit": "Retro 8-bit", "清脆木琴": "Wooden marimba", "科幻電子": "Sci-fi electronic", "試聽音效": "Play sounds", "版面：角色和聊天可以左右換邊；拖曳中間的分隔線可以調整大小，拖到正中間或四分之一的位置會自動吸附。": "Layout: swap her and the chat left/right, or drag the divider in the middle to resize — it snaps at the middle and at a quarter.", "左右換邊": "Swap sides", "恢復預設版面": "Reset layout"});
 const I18N_RE=[
  [/^顯示更早的 (\d+) 則$/,"Show $1 earlier"],
  [/^已記下：(.+)$/s,"Noted: $1"],[/^你的方案不能用 (\S+)，已改用 (\S+)$/,"Your plan can't use $1 — switched to $2"],[/^(\S+) 現在不能用（免費額度用完或需要付費方案），已自動改用 (\S+)$/,"$1 isn't available right now (free quota used up or paid plan needed) — switched to $2"],[/^上網查：「(.*)」$/,"Searching the web: \"$1\""],[/^✅ 使用 Gemini（(.+)），金鑰 (.*)$/,"✅ Using Gemini ($1), key $2"],[/^(Gemini|Claude) 連線成功$/,"Connected to $1"],[/^❌ (?:金鑰無效或沒有額度|免費額度暫時用完|連不到（電腦有網路嗎？）|測試失敗)：(.*)$/s,"❌ Test failed: $1"],[/^✅ 使用 Claude（(.+)），金鑰 (.*)$/,"✅ Using Claude ($1), key $2"],[/^已儲存（(.+)），要換再貼新的$/,"Saved ($1) — paste a new one to replace"],[/^查天氣：(.*)$/,"Checking weather: $1"],[/^❌ (?:金鑰無效或餘額不足|連不到 Claude（電腦有網路嗎？）|測試失敗)：(.*)$/s,"❌ Test failed: $1"],[/^出錯了：(.*)$/s,"Something went wrong: $1"],
@@ -3029,7 +3090,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="2.2.1",APP_STAGE="",APP_BUILD="2026-11-07 02:00";
+const APP_VER="1.4.1",APP_STAGE="",APP_BUILD="2026-11-07 02:30";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -3040,7 +3101,8 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
- {v:"2.2.1",d:"11/07 02:00",add:[["大優化：從頭到尾檢查過每個畫面、每個設定分類、五種介面風格、中英文、彈出選單和整套新手教學，沒有發現錯誤","The big tune-up: every screen, every settings group, all five styles, both languages, every pop-up and the whole guided tour were checked from start to finish, with no errors found"]],fix:[["設定分類打開時不會再跳走：打開一個分類時上面那個會收起來，原本畫面會跟著往下跑，現在會停在你打開的那個分類開頭","Settings groups no longer jump away: opening one closed the one above and the view slid past it — now it stays at the top of the group you opened"],["更省電：背景的漂浮光點畫面減少約七成的運算；視窗在背景 30 秒、或 5 分鐘沒碰，裝飾動畫就會暫停；開始畫面消失後它的動畫也會停","Lighter on the computer: the floating background dots take about 70% less work; decorative animation pauses after 30 seconds in the background or 5 minutes untouched; the start screen’s animation stops once it’s gone"],["本地模型在各處都顯示成輕量版／標準版／強力版（上方狀態、ⓘ、AI 設定），切換語言時 AI 選單也會跟著換","Local models are shown as Light / Standard / Powerful everywhere (top bar, ⓘ, AI settings), and the AI menu follows a language switch"],["英文介面裡殘留的中文都翻好了；麥克風在英文介面會聽英文","Leftover Chinese in the English interface is translated, and the microphone listens for English in the English interface"],["說明文字全面更新：解除安裝的位置和選項、音樂小工具（Windows 也支援 YouTube）、網頁版不再叫你改用本地 AI","Help text brought up to date: where uninstall is and what it offers, the music widget (YouTube too on Windows), and the web version no longer suggests the local AI"]]},
+ {v:"1.4.1",d:"11/07 02:30",add:[["角色畫質：低／中／高／極高（設定 → 外觀與音效）。高：沒事時會自然晃動、偶爾換重心，腳下有跟著呼吸的陰影；極高：再加上輪廓光、背光、飄浮光點和掠過畫面的光澤。低最省資源","Character quality: Low / Medium / High / Ultra (Settings → Look & sound). High: she sways naturally and shifts her weight when idle, with a shadow that breathes with her; Ultra adds a rim light, back light, drifting light motes and a sheen. Low uses the least power"]],fix:[["音樂只支援 Spotify：瀏覽器裡的 YouTube 沒辦法從外面穩定控制，所以不再顯示（Mac 和 Windows 都一樣）","Music is Spotify only: YouTube in a browser can’t be controlled reliably from outside, so it’s no longer shown (Mac and Windows)"],["按暫停／播放馬上有反應，不會再跳回原本的狀態；Mac 上不再卡住其他功能","Play / Pause answers right away and no longer flips back; on a Mac it no longer holds up the rest of the app"],["更快發現音樂變化：換歌約 2 秒內、打開 Spotify 約 5 秒內就會顯示","Notices music changes sooner: a new song within about 2 seconds, Spotify opening within about 5"]]},
+ {v:"1.3.1",d:"11/07 02:00",add:[["大優化：從頭到尾檢查過每個畫面、每個設定分類、五種介面風格、中英文、彈出選單和整套新手教學，沒有發現錯誤","The big tune-up: every screen, every settings group, all five styles, both languages, every pop-up and the whole guided tour were checked from start to finish, with no errors found"]],fix:[["設定分類打開時不會再跳走：打開一個分類時上面那個會收起來，原本畫面會跟著往下跑，現在會停在你打開的那個分類開頭","Settings groups no longer jump away: opening one closed the one above and the view slid past it — now it stays at the top of the group you opened"],["更省電：背景的漂浮光點畫面減少約七成的運算；視窗在背景 30 秒、或 5 分鐘沒碰，裝飾動畫就會暫停；開始畫面消失後它的動畫也會停","Lighter on the computer: the floating background dots take about 70% less work; decorative animation pauses after 30 seconds in the background or 5 minutes untouched; the start screen’s animation stops once it’s gone"],["本地模型在各處都顯示成輕量版／標準版／強力版（上方狀態、ⓘ、AI 設定），切換語言時 AI 選單也會跟著換","Local models are shown as Light / Standard / Powerful everywhere (top bar, ⓘ, AI settings), and the AI menu follows a language switch"],["英文介面裡殘留的中文都翻好了；麥克風在英文介面會聽英文","Leftover Chinese in the English interface is translated, and the microphone listens for English in the English interface"],["說明文字全面更新：解除安裝的位置和選項、網頁版不再叫你改用本地 AI","Help text brought up to date: where uninstall is and what it offers, and the web version no longer suggests the local AI"]]},
  {v:"1.2.1",d:"11/07 00:30",add:[],fix:[["說明文字更新：記憶同步、備份位置、本地 AI、音樂小工具和新手教學的說明改成跟現在的功能一致","Help text updated: memory sync, backup location, local AI, the music widget and the guided tour now match how the app works"]]},
  {v:"1.2.0",d:"11/06 23:30",add:[["本地 AI 可以全部下載起來，要用哪一個直接在聊天畫面下方的 AI 選單切換，會標示輕量版／標準版／強力版；設定裡只剩下載和刪除。一次按好幾個「下載」會排隊，一個接一個下載","Download any or all local AI models, then choose one from the AI menu under the chat (marked Light / Standard / Powerful); Settings now just downloads and deletes. Press Download on several and they queue up"],["App 更新改在 App 裡完成：會顯示下載進度、速度和剩下的時間，下載好自動安裝並重新打開，不會再跑到瀏覽器的下載資料夾","Updates happen inside the app: download progress, speed and time left, then it installs and reopens by itself — no more trips to the browser’s Downloads folder"]],fix:[["開始畫面點下去馬上有反應：資料在 App 打開時就先在背景準備好","The start screen answers your click right away: everything loads in the background as soon as the app opens"],["用量圓圈：滑鼠移上去就會顯示詳細用量，用本地 AI 時不會出現","Usage ring: hover to see the details; it’s hidden while using the local AI"],["Windows 音樂小工具會跟著正在播的東西（例如瀏覽器裡的 YouTube），上一首／暫停／下一首會控制它，也會盡量顯示影片的縮圖","Windows music widget follows whatever is playing (like YouTube in a browser): Previous / Pause / Next control it, and it shows the video’s picture when available"],["模型下載中不能用本地 AI；她回答時不能換 AI 或改 AI 設定，避免中途出錯","While a model downloads, local AI is paused; while she’s answering, the AI and its settings can’t be changed, so nothing breaks midway"]]},
  {v:"1.1.1",d:"11/06 22:30",add:[],fix:[["Windows 版打開更快：不再等本地 AI 開好才出現視窗；背景小幫手同時處理多件事，AI 回答、登入、天氣在等待時，其他功能不會卡住（Mac 也一樣）","Faster start on Windows: the window no longer waits for the local AI to start, and the background helper does several things at once, so nothing freezes while an AI reply, sign-in or weather lookup is on its way (same on Mac)"],["Windows 工作列的圖示變清楚了（第一次打開後就會換成清楚的版本）","The Windows taskbar icon is sharp now (it switches to the sharp one after the app opens)"],["文字字型改成背景載入，網路慢的時候畫面也會馬上出現","Fonts load in the background, so the screen shows up right away even on a slow connection"],["安裝包裡的說明改成簡短的中英對照，只說怎麼安裝和打開","The guide in the install package is now short and bilingual, covering just how to install and open the app"]]},
@@ -3318,7 +3380,7 @@ function tourSteps(){
     [".convbar",en?"Chats":"對話",en?"Click the chat name to switch, rename or delete chats. “＋ New chat” starts a fresh one. “Incognito” isn’t saved and isn’t remembered. In every chat she still remembers the key points about you.":"點對話名稱可以切換、改名、刪除以前的對話；「＋ 新對話」開一段新的；「無痕」聊的內容不會被保存、也不會被記住。不管在哪段對話，她都記得關於你的重點。","chat"],
     ["#heroWrap",en?"Her":"她",en?"Her mouth moves when she talks and her face follows her mood. Tap her and she’ll say something — often about what you’ve been talking about. Now and then she speaks up on her own: about the weather, your song or what you talked about. After 10 quiet minutes she falls asleep and her bubble shows Zzz…; say something to wake her.":"這是她：說話時會對嘴、表情會跟著心情變。點她一下會有反應，常常跟你們最近聊的事有關。她也會不定時主動找你說話：關心天氣、聊你在聽的歌、接續剛剛的話題。10 分鐘沒動靜她會睡著，泡泡會顯示 Zzz…，跟她說話就會醒來。","chat"],
     ["#wxCard",en?"Weather":"天氣",en?"Left of the clock: the weather where you are, today’s high and low, and the chance of rain for the next few hours. Hover for details; tap it and she tells you (with an umbrella reminder if needed).":"時鐘左邊是你所在地的天氣：溫度、高低溫和接下來幾小時的降雨機率。滑鼠移上去看詳細，點一下她會告訴你（要下雨會提醒帶傘）。","chat"],
-    ["#muCard",en?"Music":"音樂",/Mac/i.test(navigator.platform||"")?(en?"Right of the clock: what Spotify is playing on this computer, with its cover. Previous, play/pause and next are on the right; drag the thin line along the bottom to jump in the song. A free Spotify account works.":"時鐘右邊是這台電腦 Spotify 正在播的歌和封面：右邊有上一首、暫停、下一首，拖下面那條細線可以跳到歌曲的任何位置。免費帳號也能用。"):(en?"Right of the clock: whatever is playing on this computer — Spotify, or YouTube in a browser — with its picture. Previous, play/pause and next are on the right; drag the thin line along the bottom to jump.":"時鐘右邊是這台電腦正在播的東西（Spotify，或瀏覽器裡的 YouTube）和封面：右邊有上一首、暫停、下一首，拖下面那條細線可以跳到任何位置。"),"chat"],
+    ["#muCard",en?"Music":"音樂",en?"Right of the clock: what Spotify is playing on this computer, with its cover. Previous, play/pause and next are on the right; drag the thin line along the bottom to jump in the song. A free Spotify account works.":"時鐘右邊是這台電腦 Spotify 正在播的歌和封面：右邊有上一首、暫停、下一首，拖下面那條細線可以跳到歌曲的任何位置。免費帳號也能用。","chat"],
     ["#splitter",en?"Layout":"版面",en?"Drag this line to make her or the chat bigger — it snaps at the middle and at a quarter. The ⇄ button in the middle swaps the two sides. Double-click the line to reset.":"拖這條線可以把她或聊天區調大，拖到正中間或四分之一的地方會自動吸附；中間的 ⇄ 可以把兩邊換位置，點兩下這條線就恢復預設。","chat"],
     ['.tab[data-tab="pMem"]',en?"Memory":"重點",en?"She writes down key points about you (likes, plans, important people) and uses them later. Add your own, or delete anything she got wrong.":"她會自己記下關於你的事（喜好、計畫、重要的人），之後聊天會用到。你可以自己新增，記錯的也可以刪掉。","pMem"],
     ['.tab[data-tab="pFiles"]',en?"Files":"檔案",en?"Every file you’ve sent is listed here — open or delete them. She remembers what’s inside, so you can ask about them later.":"你傳過的檔案都在這裡，可以重新打開或刪掉。她會記得檔案內容，之後問也找得到。","pFiles"],
@@ -4427,6 +4489,7 @@ paintSnd();
     try{localStorage.setItem("m01.theme",t)}catch(e){}const sel=$("themeSel");if(sel)sel.value=t;
     const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=(getComputedStyle(r).getPropertyValue("--bg")||"").trim()||"#09090B"};
   try{applyTheme(localStorage.getItem("m01.theme")||"mecha")}catch(e){}
+  $("gfxSel").onchange=e=>{const g=e.target.value;try{localStorage.setItem(GFX_KEY,g)}catch(err){}applyGfx(g);playSfx("press",.5)};
   $("themeSel").onchange=e=>{const t=e.target.value;S.settings.theme=t;applyTheme(t);S.settings.accent=THEME_ACCENT[t];applyAccent(THEME_ACCENT[t]);saveSettingsQuiet();playSfx("press",.5)};
 
   /* ---------- sound sets (the default "mecha" set uses the recorded sounds) ---------- */
@@ -4887,7 +4950,7 @@ details.cl>summary{cursor:pointer}
     if(needHelper){mu.classList.add("idle");t.textContent=en?"Music needs a reinstall":"音樂功能要重新安裝";a.textContent=en?"Click to open the download page":"點一下打開下載頁面";setArt({});return}
     if(!M.running||!M.title){mu.classList.add("idle");
       if(M.reason==="denied"||M.reason==="timeout"){t.textContent=en?"Allow control of Spotify":"請允許控制 Spotify";a.textContent=en?"Click for how":"點一下看怎麼做"}
-      else{t.textContent=en?"Nothing playing":"目前沒有在播放";const mac=/Mac/i.test(navigator.platform||"");a.textContent=mac?(en?"Play something in Spotify":"在 Spotify 播首歌吧"):(en?"Play something in Spotify or YouTube":"在 Spotify 或 YouTube 放點東西吧")}
+      else{t.textContent=en?"Nothing playing":"目前沒有在播放";a.textContent=en?"Play something in Spotify":"在 Spotify 播首歌吧"}
       setArt({});return}
     mu.classList.remove("idle");
     const txt=q(".p-txt");if(M.id!==lastId){lastId=M.id;if(!reduce()){txt.classList.remove("swap");void txt.offsetWidth;txt.classList.add("swap")}}
@@ -4907,11 +4970,13 @@ details.cl>summary{cursor:pointer}
     if(j===null){const pg=await serverFS.ping().catch(()=>null);needHelper=!!(pg&&(pg.hv||1)<4);M.running=false;paintMusic();mTimer=setTimeout(poll,needHelper?60000:15000);return}
     needHelper=false;
     if(j.ok===false&&j.running){M=Object.assign(M,{running:false,reason:j.reason||"denied"});paintMusic();mTimer=setTimeout(poll,15000);return}
+    if(want&&j.state&&Date.now()<wantUntil){if(j.state===want)want=null;else{j.state=want;j.pos=posNow()}}
     const prev=M.id;M=Object.assign({reason:""},j);mAt=performance.now();
     if(M.running&&M.title&&M.id&&prev&&M.id!==prev)maybeComment();
     paintMusic();
     const away=document.documentElement.classList.contains("fx-idle");
-    mTimer=setTimeout(poll,!M.running?(away?20000:8000):M.state==="playing"?(away?8000:2500):(away?15000:4000))}
+    // check again soon after a button press; otherwise often enough to notice a new song or Spotify opening within a few seconds
+    mTimer=setTimeout(poll,want?700:!M.running?(away?20000:5000):M.state==="playing"?(away?8000:2000):(away?15000:3000))}
   function maybeComment(){if(Date.now()-lastSaid<10*60e3||Math.random()>.35)return;try{if(S.busy||S.streaming)return}catch(e){}lastSaid=Date.now();
     const t=M.title.length>24?M.title.slice(0,24)+"…":M.title;
     const zh=[`在聽〈${t}〉啊……還不錯嘛。`,`〈${t}〉？你的品味……也還可以啦。`,`這首〈${t}〉我好像也有點喜歡。`],en=[`Listening to “${t}”? …Not bad.`,`“${t}”, huh. Your taste is… acceptable.`,`I kind of like “${t}” too.`];
@@ -4935,7 +5000,9 @@ details.cl>summary{cursor:pointer}
         const shape=x<.3?(.75+kick*.6):x<.7?(.55+half*.35):(.35+half*.3);target=Math.max(.1,Math.min(1,wave*shape*(.85+.3*Math.sin(i*2.3+h))))}
       levels[i]+=(target-levels[i])*(target>levels[i]?.45:.16);b.style.transform=`scaleY(${levels[i].toFixed(3)})`})}
   vizStart();
-  $("muPlay").onclick=e=>{e.stopPropagation();M.state=M.state==="playing"?"paused":"playing";M.pos=posNow();mAt=performance.now();paintMusic();poll(M.state==="playing"?"play":"pause")};
+  // the button answers at once; for a moment, answers that still say the old state (sent before Spotify caught up) are ignored
+  let want=null,wantUntil=0;
+  $("muPlay").onclick=e=>{e.stopPropagation();M.state=M.state==="playing"?"paused":"playing";M.pos=posNow();mAt=performance.now();want=M.state;wantUntil=Date.now()+3000;paintMusic();poll(M.state==="playing"?"play":"pause")};
   $("muNext").onclick=e=>{e.stopPropagation();poll("next")};$("muPrev").onclick=e=>{e.stopPropagation();poll("prev")};
   const seek=$("muSeek");seek.addEventListener("pointerdown",()=>seeking=true);
   seek.addEventListener("input",()=>{seeking=true;setRange(seek,+seek.value,M.dur);seek.title=fmt(+seek.value)+" / "+fmt(M.dur)});
@@ -5091,8 +5158,8 @@ details.cl>summary{cursor:pointer}
   function paintSet(){const en=E(),w=W(),d=desk();const wasOpen=DD.get.call(g);
     g.innerHTML=`<summary><span class="sg-t"><b>${en?"Widgets":"小工具"}</b><small>${en?"Music, weather, and her speaking up":"音樂、天氣、她主動說話"}</small></span><i class="sg-chev" aria-hidden="true"></i></summary>
       <div class="sgb">
-        <label class="toggle" for="wgMusic">${en?"Show what’s playing":"顯示正在播放的音樂"}<input type="checkbox" id="wgMusic" ${w.music?"checked":""} ${d?"":"disabled"}></label>
-        <p class="note" style="margin:0">${d?(/Mac/i.test(navigator.platform||"")?(en?"Shows the song playing in the Spotify app on this computer in the top bar, with play/pause, previous/next and the progress bar. A free Spotify account works. Click “OK” the first time it asks to control Spotify.":"顯示這台電腦 Spotify App 正在播的歌（在上方橫條），可以暫停、上下首、拖進度條。免費帳號也能用。第一次會問要不要讓 M-01 控制 Spotify，按「好」就可以。"):(en?"Shows whatever is playing on this computer in the top bar — Spotify, or YouTube in a browser — with play/pause, previous/next and the progress bar.":"顯示這台電腦正在播的東西（Spotify，或瀏覽器裡的 YouTube），在上方橫條，可以暫停、上下首、拖進度條。")):(en?"Only in the desktop app — the web version can’t see what’s playing on your computer.":"只有 App 版能用：網頁版看不到你電腦上正在播的東西。")}</p>
+        <label class="toggle" for="wgMusic">${en?"Show what’s playing in Spotify":"顯示正在播放的音樂（Spotify）"}<input type="checkbox" id="wgMusic" ${w.music?"checked":""} ${d?"":"disabled"}></label>
+        <p class="note" style="margin:0">${d?(en?"Shows the song playing in the Spotify app on this computer in the top bar, with play/pause, previous/next and the progress bar. A free Spotify account works. On a Mac, click “OK” the first time it asks to control Spotify.":"顯示這台電腦 Spotify App 正在播的歌（在上方橫條），可以暫停、上下首、拖進度條。免費帳號也能用。Mac 第一次會問要不要讓 M-01 控制 Spotify，按「好」就可以。"):(en?"Only in the desktop app — the web version can’t see the Spotify app on your computer.":"只有 App 版能用：網頁版看不到你電腦上的 Spotify。")}</p>
         <label class="toggle" for="wgChat">${en?"She starts talking to you now and then":"她會主動找你說話"}<input type="checkbox" id="wgChat" ${w.chat?"checked":""}></label>
         <p class="note" style="margin:0">${en?"While she’s awake and you’ve been quiet for a while, she sometimes says something in her bubble — about the weather, the song you’re playing or what you talked about. She falls asleep after 10 minutes without anything happening.":"她醒著、你一陣子沒說話時，偶爾會在泡泡裡主動說點什麼：天氣、你在聽的歌、剛剛聊的事。10 分鐘沒動靜她會睡著。"}</p>
         <label class="toggle" for="wgWx">${en?"Show the weather":"顯示天氣"}<input type="checkbox" id="wgWx" ${w.wx?"checked":""}></label>

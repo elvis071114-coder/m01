@@ -67,7 +67,7 @@ my $GSECRET = '';
 for my $gf ((dirname(abs_path($0)))."/gclient.txt", ($ARGV[0] ? dirname($ARGV[0])."/gclient.txt" : ()), ($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/gclient.txt") {
   my $t = slurp_early($gf); if (defined $t) { $t =~ s/\s+//g; if (length $t) { $GSECRET = $t; last; } } }
 my $WEBOVR = $ENV{M01_WEBOVR} // (($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/web");
-my $HV = 8;
+my $HV = 9;
 my $HELPEROVR = $ENV{M01_HELPEROVR} // (($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/helper");   # helper version: the page asks for a reinstall when a newer helper is needed
 sub page_ver { my $t = shift // ''; return $t =~ /const APP_VER="(\d+)\.(\d+)\.(\d+)"/ ? $1*1000000+$2*1000+$3 : 0; }
 my $FISHBASE = $ENV{M01_FISH_URL} // 'https://api.fish.audio';
@@ -138,9 +138,9 @@ while (my $c = $srv->accept) {
   # only our own page may use the data API (other sites cannot send this header)
   my $api = $target =~ m{^/(fs|ls|ping|pick|search|fetch|open|battery|dictate|reveal|setdata|getjson|secret|uninstall|gemini|fishtts|gtoken|selfupdate|sysinfo|music|ollamastart|pull|ollamainstall|helperupdate|appupdate)(/|$)};
   if ($api && ($h{'x-m01'} // '') ne '1') { reply($c, 403, 'text/plain', 'forbidden'); close $c; next; }
-  # network calls (AI replies, sign-in, weather) are answered by their own process, so a slow one never holds up the rest of the app
+  # network calls (AI replies, sign-in, weather) and Spotify (AppleScript is slow) are answered by their own process, so a slow one never holds up the rest of the app
   my $forked = 0;
-  if ($target =~ m{^/(gemini|gtoken|getjson|fishtts)$} && !$ENV{M01_NOFORK}) {
+  if ($target =~ m{^/(gemini|gtoken|getjson|fishtts|music)$} && !$ENV{M01_NOFORK}) {
     my $kid = fork();
     if (defined $kid && $kid > 0) { waitpid($kid, 0); close $c; next; }
     if (defined $kid) { my $g = fork(); POSIX::_exit(0) if defined $g && $g > 0; close $srv; $forked = 1; }
@@ -325,7 +325,7 @@ while (my $c = $srv->accept) {
       my $JS = 'function run(a){var s=Application("Spotify");var c=a[0]||"get",v=parseFloat(a[1]);'
         .'if(c=="toggle")s.playpause();else if(c=="play")s.play();else if(c=="pause")s.pause();else if(c=="next")s.nextTrack();else if(c=="prev")s.previousTrack();'
         .'else if(c=="vol"&&v>=0)s.soundVolume=Math.max(0,Math.min(100,Math.round(v)));else if(c=="seek"&&v>=0)s.playerPosition=v;'
-        .'if(c!="get")delay(0.25);'
+        .'if(c=="next"||c=="prev")delay(0.25);'
         .'var o={ok:true,app:"spotify",running:true,state:"",title:"",artist:"",album:"",art:"",dur:0,pos:0,vol:-1,id:""};'
         .'try{o.state=s.playerState()}catch(e){}try{o.vol=s.soundVolume()}catch(e){}try{o.pos=s.playerPosition()}catch(e){}'
         .'try{var t=s.currentTrack;o.title=t.name();o.artist=t.artist();o.album=t.album();o.art=t.artworkUrl();o.dur=t.duration()/1000;o.id=t.id()}catch(e){}'
