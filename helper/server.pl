@@ -67,7 +67,7 @@ my $GSECRET = '';
 for my $gf ((dirname(abs_path($0)))."/gclient.txt", ($ARGV[0] ? dirname($ARGV[0])."/gclient.txt" : ()), ($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/gclient.txt") {
   my $t = slurp_early($gf); if (defined $t) { $t =~ s/\s+//g; if (length $t) { $GSECRET = $t; last; } } }
 my $WEBOVR = $ENV{M01_WEBOVR} // (($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/web");
-my $HV = 6;
+my $HV = 7;
 my $HELPEROVR = $ENV{M01_HELPEROVR} // (($ENV{HOME} // '')."/Library/Application Support/M-01 Companion/helper");   # helper version: the page asks for a reinstall when a newer helper is needed
 sub page_ver { my $t = shift // ''; return $t =~ /const APP_VER="(\d+)\.(\d+)\.(\d+)"/ ? $1*1000000+$2*1000+$3 : 0; }
 my $FISHBASE = $ENV{M01_FISH_URL} // 'https://api.fish.audio';
@@ -138,6 +138,13 @@ while (my $c = $srv->accept) {
   # only our own page may use the data API (other sites cannot send this header)
   my $api = $target =~ m{^/(fs|ls|ping|pick|search|fetch|open|battery|dictate|reveal|setdata|getjson|secret|uninstall|gemini|fishtts|gtoken|selfupdate|sysinfo|music|ollamastart|pull|ollamainstall|helperupdate)(/|$)};
   if ($api && ($h{'x-m01'} // '') ne '1') { reply($c, 403, 'text/plain', 'forbidden'); close $c; next; }
+  # network calls (AI replies, sign-in, weather) are answered by their own process, so a slow one never holds up the rest of the app
+  my $forked = 0;
+  if ($target =~ m{^/(gemini|gtoken|getjson|fishtts)$} && !$ENV{M01_NOFORK}) {
+    my $kid = fork();
+    if (defined $kid && $kid > 0) { waitpid($kid, 0); close $c; next; }
+    if (defined $kid) { my $g = fork(); POSIX::_exit(0) if defined $g && $g > 0; close $srv; $forked = 1; }
+  }
 
   if ($target eq '/battery') {
     my $o = `/usr/bin/pmset -g batt 2>/dev/null`;
@@ -539,5 +546,5 @@ while (my $c = $srv->accept) {
     if ($p eq '/index.html' && -f "$WEBOVR/index.html") { my $o = slurp("$WEBOVR/index.html"); if (defined $o && page_ver($o) > page_ver($d)) { $d = $o; } else { unlink "$WEBOVR/index.html"; } }   # an older downloaded page is left over: remove it
     defined $d ? reply($c, 200, $TYPES{lc($ext // '')} // 'application/octet-stream', $d) : reply($c, 404, 'text/plain', 'not found');
   }
-  close $c;
+  close $c;  POSIX::_exit(0) if $forked;
 }

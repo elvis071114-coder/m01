@@ -4,6 +4,8 @@ param([string]$WebRoot, [string]$DataDir, [int]$Port = 47811)
 $DataDirArg = $DataDir
 $HelperOvr = Join-Path $env:LOCALAPPDATA 'M-01 Companion\helper'; if ($env:M01_HELPEROVR) { $HelperOvr = $env:M01_HELPEROVR }
 $ErrorActionPreference = 'Continue'
+$ProgressPreference = 'SilentlyContinue'   # Windows PowerShell 5.1 downloads many times slower while it draws a (hidden) progress bar
+try { [Net.ServicePointManager]::DefaultConnectionLimit = 16; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 } catch { }
 # the user can move the memory folder from inside the app; remember their choice
 $CfgFile = Join-Path $env:LOCALAPPDATA 'M-01 Companion\datadir.txt'
 if (Test-Path -LiteralPath $CfgFile) { $saved = ([IO.File]::ReadAllText($CfgFile, [Text.Encoding]::UTF8)).Trim(); if ($saved -and (Test-Path -LiteralPath $saved)) { $DataDir = $saved } }
@@ -17,7 +19,7 @@ $GTokUrl = 'https://oauth2.googleapis.com/token'; if ($env:M01_GTOKEN_URL) { $GT
 $GSecret = ''
 foreach ($gf in @((Join-Path (Split-Path -Parent $WebRoot) 'gclient.txt'), (Join-Path $env:LOCALAPPDATA 'M-01 Companion\app\gclient.txt'))) { if ($gf -and (Test-Path -LiteralPath $gf)) { $GSecret = ([IO.File]::ReadAllText($gf)).Trim(); if ($GSecret) { break } } }
 $WebOvr = Join-Path $env:LOCALAPPDATA 'M-01 Companion\web'
-$HV = 6   # helper version: the page asks for a reinstall when a newer helper is needed
+$HV = 7   # helper version: the page asks for a reinstall when a newer helper is needed
 function Page-Ver([string]$t) { $m = [regex]::Match([string]$t, 'const APP_VER="(\d+)\.(\d+)\.(\d+)"'); if ($m.Success) { return ([int]$m.Groups[1].Value)*1000000 + ([int]$m.Groups[2].Value)*1000 + [int]$m.Groups[3].Value }; return 0 }
 $DataMark = [regex]::Unescape('_\u8cc7\u6599\uff08\u8acb\u52ff\u4fee\u6539\uff09')
 if (-not (Test-Path $DataDir)) { New-Item -ItemType Directory -Path $DataDir -Force | Out-Null }
@@ -234,8 +236,193 @@ function Parse-Query([string]$qs) {
   return $q
 }
 
+# ---------- sharp taskbar icon: Edge app windows use a stretched page icon, so give the window (and the shortcuts) the app's own id and .ico ----------
+$WinIconPs = @'
+$ErrorActionPreference = 'SilentlyContinue'
+$cs = @"
+using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+[StructLayout(LayoutKind.Sequential, Pack = 4)]
+public struct M01PKey { public Guid fmtid; public uint pid; public M01PKey(Guid g, uint p) { fmtid = g; pid = p; } }
+[StructLayout(LayoutKind.Explicit)]
+public struct M01PVar { [FieldOffset(0)] public ushort vt; [FieldOffset(8)] public IntPtr p; [FieldOffset(16)] public IntPtr pad; }
+[ComImport, Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+public interface IM01Props {
+  [PreserveSig] int GetCount(out uint c);
+  [PreserveSig] int GetAt(uint i, out M01PKey k);
+  [PreserveSig] int GetValue(ref M01PKey k, out M01PVar v);
+  [PreserveSig] int SetValue(ref M01PKey k, ref M01PVar v);
+  [PreserveSig] int Commit();
+}
+[ComImport, Guid("00021401-0000-0000-C000-000000000046")] public class M01ShellLink { }
+public static class M01Win {
+  delegate bool EnumProc(IntPtr h, IntPtr l);
+  [DllImport("user32.dll")] static extern bool EnumWindows(EnumProc f, IntPtr l);
+  [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetWindowText(IntPtr h, StringBuilder sb, int n);
+  [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int GetClassName(IntPtr h, StringBuilder sb, int n);
+  [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr h);
+  [DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr h, uint m, IntPtr w, IntPtr l);
+  [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern IntPtr LoadImage(IntPtr hi, string name, uint type, int cx, int cy, uint flags);
+  [DllImport("user32.dll")] static extern uint GetDpiForWindow(IntPtr h);
+  [DllImport("shell32.dll")] static extern int SHGetPropertyStoreForWindow(IntPtr h, ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out IM01Props ps);
+  [DllImport("ole32.dll")] static extern int PropVariantClear(ref M01PVar v);
+  static Guid AppKeys = new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3");
+  static Guid StoreIid = new Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99");
+  static HashSet<IntPtr> done = new HashSet<IntPtr>();
+  static int Put(IM01Props ps, uint pid, string val) {
+    M01PKey k = new M01PKey(AppKeys, pid); M01PVar v = new M01PVar(); v.vt = 31; v.p = Marshal.StringToCoTaskMemUni(val);
+    try { return ps.SetValue(ref k, ref v); } finally { Marshal.FreeCoTaskMem(v.p); }
+  }
+  static string Get(IM01Props ps, uint pid) {
+    M01PKey k = new M01PKey(AppKeys, pid); M01PVar v;
+    if (ps.GetValue(ref k, out v) != 0) return null;
+    string r = (v.vt == 31 && v.p != IntPtr.Zero) ? Marshal.PtrToStringUni(v.p) : null; PropVariantClear(ref v); return r;
+  }
+  // the shortcut gets the same id as the window, so Windows shows the shortcut's sharp .ico on the taskbar
+  public static bool LinkId(string lnk, string id) {
+    try {
+      object o = new M01ShellLink(); IPersistFile pf = (IPersistFile)o; pf.Load(lnk, 2);
+      IM01Props ps = (IM01Props)o; if (Get(ps, 5) == id) { Marshal.ReleaseComObject(o); return true; }
+      Put(ps, 5, id); ps.Commit(); pf.Save(lnk, true); Marshal.ReleaseComObject(o); return true;
+    } catch { return false; }
+  }
+  public static int Fix(string title, string icon, string id, string cmd) {
+    List<IntPtr> wins = new List<IntPtr>();
+    EnumWindows(delegate (IntPtr hw, IntPtr lp) {
+      if (!IsWindowVisible(hw)) return true;
+      StringBuilder c = new StringBuilder(64); GetClassName(hw, c, 64); if (!c.ToString().StartsWith("Chrome_WidgetWin_")) return true;
+      StringBuilder t = new StringBuilder(256); GetWindowText(hw, t, 256); if (t.ToString() == title) wins.Add(hw);
+      return true;
+    }, IntPtr.Zero);
+    foreach (IntPtr h in wins) {
+      uint dpi = 96; try { dpi = GetDpiForWindow(h); if (dpi == 0) dpi = 96; } catch { dpi = 96; }
+      int sm = (int)(16 * dpi / 96), bg = (int)(32 * dpi / 96);
+      IntPtr hs = LoadImage(IntPtr.Zero, icon, 1, sm, sm, 0x10), hb = LoadImage(IntPtr.Zero, icon, 1, bg, bg, 0x10);
+      if (hs != IntPtr.Zero) SendMessage(h, 0x80, IntPtr.Zero, hs);
+      if (hb != IntPtr.Zero) SendMessage(h, 0x80, new IntPtr(1), hb);
+      if (!done.Contains(h)) {
+        try {
+          Guid iid = StoreIid; IM01Props ps;
+          if (SHGetPropertyStoreForWindow(h, ref iid, out ps) == 0 && ps != null) {
+            Put(ps, 2, cmd); Put(ps, 4, title); Put(ps, 3, icon + ",0"); Put(ps, 5, id); ps.Commit(); Marshal.ReleaseComObject(ps);
+          }
+        } catch { }
+        done.Add(h);
+      }
+    }
+    return wins.Count;
+  }
+}
+"@
+# compile once and keep the result, so later launches skip the compiler
+$dll = Join-Path $env:LOCALAPPDATA 'M-01 Companion\helper\m01win1.dll'
+if (-not (Test-Path -LiteralPath $dll)) { try { New-Item -ItemType Directory -Path (Split-Path -Parent $dll) -Force | Out-Null; Add-Type -TypeDefinition $cs -OutputAssembly $dll -OutputType Library -ErrorAction Stop } catch { } }
+if (-not ('M01Win' -as [type])) { try { Add-Type -Path $dll -ErrorAction Stop } catch { } }
+if (-not ('M01Win' -as [type])) { try { Add-Type -TypeDefinition $cs -ErrorAction Stop } catch { exit } }
+$id = 'Elvis.M01Companion'
+$cmd = '"' + $env:WINDIR + '\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $M01Launch + '"'
+foreach ($l in @((Join-Path ([Environment]::GetFolderPath('Desktop')) 'M-01 Companion.lnk'), (Join-Path ([Environment]::GetFolderPath('Programs')) 'M-01 Companion.lnk'), (Join-Path $env:APPDATA 'Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\M-01 Companion.lnk'))) {
+  if (Test-Path -LiteralPath $l) { [void][M01Win]::LinkId($l, $id) }
+}
+# wait for the window, then set it again a few times in case Edge puts its own icon back after the page loads
+$seen = 0
+for ($i = 0; $i -lt 120 -and $seen -lt 6; $i++) {
+  if ([M01Win]::Fix('M-01 Companion', $M01Icon, $id, $cmd) -gt 0) { $seen++; Start-Sleep -Milliseconds (500 * $seen) } else { Start-Sleep -Milliseconds 250 }
+}
+'@
+$script:IconAt = [DateTime]::MinValue
+function Start-WinIcon {
+  try {
+    if (([DateTime]::Now - $script:IconAt).TotalSeconds -lt 20) { return }
+    $script:IconAt = [DateTime]::Now
+    $appDir = Split-Path -Parent $WebRoot
+    $ico = Join-Path $appDir 'icon.ico'; $lp = Join-Path $appDir 'launch.ps1'
+    if (-not (Test-Path -LiteralPath $ico)) { return }
+    $pre = '$M01Icon = ''' + $ico.Replace("'", "''") + "'`r`n" + '$M01Launch = ''' + $lp.Replace("'", "''") + "'`r`n"
+    $enc = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($pre + $WinIconPs))
+    Start-Process powershell.exe -WindowStyle Hidden -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', $enc)
+  } catch { }
+}
+
+# ---------- network calls run on their own threads, so a slow AI reply or weather lookup never freezes the rest of the app ----------
+$NetJob = {
+  param($client, [string]$mode, [string]$url, [string]$method, [byte[]]$body, [string]$ctype, [hashtable]$hdr, [int]$secs, [string]$tokFile)
+  $ProgressPreference = 'SilentlyContinue'
+  $utf8 = New-Object System.Text.UTF8Encoding($false)
+  $code = 0; $bytes = $null; $resp = $null
+  try {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    $rq = [Net.HttpWebRequest]::Create($url)
+    $rq.Method = $method; $rq.Timeout = $secs * 1000; $rq.ReadWriteTimeout = $secs * 1000
+    $rq.AutomaticDecompression = [Net.DecompressionMethods]::GZip -bor [Net.DecompressionMethods]::Deflate
+    $rq.UserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) M-01-Companion'
+    if ($hdr) { foreach ($k in @($hdr.Keys)) { $rq.Headers[[string]$k] = [string]$hdr[$k] } }
+    if ($method -ne 'GET') {
+      if ($null -eq $body) { $body = [byte[]]@() }
+      $rq.ContentType = $ctype; $rq.ContentLength = $body.Length
+      $rqs = $rq.GetRequestStream(); $rqs.Write($body, 0, $body.Length); $rqs.Close()
+    }
+    $resp = $rq.GetResponse()
+  } catch {
+    $ex = $_.Exception; while ($ex -and -not ($ex -is [Net.WebException])) { $ex = $ex.InnerException }
+    if ($ex) { $resp = $ex.Response }
+  }
+  if ($resp) {
+    try { $code = [int]$resp.StatusCode; $mem = New-Object IO.MemoryStream; $resp.GetResponseStream().CopyTo($mem); $bytes = $mem.ToArray() } catch { } finally { try { $resp.Close() } catch { } }
+  }
+  if ($null -eq $bytes) { $bytes = [byte[]]@() }
+  $type = 'application/json'; $out = $null
+  if ($mode -eq 'json') {
+    if ($code -ge 200 -and $code -lt 300 -and $bytes.Length -gt 0) { $type = 'application/json; charset=utf-8'; $out = $bytes }
+    else { $out = $utf8.GetBytes('{"error":true,"reason":"unreachable"}') }
+  } elseif ($mode -eq 'fish') {
+    if ($code -eq 200 -and $bytes.Length -gt 0) { $type = 'audio/mpeg'; $out = $bytes }
+    else {
+      $etxt = $utf8.GetString($bytes); if ($etxt.Length -gt 400) { $etxt = $etxt.Substring(0, 400) }; $etxt = $etxt -replace '[^\x20-\x7e]', ''
+      $out = $utf8.GetBytes('{"status":' + $code + ',"error":' + ($etxt | ConvertTo-Json -Compress) + '}')
+    }
+  } else {
+    $txt = $utf8.GetString($bytes)
+    if ($mode -eq 'gtoken') {
+      # the long-lived refresh token stays in a local file; the page only gets the short access token
+      $m = [regex]::Match($txt, '"refresh_token"\s*:\s*"([^"]+)"')
+      if ($m.Success) {
+        try { New-Item -ItemType Directory -Path (Split-Path -Parent $tokFile) -Force | Out-Null; [IO.File]::WriteAllText($tokFile, $m.Groups[1].Value, $utf8) } catch { }
+        $t2 = [regex]::Replace($txt, ',\s*"refresh_token"\s*:\s*"[^"]*"', '')
+        if ($t2 -eq $txt) { $t2 = [regex]::Replace($txt, '"refresh_token"\s*:\s*"[^"]*"\s*,?', '') }
+        $txt = $t2
+      }
+    }
+    if ($txt -notmatch '^\s*[\[{]') { $txt = 'null' }
+    $out = $utf8.GetBytes('{"status":' + $code + ',"body":' + $txt + '}')
+  }
+  try {
+    $st = $client.GetStream()
+    $hb = [System.Text.Encoding]::ASCII.GetBytes("HTTP/1.1 200 OK`r`nContent-Type: $type`r`nContent-Length: $($out.Length)`r`nCache-Control: no-store`r`nConnection: close`r`n`r`n")
+    $st.Write($hb, 0, $hb.Length); if ($out.Length -gt 0) { $st.Write($out, 0, $out.Length) }
+  } catch { } finally { try { $client.Close() } catch { } }
+}
+$NetPool = $null; try { $NetPool = [RunspaceFactory]::CreateRunspacePool(1, 8); $NetPool.Open() } catch { $NetPool = $null }
+$NetJobs = New-Object System.Collections.ArrayList
+# returns $true when the request was handed to a background thread (that thread answers and closes the connection)
+function Start-NetJob($client, [string]$mode, [string]$url, [string]$method, [byte[]]$body, [string]$ctype, [hashtable]$hdr, [int]$secs, [string]$tokFile) {
+  if (-not $NetPool) { & $NetJob $client $mode $url $method $body $ctype $hdr $secs $tokFile; return $true }
+  try {
+    $ps = [PowerShell]::Create(); $ps.RunspacePool = $NetPool
+    [void]$ps.AddScript($NetJob).AddArgument($client).AddArgument($mode).AddArgument($url).AddArgument($method).AddArgument($body).AddArgument($ctype).AddArgument($hdr).AddArgument($secs).AddArgument($tokFile)
+    [void]$NetJobs.Add(@($ps, $ps.BeginInvoke()))
+  } catch { & $NetJob $client $mode $url $method $body $ctype $hdr $secs $tokFile }
+  return $true
+}
+function Clear-NetJobs { for ($j = $NetJobs.Count - 1; $j -ge 0; $j--) { $it = $NetJobs[$j]; if ($it[1].IsCompleted) { try { [void]$it[0].EndInvoke($it[1]) } catch { }; try { $it[0].Dispose() } catch { }; $NetJobs.RemoveAt($j) } } }
+
 while ($true) {
   $client = $listener.AcceptTcpClient()
+  $handed = $false
+  Clear-NetJobs
   try {
     $client.ReceiveTimeout = 15000
     $stream = $client.GetStream()
@@ -245,7 +432,7 @@ while ($true) {
       $n = $stream.Read($buf, 0, $buf.Length); if ($n -le 0) { break }
       $ms.Write($buf, 0, $n)
       $all = $ms.ToArray()
-      for ($i = 3; $i -lt $all.Length; $i++) { if ($all[$i-3] -eq 13 -and $all[$i-2] -eq 10 -and $all[$i-1] -eq 13 -and $all[$i] -eq 10) { $headerEnd = $i + 1; break } }
+      $hx = [System.Text.Encoding]::ASCII.GetString($all).IndexOf("`r`n`r`n", [StringComparison]::Ordinal); if ($hx -ge 0) { $headerEnd = $hx + 4 }
     }
     if ($headerEnd -lt 0) { $client.Close(); continue }
     $all = $ms.ToArray()
@@ -276,13 +463,7 @@ while ($true) {
     elseif ($target -eq '/getjson') {
       $q = Parse-Query $qs; $u = [string]$q['url']
       if (($u -match '^https://(geocoding-api|api)\.open-meteo\.com/') -or ($u -match '^https://get\.geojs\.io/v1/ip/geo\.json$') -or ($u -match '^https://open\.spotify\.com/oembed\?url=[\w%.\-]+$') -or ($u -match '^https://itunes\.apple\.com/search\?[\w=&.%+-]*$') -or ($u -match '^https://open\.spotify\.com/oembed\?url=[\w%.-]*$') -or ($u -match '^https://api\.bigdatacloud\.net/data/reverse-geocode-client\?[\w=&.%-]*$') -or ($u -match '^https://(raw\.githubusercontent\.com|gist\.githubusercontent\.com|[A-Za-z0-9-]+\.github\.io)/\S*\.json(\?\S*)?$')) {
-        $bytes = $null
-        try {
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          $resp = Invoke-WebRequest -Uri $u -UseBasicParsing -TimeoutSec 12
-          $bytes = $resp.RawContentStream.ToArray()
-        } catch { $bytes = $null }
-        if ($bytes -and $bytes.Length -gt 0) { Send-Reply $stream 200 'application/json; charset=utf-8' $bytes } else { Send-Text $stream 200 'application/json' '{"error":true,"reason":"unreachable"}' }
+        $handed = Start-NetJob $client 'json' $u 'GET' $null '' $null 12 ''
       } else { Send-Text $stream 403 'text/plain' 'forbidden' }
     }
     elseif ($target -eq '/secret') {
@@ -322,26 +503,7 @@ while ($true) {
         if (-not $rt) { Send-Text $stream 200 'application/json' '{"status":401,"body":{"error":"not_signed_in"}}'; $skip = $true }
         else { $form = $form + '&refresh_token=' + [Uri]::EscapeDataString($rt) }
       }
-      if (-not $skip) {
-        $code = 0; $txt = ''
-        try {
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          $resp = Invoke-WebRequest -Uri $GTokUrl -Method Post -Body $form -ContentType 'application/x-www-form-urlencoded' -UseBasicParsing -TimeoutSec 30
-          $code = [int]$resp.StatusCode; $txt = $utf8.GetString($resp.RawContentStream.ToArray())
-        } catch {
-          $er = $_.Exception.Response
-          if ($er) { $code = [int]$er.StatusCode; try { $sr = New-Object IO.StreamReader($er.GetResponseStream(), $utf8); $txt = $sr.ReadToEnd() } catch { $txt = '' } }
-        }
-        $m = [regex]::Match($txt, '"refresh_token"\s*:\s*"([^"]+)"')
-        if ($m.Success) {
-          New-Item -ItemType Directory -Path (Split-Path -Parent $GoogFile) -Force | Out-Null; [IO.File]::WriteAllText($GoogFile, $m.Groups[1].Value, $utf8)
-          $t2 = [regex]::Replace($txt, ',\s*"refresh_token"\s*:\s*"[^"]*"', '')
-          if ($t2 -eq $txt) { $t2 = [regex]::Replace($txt, '"refresh_token"\s*:\s*"[^"]*"\s*,?', '') }
-          $txt = $t2
-        }
-        if ($txt -notmatch '^\s*[\[{]') { $txt = 'null' }
-        Send-Text $stream 200 'application/json' ('{"status":' + $code + ',"body":' + $txt + '}')
-      }
+      if (-not $skip) { $handed = Start-NetJob $client 'gtoken' $GTokUrl 'POST' ($utf8.GetBytes($form)) 'application/x-www-form-urlencoded' $null 30 $GoogFile }
     }
     elseif ($target -eq '/gemini') {
       $q = Parse-Query $qs
@@ -351,17 +513,7 @@ while ($true) {
       if (-not $gk) { Send-Text $stream 200 'application/json' '{"status":401,"body":{"error":{"message":"no key"}}}' }
       else {
         $gbase = 'https://generativelanguage.googleapis.com'; if ($env:M01_GEMINI_URL) { $gbase = $env:M01_GEMINI_URL }
-        $code = 0; $txt = ''
-        try {
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          $resp = Invoke-WebRequest -Uri ($gbase + '/v1beta/models/' + $model + ':generateContent') -Method Post -Body $body -ContentType 'application/json; charset=utf-8' -Headers @{ 'x-goog-api-key' = $gk } -UseBasicParsing -TimeoutSec 120
-          $code = [int]$resp.StatusCode; $txt = $utf8.GetString($resp.RawContentStream.ToArray())
-        } catch {
-          $er = $_.Exception.Response
-          if ($er) { $code = [int]$er.StatusCode; try { $sr = New-Object IO.StreamReader($er.GetResponseStream(), $utf8); $txt = $sr.ReadToEnd() } catch { $txt = '' } }
-        }
-        if ($txt -notmatch '^\s*[\[{]') { $txt = 'null' }
-        Send-Text $stream 200 'application/json' ('{"status":' + $code + ',"body":' + $txt + '}')
+        $handed = Start-NetJob $client 'wrap' ($gbase + '/v1beta/models/' + $model + ':generateContent') 'POST' $body 'application/json; charset=utf-8' @{ 'x-goog-api-key' = $gk } 120 ''
       }
     }
     elseif ($target -eq '/fishtts') {
@@ -372,18 +524,7 @@ while ($true) {
       if (-not $fk) { Send-Text $stream 200 'application/json' '{"status":401,"error":"no key"}' }
       else {
         $fbase = 'https://api.fish.audio'; if ($env:M01_FISH_URL) { $fbase = $env:M01_FISH_URL }
-        $code = 0; $bytes = $null; $etxt = ''
-        try {
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          $resp = Invoke-WebRequest -Uri ($fbase + '/v1/tts') -Method Post -Body $body -ContentType 'application/json; charset=utf-8' -Headers @{ 'Authorization' = ('Bearer ' + $fk); 'model' = $model } -UseBasicParsing -TimeoutSec 90
-          $code = [int]$resp.StatusCode; $bytes = $resp.RawContentStream.ToArray()
-        } catch {
-          $er = $_.Exception.Response
-          if ($er) { $code = [int]$er.StatusCode; try { $sr = New-Object IO.StreamReader($er.GetResponseStream(), $utf8); $etxt = $sr.ReadToEnd() } catch { $etxt = '' } }
-        }
-        if ($code -eq 200 -and $bytes -and $bytes.Length -gt 0) { Send-Reply $stream 200 'audio/mpeg' $bytes }
-        else { if ($etxt.Length -gt 400) { $etxt = $etxt.Substring(0, 400) }; $etxt = $etxt -replace '[^\x20-\x7e]', ''
-          Send-Text $stream 200 'application/json' ('{"status":' + $code + ',"error":' + (Json-Str $etxt) + '}') }
+        $handed = Start-NetJob $client 'fish' ($fbase + '/v1/tts') 'POST' $body 'application/json; charset=utf-8' @{ 'Authorization' = ('Bearer ' + $fk); 'model' = $model } 90 ''
       }
     }
     elseif ($target -eq '/uninstall') {
@@ -674,6 +815,7 @@ if (`$LASTEXITCODE -eq 0) {
         $f = Join-Path $WebRoot ($p.TrimStart('/') -replace '/', '\')
         $ext = [System.IO.Path]::GetExtension($f).TrimStart('.').ToLower()
         $ovf = Join-Path $WebOvr 'index.html'
+        if ($p -eq '/index.html' -and $env:M01_NOICON -ne '1') { Start-WinIcon }
         if ($p -eq '/index.html' -and (Test-Path -LiteralPath $ovf -PathType Leaf) -and (Test-Path -LiteralPath $f -PathType Leaf) -and ((Page-Ver ([IO.File]::ReadAllText($ovf, $utf8))) -le (Page-Ver ([IO.File]::ReadAllText($f, $utf8))))) { try { Remove-Item -LiteralPath $ovf -Force } catch { } }   # an older downloaded page is left over: remove it
         if ($p -eq '/index.html' -and (Test-Path -LiteralPath $ovf -PathType Leaf) -and (Test-Path -LiteralPath $f -PathType Leaf) -and ((Page-Ver ([IO.File]::ReadAllText($ovf, $utf8))) -gt (Page-Ver ([IO.File]::ReadAllText($f, $utf8))))) { Send-Reply $stream 200 $Types['html'] ([System.IO.File]::ReadAllBytes($ovf)) }
         elseif (Test-Path -LiteralPath $f -PathType Leaf) { $t = $Types[$ext]; if (-not $t) { $t = 'application/octet-stream' }; Send-Reply $stream 200 $t ([System.IO.File]::ReadAllBytes($f)) }
@@ -683,6 +825,6 @@ if (`$LASTEXITCODE -eq 0) {
   } catch {
     try { Send-Text $stream 400 'text/plain' 'error' } catch {}
   } finally {
-    try { $client.Close() } catch {}
+    if (-not $handed) { try { $client.Close() } catch {} }
   }
 }
