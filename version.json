@@ -1,7 +1,7 @@
 {
- "version": "1.2.0",
- "notes": "1.2.0：本地 AI 可以全部下載、在聊天畫面切換；更新改在 App 裡完成（有進度條）；開始畫面點了馬上有反應；音樂小工具支援瀏覽器的 YouTube。這次會先更新背景小幫手，再在 App 裡下載安裝新版。",
- "notes_en": "1.2.0: keep several local AI models and switch from the chat; updates install inside the app with a progress bar; instant start screen; the music widget follows YouTube in a browser. This one updates the helper first, then downloads and installs the new version inside the app.",
+ "version": "1.2.1",
+ "notes": "1.2.1：說明文字更新（記憶同步、備份位置、本地 AI、音樂、新手教學）。按一下就能更新。",
+ "notes_en": "1.2.1: help text updated (memory sync, backup location, local AI, music, guided tour). One-click update.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
@@ -12,6 +12,6 @@
  "helper_win": "https://elvis071114-coder.github.io/m01/helper/server.ps1",
  "helper_win_sha": "75762b30be1e9cbdc92435ab27c25fc8be001977b44f3fd72d51f15c724ad329",
  "pkg": 2,
- "windows_sha": "dbba811552390e6df259089f1efd918bc80ca385a493343526410ef8b91a989f",
- "mac_sha": "eea3a604ae1ef3b829c97b6889f57dfadee7f53636549e8b9ff6b627ebd0f145"
+ "windows_sha": "8a7c3a61af5ea866137741738b76add42dd622c1a8006df500ac8d48c1d6b1f5",
+ "mac_sha": "456fe3de5eb3f988ae3e44205d11df2118f42cc503219347901a6bb21b7fe4e6"
 }
