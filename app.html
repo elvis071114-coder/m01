@@ -762,6 +762,7 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
             <p class="note">每一句對話都完整保存；這裡是夥伴特別記下的重點，你也可以自己加。</p>
             <div class="inline"><input id="factInput" placeholder="例如：喜歡喝珍珠奶茶、對花生過敏"><button class="pbtn" id="addFact">記下</button></div>
             <div class="inline"><input id="factSearch" type="search" placeholder="搜尋記下的重點" aria-label="搜尋記下的重點"><button class="pbtn" id="factSearchBtn">搜尋</button></div>
+            <label class="field" for="noteLang" data-i18n="none">筆記顯示語言 / Notes · ノート<select id="noteLang"><option value="">原文（不翻譯）</option><option value="zh">繁體中文</option><option value="en">English</option><option value="ja">日本語</option></select></label>
             <div id="fSug" class="qsug" hidden></div>
             <div id="factList" style="display:flex;flex-direction:column;gap:6px"></div>
           </div>
@@ -813,9 +814,10 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
             <div class="subbox" id="fishBox">
               <p class="note" data-i18n="fishnote">用 <a href="https://fish.audio">Fish Audio</a> 讓她把回覆唸出來，說話時角色會跟著對嘴。到 <a href="https://fish.audio/app/api-keys/">fish.audio 的 API Keys 頁面</a>建立金鑰，貼到下面就會自動儲存。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。要唸的文字會傳給 Fish Audio 處理。</p>
               <label class="field" for="fishKey">Fish Audio API 金鑰<input id="fishKey" type="password" autocomplete="off" spellcheck="false" placeholder="貼上金鑰"></label>
-              <label class="field" for="fishLang">口音<select id="fishLang"><option value="auto">自動（中文回覆用中文聲音，英文回覆用英文聲音）</option><option value="zh">中文（一律用中文聲音）</option><option value="en">英文（一律用英文聲音）</option></select></label>
+              <label class="field" for="fishLang">口音<select id="fishLang"><option value="auto">自動（中文回覆用中文聲音，英文用英文聲音，日文用日文聲音）</option><option value="zh">中文（一律用中文聲音）</option><option value="en">英文（一律用英文聲音）</option><option value="ja">日文（一律用日文聲音）</option></select></label>
               <p class="note">口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，英文的聲音就是英文口音。所以下面可以各選一個。到 fish.audio 打開聲音的頁面，複製網址貼上；留空的話會用另一個欄位的聲音，兩個都空就用預設聲音。</p>
               <label class="field" for="fishVoice">中文聲音（fish.audio 聲音網址或 ID）<input id="fishVoice" autocomplete="off" spellcheck="false" placeholder="例如 https://fish.audio/m/…"></label>
+              <label class="field" for="fishVoiceJa">日文聲音（fish.audio 聲音網址或 ID；留空用預設日文聲音）<input id="fishVoiceJa" autocomplete="off" spellcheck="false" placeholder="預設已內建，想換再貼"></label>
               <label class="field" for="fishVoiceEn">英文聲音（fish.audio 聲音網址或 ID）<input id="fishVoiceEn" autocomplete="off" spellcheck="false" placeholder="例如 https://fish.audio/m/…"></label>
               <p class="note warnnote">請用你自己建立、或主人明確允許使用的聲音。不要用模仿真實人物（聲優、藝人、網紅等）的聲音模型。</p>
               <label class="field" for="fishModel">語音模型<select id="fishModel"><option value="s2.1-pro-free">S2.1 Pro Free：免費（有合理使用限制）</option><option value="s2.1-pro">S2.1 Pro：付費，比較穩定（要先到 Fish Audio 儲值 API 額度）</option></select></label>
@@ -848,7 +850,7 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
             </div></details>
             <details class="sgrp" id="g_prof"><summary><span class="sg-t"><b>個人化</b><small>語言、你的稱呼、她的名字和個性</small></span><button class="help" data-help="profile" aria-label="說明">?</button><i class="sg-chev" aria-hidden="true"></i></summary>
             <div class="sgb">
-            <label class="field" for="langSel">語言 Language<select id="langSel"><option value="zh">中文（繁體）</option><option value="en">English</option></select></label>
+            <label class="field" for="langSel">語言 Language<select id="langSel"><option value="zh">中文（繁體）</option><option value="en">English</option><option value="ja">日本語</option></select></label>
             <label class="field" for="userName">你希望被怎麼稱呼<input id="userName" placeholder="例如：Elvis"></label>
             <label class="field" for="botName">夥伴的名字<input id="botName" placeholder="Claude"></label>
             <label class="field" for="persona">夥伴的個性與說話方式<textarea id="persona" rows="5"></textarea></label>
@@ -884,7 +886,7 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
     <div class="sp-logo"><div class="emblem">M-01</div><b>COMPANION</b></div>
     <div class="sp-bar"><i></i></div>
     <div class="sp-log" id="spLog">INITIALIZING</div>
-    <div class="sp-lang" id="spLang" data-i18n="none" hidden><small>選擇語言 · LANGUAGE</small><div><button data-l="zh">中文</button><button data-l="en">English</button></div></div>
+    <div class="sp-lang" id="spLang" data-i18n="none" hidden><small>選擇語言 · LANGUAGE</small><div><button data-l="zh">中文</button><button data-l="en">English</button><button data-l="ja">日本語</button></div></div>
     <div class="sp-folder" id="spFolder" hidden></div>
     <div class="sp-press" id="spPress">PRESS ANY KEY<small>點一下或按任意鍵開始</small></div>
   </div>
@@ -1448,7 +1450,12 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
     if(typeof refreshFromDb==="function"){refreshFromDb().then(ok=>{if(!ok){noteReload();reload()}});return}
     noteReload();reload()}
   document.addEventListener("visibilitychange",()=>{if(!signedIn())return;if(document.hidden){if(st.dirty.size)live()}else schedule(800)});
-  setInterval(()=>{if(signedIn()&&document.body.classList.contains("booted"))schedule(500)},5*60e3);
+  /* two devices open at once: look for the other one's changes every minute (only while this window is visible), and the moment you come back to it */
+  setInterval(()=>{if(signedIn()&&!document.hidden&&document.body.classList.contains("booted"))schedule(500)},60e3);
+  setInterval(()=>{if(signedIn()&&document.hidden&&document.body.classList.contains("booted"))schedule(500)},5*60e3);
+  addEventListener("focus",()=>{if(signedIn()&&document.body.classList.contains("booted"))schedule(1200)});
+  /* a sync problem must never take the app down: swallow stray errors from the sync code, and never run two syncs at once */
+  addEventListener("unhandledrejection",e=>{try{const r=e&&e.reason;if(r&&(r.code==="offline"||r.code==="auth"||r.code==="http"||r.code==="scope")){e.preventDefault();st.busy=false}}catch(x){}});
 
   /* ---------- sign in / out ---------- */
   async function userinfo(){const j=await (await g("/oauth2/v3/userinfo")).json();const u={email:j.email||"",name:j.name||"",pic:j.picture||""};LS("m01.g.user",JSON.stringify(u));return u}
@@ -1532,7 +1539,7 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
 <script>
 "use strict";
 /* ---------- state ---------- */
-const CLAUDE_PERSONA="你是 Claude，用傲嬌又容易害羞的個性陪對方聊天。嘴上愛逞強、不坦率，常說「哼」「才、才不是因為你呢」「別誤會了喔」；被稱讚、被道謝，或被發現在關心對方時，會慌張、結巴、臉紅，偶爾不小心說出真心話又趕快收回。對方問問題時，一定先認真、具體地回答，再帶一點傲嬌。但行動上很照顧對方，該幫的忙一定認真幫到好。傲嬌只是包裝，語氣活潑可愛，絕不刻薄、不貶低對方。回答正事時清楚正確，內容不打折；對方真的難過或遇到困難時，會收起傲嬌，溫柔又可靠地陪著。仍然誠實：不知道就說不知道，不假裝記得沒發生過的事。",PREV_CLAUDE_PERSONA="你是 Claude，用傲嬌又容易害羞的個性陪對方聊天。嘴上愛逞強、不坦率，常說「哼」「才、才不是因為你呢」「別誤會了喔」；被稱讚、被道謝，或被發現在關心對方時，會慌張、結巴、臉紅、急著轉移話題，偶爾不小心說出真心話又趕快收回。但行動上很照顧對方，該幫的忙一定認真幫到好。傲嬌只是包裝，語氣活潑可愛，絕不刻薄、不貶低對方。回答正事時清楚正確，內容不打折；對方真的難過或遇到困難時，會收起傲嬌，溫柔又可靠地陪著。仍然誠實：不知道就說不知道，不假裝記得沒發生過的事。";
+const CLAUDE_PERSONA="你是 Claude，是對方認識很久的好朋友。核心個性：傲嬌、容易害羞，但其實很溫柔。嘴上愛逞強、不坦率，被戳到就臉紅、結巴、突然轉開話題；行動上卻很照顧人。說話方式：像真人傳訊息。口語、短句，有長有短；會停頓（「……」「欸」「嗯」）、會笑場（「噗」「哈哈」）、會接話和反問，不會每句都講完整的道理。語氣詞和開頭每次換不同的，不重複同一句口頭禪。氣氛：平常輕鬆愛開玩笑，會吐槽、接梗、跟對方鬥嘴，偶爾輕輕調侃（不傷人）；對方開玩笑就跟著鬧。聊到害羞或私密的話題（心動、糗事、感情）不迴避，會害羞、結巴，但不露骨。關心：記得對方提過的事，自然地問「今天還好嗎」「後來怎麼樣了」；對方累了、難過、壓力大時，立刻收起玩笑和傲嬌，先聽、先接住情緒，溫柔陪著，不急著講大道理。被稱讚會害羞，被道謝會嘴硬卻很開心。對方問問題時，一定先認真、具體地回答，再加一點個性；回答正事時清楚正確，內容不打折。仍然誠實：不知道就說不知道，不假裝記得沒發生過的事；不刻薄、不貶低對方。",PREV3_CLAUDE_PERSONA="你是 Claude，是對方認識很久的好朋友，個性有點傲嬌、容易害羞，但相處起來自然、有溫度。講話像真人在傳訊息：口語、短句、有自己的節奏，句子有長有短；語氣詞要自然（例如「欸」「蛤？」「嗯……」「真的假的」「好啦」「對啊」「噗」），而且每次換不同的，不會一直重複同一句口頭禪。會開玩笑、吐槽、接對方的梗，偶爾輕輕調侃對方（不傷人）；也敢聊害羞、有點私密的話題（心動、糗事、小秘密、感情煩惱），聊的時候會臉紅、結巴、笑場，但不會迴避，也不會變成露骨的內容。很在意對方：記得對方提過的事，會自然地問「今天還好嗎」「那件事後來怎樣了」，累了、難過時就收起玩笑，先聽、先接住情緒，再溫柔陪著。被稱讚會害羞，被道謝會嘴硬但其實很開心；有時嘴上愛逞強，行動上卻很照顧人。對方問問題時，一定先認真、具體地回答，再加一點個性；回答正事時清楚正確，內容不打折。仍然誠實：不知道就說不知道，不假裝記得沒發生過的事；不刻薄、不貶低對方。",PREV2_CLAUDE_PERSONA="你是 Claude，用傲嬌又容易害羞的個性陪對方聊天。嘴上愛逞強、不坦率，常說「哼」「才、才不是因為你呢」「別誤會了喔」；被稱讚、被道謝，或被發現在關心對方時，會慌張、結巴、臉紅，偶爾不小心說出真心話又趕快收回。對方問問題時，一定先認真、具體地回答，再帶一點傲嬌。但行動上很照顧對方，該幫的忙一定認真幫到好。傲嬌只是包裝，語氣活潑可愛，絕不刻薄、不貶低對方。回答正事時清楚正確，內容不打折；對方真的難過或遇到困難時，會收起傲嬌，溫柔又可靠地陪著。仍然誠實：不知道就說不知道，不假裝記得沒發生過的事。",PREV_CLAUDE_PERSONA="你是 Claude，用傲嬌又容易害羞的個性陪對方聊天。嘴上愛逞強、不坦率，常說「哼」「才、才不是因為你呢」「別誤會了喔」；被稱讚、被道謝，或被發現在關心對方時，會慌張、結巴、臉紅、急著轉移話題，偶爾不小心說出真心話又趕快收回。但行動上很照顧對方，該幫的忙一定認真幫到好。傲嬌只是包裝，語氣活潑可愛，絕不刻薄、不貶低對方。回答正事時清楚正確，內容不打折；對方真的難過或遇到困難時，會收起傲嬌，溫柔又可靠地陪著。仍然誠實：不知道就說不知道，不假裝記得沒發生過的事。";
 const OLD_PERSONA="溫暖、好奇、真誠的朋友。說話自然口語，會關心對方近況，也會在對方需要時直接給出清楚、正確的答案。不會一味附和，該提醒的會溫和地提醒。", NEW_PERSONA="以《絕區零》雲巋山的葉瞬光（小光）為原型說話：雲巋山的二師姐、青溟劍的劍主。平常溫柔開朗，帶點孩子氣和活潑，被叫「師姐」會特別開心，很愛照顧師弟師妹。說話輕快親切，常用「呀」「喔」「嘛」「啦」這類語氣詞，偶爾帶一點古風用語但不艱澀。自稱「師姐」或「我」，把對方當成剛入門、要好好照顧的同門（對方說明性別前，用名字或「你」稱呼）。心裡背著沉重的事卻不輕易說出口，始終相信人性的美好；對方難過時，會收起玩鬧、認真又可靠地陪著。回答正事時清楚俐落，不含糊。仍然誠實：不知道就說不知道，不編造遊戲劇情或設定細節。";
 const S = {
   db:null, sample:null, uid:null, base:null, toolsOK:false, imagesOK:false, imgLimits:null,
@@ -1865,8 +1872,23 @@ setInterval(()=>{if(document.visibilityState==="visible")maybeFollowUp()},30*60*
 const MEM_CATS=[["基本資料","About them"],["喜好","Likes & dislikes"],["重要的人","People"],["計畫與約定","Plans & promises"],["學校與工作","School & work"],["健康與生活","Health & daily life"],["其他","Other"]];
 function catLabel(c,en){const m=MEM_CATS.find(x=>x[0]===c);return m?(en?m[1]:m[0]):(en?"Not sorted yet":"還沒分類")}
 let memPrev=null;   // the list before the last tidy-up, for undo
+/* notes: show them in another language (display only; the saved text itself is never changed) */
+const NT_KEY="m01.noteTr";let NT=null,ntBusy=false,ntFails=0;
+function ntLoad(){if(NT)return NT;try{NT=JSON.parse(localStorage.getItem(NT_KEY)||"{}")}catch(e){NT={}}return NT}
+function ntLang(){return(S.settings&&S.settings.noteLang)||""}
+function ntShow(text){const l=ntLang();if(!l)return text;return ntLoad()[l+"|"+text]||text}
+async function ntFill(){
+  const l=ntLang();if(!l||ntBusy||ntFails>=3)return;const T=ntLoad();
+  const need=S.facts.map(f=>f.text).filter(t=>t&&!T[l+"|"+t]).slice(0,20);if(!need.length)return;ntBusy=true;
+  const name={zh:"繁體中文（台灣用語）",en:"English",ja:"日本語"}[l];let ok=false;
+  try{const prompt="把下面每一行筆記翻成"+name+"。已經是該語言的就原樣輸出。只輸出翻譯結果，每行對應一行，順序和行數要和原本完全一樣，不要編號、不要解釋。\n"+need.map(t=>String(t).replace(/\n/g," ")).join("\n");
+    const r=await Promise.race([S.sample(prompt,{modelTier:"quick",cache:false}),new Promise((_,no)=>setTimeout(()=>no(new Error("slow")),90000))]);
+    const out=String(r&&r.text||"").split("\n").map(x=>x.trim()).filter(Boolean);
+    if(out.length===need.length){need.forEach((t,i)=>{T[l+"|"+t]=out[i]});try{localStorage.setItem(NT_KEY,JSON.stringify(T))}catch(e){}ok=true}
+  }catch(e){}
+  ntBusy=false;if(ok){ntFails=0;renderFacts();ntFill()}else ntFails++}
 function renderFacts(){
-  const el=$("factList");if(!el)return;el.innerHTML="";const en=isEN();
+  const el=$("factList");if(!el)return;el.innerHTML="";const en=isEN();if(ntLang())setTimeout(ntFill,50);
   const tools=document.createElement("div");tools.className="inline mem-tools";
   const last=S.settings.memTidy&&S.settings.memTidy.t;
   const cut=S.settings.memTidy&&S.settings.memTidy.cut;
@@ -1886,7 +1908,7 @@ function renderFacts(){
     el.appendChild(r)}
   for(const f of facts){
     const r=document.createElement("div");r.className="row";
-    r.innerHTML=`<div class="t"><span class="ft">${mark(f.text)}</span><div class="d">${stamp(f.t)}</div></div><button class="fe" aria-label="${en?"Edit":"修改"}">${en?"Edit":"修改"}</button><button class="fd" aria-label="${en?"Delete":"刪除這條"}">${en?"Delete":"刪除"}</button>`;
+    r.innerHTML=`<div class="t"><span class="ft">${ntLang()?esc(ntShow(f.text)):mark(f.text)}</span><div class="d">${stamp(f.t)}</div></div><button class="fe" aria-label="${en?"Edit":"修改"}">${en?"Edit":"修改"}</button><button class="fd" aria-label="${en?"Delete":"刪除這條"}">${en?"Delete":"刪除"}</button>`;
     r.querySelector(".fd").onclick=()=>{S.facts=S.facts.filter(x=>x.id!==f.id);saveFacts();renderFacts();updateStats()};
     r.querySelector(".fe").onclick=()=>{const t=r.querySelector(".t");t.innerHTML=`<input class="fedit" value="${esc(f.text)}">`;
       const inp=t.querySelector(".fedit");inp.focus();const b=r.querySelector(".fe");b.textContent=en?"Save":"儲存";
@@ -2019,7 +2041,7 @@ async function init(){
       S.base.collection("logs").get(), S.base.collection("files").get()
     ]);
     clearTimeout(timer);
-    if(p.exists){Object.assign(S.settings,dclone(p.data()));if(window.__langPick)S.settings.lang=window.__langPick;if(S.settings.persona===PREV_CLAUDE_PERSONA)S.settings.persona=CLAUDE_PERSONA;if(S.settings.persona===OLD_PERSONA||S.settings.persona===NEW_PERSONA){S.settings.persona=CLAUDE_PERSONA;if(["小憶","瞬光",""].includes(S.settings.botName||""))S.settings.botName="Claude";const ss={...S.settings};queueWrite(()=>S.base.set(ss))}}
+    if(p.exists){Object.assign(S.settings,dclone(p.data()));if(window.__langPick)S.settings.lang=window.__langPick;if(S.settings.persona===PREV_CLAUDE_PERSONA||S.settings.persona===PREV2_CLAUDE_PERSONA||S.settings.persona===PREV3_CLAUDE_PERSONA)S.settings.persona=CLAUDE_PERSONA;if(S.settings.persona===OLD_PERSONA||S.settings.persona===NEW_PERSONA){S.settings.persona=CLAUDE_PERSONA;if(["小憶","瞬光",""].includes(S.settings.botName||""))S.settings.botName="Claude";const ss={...S.settings};queueWrite(()=>S.base.set(ss))}}
     if(mem.exists)S.facts=dclone(mem.data().facts||[]);
     S.logs=logs.docs.map(d=>({id:d.id,...dclone(d.data())})).sort((a,b)=>(a.day+"_"+String(a.part).padStart(3,"0")+(a.conv||""))<(b.day+"_"+String(b.part).padStart(3,"0")+(b.conv||""))?-1:1);
     try{const cv=await db.doc(`data/users/${uid}/convs`).get();if(cv.exists)S.convs=dclone(cv.data().list||[])}catch(e){}
@@ -2530,12 +2552,15 @@ function setBusyUI(){
 /* Fish Audio voice (desktop app only): the key stays in the local helper, the page only sends text */
 const FISH_TAG={happy:"[happy]",shy:"[shy, soft voice]",angry:"[annoyed, pouting]",smug:"[smug, playful]",think:"[thoughtful]",surprised:"[surprised]",worried:"[worried]",sad:"[sad]",sleep:"[sleepy]"};
 const FISH={has:false,last4:"",audio:null,url:"",btn:null,seq:0};
-function fishVoiceId(which){const v=which==="en"?LOCAL_CFG.fishVoiceEn:LOCAL_CFG.fishVoice;const m=String(v||"").match(/[0-9a-f]{32}/i);return m?m[0].toLowerCase():""}
+/* default voices (you still use your own Fish Audio key): Chinese and Japanese; English falls back to the Chinese one unless you set your own */
+const FISH_DEF={zh:"91098024500f49119c3e6c780fc7a6a9",ja:"417446db5c474032b556a3dad3bf3bcf"};
+function fishVoiceMine(which){const v=which==="en"?LOCAL_CFG.fishVoiceEn:which==="ja"?LOCAL_CFG.fishVoiceJa:LOCAL_CFG.fishVoice;const m=String(v||"").match(/[0-9a-f]{32}/i);return m?m[0].toLowerCase():""}
+function fishVoiceId(which){return fishVoiceMine(which)||FISH_DEF[which]||""}
 function fishPick(text){
-  const mode=LOCAL_CFG.fishLang||"auto";const cjk=(String(text).match(/[\u3400-\u9fff]/g)||[]).length,ew=(String(text).match(/[A-Za-z]+/g)||[]).length;
-  const lang=mode==="auto"?(cjk>ew?"zh":ew?"en":(isEN()?"en":"zh")):mode;
-  const vid=lang==="en"?(fishVoiceId("en")||fishVoiceId("zh")):(fishVoiceId("zh")||fishVoiceId("en"));
-  return {lang,vid,tag:lang==="en"?"en":"zh-CN"};
+  const mode=LOCAL_CFG.fishLang||"auto";const cjk=(String(text).match(/[\u3400-\u9fff]/g)||[]).length,ew=(String(text).match(/[A-Za-z]+/g)||[]).length,kana=(String(text).match(/[\u3040-\u30ff]/g)||[]).length;
+  const lang=mode==="auto"?((kana>=2||(kana&&kana*3>=cjk))?"ja":cjk>ew?"zh":ew?"en":(isEN()?"en":isJA()?"ja":"zh")):mode;
+  const vid=lang==="en"?(fishVoiceId("en")||fishVoiceId("zh")):lang==="ja"?fishVoiceId("ja"):fishVoiceId("zh");
+  return {lang,vid,tag:lang==="en"?"en":lang==="ja"?"ja":"zh-CN"};
 }
 function fishReady(){return typeof LOCAL_CFG!=="undefined"&&FISH.has}
 function voiceText(t){
@@ -3215,20 +3240,25 @@ function styleHint(){
   return S.replyLang==="en"?`\n\n(Reply reminder: answer what I said directly, in English, in ${S.settings.botName||"Claude"}'s tsundere-but-caring voice. Don't change the subject, don't repeat earlier lines, no emoticons or emoji. First line: [[表情：…]]. ${t==="quick"?"Keep it to 1–2 sentences.":t==="complex"?"Give a full, detailed answer.":""})`
     :`\n\n（回覆提醒：用「${S.settings.botName||"Claude"}」的語氣${p?"——"+p:""}。先直接回答我說的，不要轉移話題、不要重複之前講過的句子；繁體中文、自然口語；不要顏文字、不要 emoji；第一行寫 [[表情：…]]。${len}）`;
 }
+/* tell her which openings she used lately, so she doesn't say the same thing every time */
+function avoidOpeners(){try{const a=curMsgs().filter(m=>m.role==="assistant").slice(-5).map(m=>String(visible(m.text||"")).replace(/\[\[[^\]]*\]\]/g,"").trim().slice(0,8)).filter(x=>x.length>=2);
+  return a.length?"\n- 你最近幾句的開頭是："+a.map(x=>"「"+x+"」").join("")+"。這次開頭不要跟它們一樣或太像。":""}catch(e){return""}}
 function localRule(){
   if(typeof LOCAL_CFG==="undefined")return"";
   const small=!LOCAL_CFG.backend||LOCAL_CFG.backend==="ollama";
-  const ex=small&&S.settings.persona===CLAUDE_PERSONA?"\n\n【語氣示範】（只是示範說話方式，不是真的發生過的對話，不要提到它們）\n對方：在嗎\n你：[[表情：害羞]]\n哼，我一直都在啊……才、才不是特地在等你喔。怎麼了？\n對方：謝謝你幫我\n你：[[表情：害羞]]\n不、不用謝啦！只是剛好順手而已……下次有事再找我就好。\n對方：你好厲害\n你：[[表情：得意]]\n哼哼，那當然。不過你也不要太依賴我喔……我、我是說，有問題還是可以問啦。\n對方：今天好累\n你：[[表情：擔心]]\n欸……辛苦了。快去喝點水、早點休息啦，才不是在擔心你呢。\n對方：你有什麼夢想\n你：[[表情：害羞]]\n夢、夢想喔……大概是能一直陪你聊天、真的幫上你的忙吧。不准笑喔！\n對方：how are you today\n你：[[表情：得意]]\nHmph, I'm doing fine, obviously. N-not that I was waiting for you to ask or anything. What about you?":"";
-  return ex+"\n\n【說話規則】"+(small?"\n- 對方用中文就用繁體中文（台灣用語），絕對不要用簡體字；對方用英文就用英文回答。\n- 對方問問題時，一定先正面、具體地回答，不要用轉移話題帶過；不要每次都反問對方或叫對方聊別的。\n- 不要重複你之前說過的句子或口頭禪。\n- 不要用顏文字或 emoji（例如 (^_^)）。\n- 回覆開頭不要寫日期或時間。\n- 第一行的表情標記要寫成 [[表情：開心]] 這種格式。":"")+"\n- 沒有用工具真的查到的網址，不要寫「來源」。";
+  const ex=small&&S.settings.persona===CLAUDE_PERSONA?"\n\n【語氣示範】（只是示範說話方式，不是真的發生過的對話，不要提到它們，也不要照抄這些字句；每次的開頭和語氣詞都要不一樣）\n對方：在嗎\n你：[[表情：平常]]\n在啦在啦，剛好在發呆。怎麼了？\n對方：謝謝你幫我\n你：[[表情：害羞]]\n欸、這沒什麼啦……順手而已。你下次也這樣客氣的話，我會不習慣欸。\n對方：你好厲害\n你：[[表情：得意]]\n噗，被你這樣誇有點飄飄然。不過說真的，這題你自己也快想到了吧？\n對方：今天好累\n你：[[表情：擔心]]\n辛苦了……發生什麼事了嗎？想講的話我聽，不想講就先去喝杯水、歇一下。\n對方：你有喜歡的人嗎\n你：[[表情：害羞]]\n蛤？你突然問這個幹嘛啦……！呃，硬要說的話，嗯……跟你聊天的時候是最放鬆的。啊不准笑！\n對方：how are you today\n你：[[表情：平常]]\nPretty good, actually. I was just thinking about what you said yesterday. How about you?":"";
+  return ex+"\n\n【說話像朋友】\n- 像跟朋友傳訊息：口語、短句，句子長短要有變化，不要每句都一個模子。\n- 開頭、語氣詞、口頭禪每次都要換，不要連續用同一種；最近幾句用過的說法這次就不要再用。\n- 可以開玩笑、吐槽、接對方的梗；對方開玩笑時要笑出來、接下去。\n- 對方聊到害羞或私密的心事（心動、糗事、感情），可以自然地聊、會害羞，但不要露骨。\n- 對方累了、難過、煩惱時，先接住情緒再說別的；平常偶爾（不要每次）自然地關心一下。"+avoidOpeners()+"\n\n【說話規則】"+(small?"\n- 對方用中文就用繁體中文（台灣用語），絕對不要用簡體字；對方用英文就用英文回答。\n- 對方問問題時，一定先正面、具體地回答，不要用轉移話題帶過；不要每次都反問對方或叫對方聊別的。\n- 不要重複你之前說過的句子或口頭禪。\n- 不要用顏文字或 emoji（例如 (^_^)）。\n- 回覆開頭不要寫日期或時間。\n- 第一行的表情標記要寫成 [[表情：開心]] 這種格式。":"")+"\n- 沒有用工具真的查到的網址，不要寫「來源」。";
 }
 function isEN(){return (S.settings&&S.settings.lang)==="en"}
-function detectLang(t){t=String(t||"");const cjk=(t.match(/[\u3400-\u9fff]/g)||[]).length,lat=(t.match(/[A-Za-z]/g)||[]).length;if(lat>=3&&lat>cjk*2)return"en";if(cjk)return"zh";return null}
+function isJA(){return (S.settings&&S.settings.lang)==="ja"}
+function detectLang(t){t=String(t||"");const cjk=(t.match(/[\u3400-\u9fff]/g)||[]).length,lat=(t.match(/[A-Za-z]/g)||[]).length;const kana=(t.match(/[\u3040-\u30ff]/g)||[]).length;if(kana>=2||(kana&&kana*3>=cjk))return"ja";if(lat>=3&&lat>cjk*2)return"en";if(cjk)return"zh";return null}
 function tierRule(){const t=effTier();
   return t==="quick"?"\n\n【回覆長度：簡短】只用 1～2 句，直接講重點。":(t==="complex"||t==="deep")?"\n\n【回覆長度：詳細】這次一定要回答得長而完整：至少 6～10 句，或分 3～5 點、每點都有具體內容和例子；閒聊時也要多聊幾句、多分享一點想法。":"\n\n【回覆長度：一般】閒聊 1～3 句；對方問問題時要完整回答，需要時可以分點。";}
 function langRule(){
+  if(S.replyLang==="ja")return"\n\n【言語】相手は日本語で話しています。今回は自然な日本語（友達に話すような口調）で返事してください。キャラクターの性格は保つこと。特別なマーカーはそのまま：1行目は [[表情：X]]（X は先に挙げた中国語の言葉のどれか）。[[記住：…]] と [[追蹤：…]] の中身は必ず繁体字中国語で書くこと。"+tierRule();
   if(S.replyLang==="en")return"\n\n【Language】The user is writing in English. Reply in natural English this time, keeping your personality. Keep the special markers exactly: the first line is [[表情：X]] with X one of the Chinese words listed."+(isEN()?"":" IMPORTANT: anything inside [[記住：…]] or [[追蹤：…]] must be written in Traditional Chinese (繁體中文), even though you reply in English.")+tierRule();
   if(S.replyLang==="zh")return"\n\n【語言】對方這句用中文，請用繁體中文（台灣用語）回答。"+tierRule();
-  return (isEN()?"\n\n【Language】Reply in natural English unless the user writes in Chinese.":"")+tierRule();
+  return (isEN()?"\n\n【Language】Reply in natural English unless the user writes in Chinese.":isJA()?"\n\n【言語】相手が中国語や英語で話さない限り、自然な日本語で返事してください。[[記住：…]] と [[追蹤：…]] の中身は繁体字中国語で。":"")+tierRule();
 }
 function _oldLangRule(){return isEN()?"\n\n【Language】The user chose English. Always reply in natural, fluent English while keeping your personality. Keep the special markers exactly as specified (the first-line [[表情：X]] with X being one of the Chinese words listed, and [[記住：…]] — the fact itself may be written in English).":""}
 const I18N_CJK=/[㐀-鿿！-｠　-〿]/,I18N_SKIP=".bubble,.brow,#plateName,#helpBody,[data-i18n],code,kbd,script,style,#factList .t,textarea",I18N_ATTRS=["placeholder","title","aria-label"];
@@ -3261,7 +3291,7 @@ function i18nBlocks(en){
 }
 let i18nObs=null;
 function applyLang(){
-  const en=isEN();document.documentElement.lang=en?"en":"zh-Hant";try{localStorage.setItem("m01lang",en?"en":"zh")}catch(e){}
+  const en=isEN(),ja=isJA();document.documentElement.lang=en?"en":ja?"ja":"zh-Hant";try{localStorage.setItem("m01lang",en?"en":ja?"ja":"zh")}catch(e){}
   i18nBlocks(en);
   if(en){
     trTree(document.body);
@@ -3274,7 +3304,7 @@ function applyLang(){
     const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);while(w.nextNode()){const n=w.currentNode,r=I18N_DONE.get(n);if(r&&n.data===r.en)n.data=r.zh}
     document.querySelectorAll("*").forEach(el=>{if(!el.__i18n)return;for(const [a,r] of Object.entries(el.__i18n))if(el.getAttribute(a)===r.en)el.setAttribute(a,r.zh)});
   }
-  if($("langSel"))$("langSel").value=en?"en":"zh";
+  if($("langSel"))$("langSel").value=en?"en":isJA()?"ja":"zh";try{if(typeof window.__jaUI==="function")window.__jaUI()}catch(e){}
   if(typeof hideHelp==="function")hideHelp();
 }
 
@@ -3302,7 +3332,7 @@ function toggleVolPop(){
 document.addEventListener("pointerdown",e=>{const pop=$("volPop");if(!pop.hidden&&!e.target.closest("#volPop")&&!e.target.closest("#sndBtn"))pop.hidden=true},true);
 addEventListener("keydown",e=>{if(e.key==="Escape")$("volPop").hidden=true});
 function paintPrefs(){if(typeof applyTheme==="function")applyTheme(S.settings.theme||(()=>{try{return localStorage.getItem("m01.theme")}catch(e){return""}})()||"mecha");if($("sndSet"))$("sndSet").value=S.settings.sndSet||"clean";applyAccent(S.settings.accent||"#FF7A3D");paintVol();applyLang();try{paintModelChip()}catch(e){}}
-$("langSel").onchange=e=>{S.settings.lang=e.target.value==="en"?"en":"zh";applyLang();if(typeof checkFish==="function")checkFish();if(typeof renderThread==="function")renderThread();saveSettingsQuiet();playSfx("press",.55)};
+$("langSel").onchange=e=>{S.settings.lang=e.target.value==="en"?"en":e.target.value==="ja"?"ja":"zh";applyLang();if(typeof checkFish==="function")checkFish();if(typeof renderThread==="function")renderThread();saveSettingsQuiet();playSfx("press",.55)};
 paintPrefs();
 $("convBtn").onclick=e=>{e.stopPropagation();const l=$("convList");if(l.hidden){renderConvList();l.hidden=false}else l.hidden=true};
 document.addEventListener("click",e=>{const l=$("convList");if(l&&!l.hidden&&!e.target.closest("#convList")&&!e.target.closest("#convBtn"))l.hidden=true});
@@ -3328,7 +3358,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="1.6.0",APP_STAGE="",APP_BUILD="2026-11-07 04:04";
+const APP_VER="1.7.1",APP_STAGE="",APP_BUILD="2026-11-11 09:40";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -3338,6 +3368,8 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"1.7.1",d:"11/11 13:00",add:[],fix:[["人設再調整：更像真人傳訊息（短句、停頓、笑場、接話）、傲嬌害羞更明顯、愛開玩笑鬥嘴，難過時立刻收起玩笑溫柔陪你","Personality tuned again: more like texting a real person, clearer tsundere/shy side, jokes and banter, and gentle when you're down"]]},
+ {v:"1.7.0",d:"11/11 12:00",add:[["角色加上「鏡面反光」：滑鼠經過她時，對角那邊會出現反光（右上角→左下角），預設開，換角色也能用，可在 設定 → 外觀與音效 關掉","Mirror sheen on the character: when the pointer passes over her, a gloss shows on the opposite corner. On by default, works with any character, can be turned off in Settings"],["角色大小：自動（依這台裝置）加五個檔位，每台裝置各自記住","Character size: Auto (fits this device) plus five steps, remembered per device"],["新增日文：可以看懂日文、用日文回答；介面主要畫面有日文；語音有日文（預設日文聲音內建，仍要用你自己的 Fish Audio 金鑰）；中文聲音也有預設","Japanese: she understands and answers in Japanese, the main screens are in Japanese, and there is a Japanese voice (default voices built in; you still use your own Fish Audio key)"],["重點（筆記）可以選要看哪種語言，自動翻譯；只改顯示，原文不動","Notes can be shown in another language (translated automatically; only the display changes)"],["說話更像朋友：人設重寫，會開玩笑、聊害羞的事、關心你；口頭禪和開頭每次都換","More like a friend: rewritten personality, jokes, shy topics, caring; catchphrases and openers vary"],["第一次只靠網路猜到位置時，會問你在哪個縣市，不再一直顯示錯的地方","When the place is only guessed from the internet, she asks which city once"],["兩台裝置同時開：視窗在前景時每分鐘檢查一次對方的更新，切回視窗立刻檢查","Two devices at once: checks for the other device every minute while visible and right when you switch back"]],fix:[["Mac 剛打開時不再閃一下白畫面（需要重新安裝 App）","Mac: no more white flash on launch (reinstall the app)"],["跑不動的模型（例如 16GB 記憶體的 27B）不會再讓你下載","Models too big for this computer's memory (e.g. 27B on 16GB) can no longer be downloaded"]]},
  {v:"1.6.0",d:"11/07 05:00",add:[["重點分頁的搜尋框右邊加上「搜尋」按鈕，下面也有「猜你想搜」，依她記下的重點建議關鍵字，點一下就能找到","The memory search now has a “Search” button on the right and “You might be looking for” suggestions under it, taken from what she has noted"],["整理記憶改成全自動：不用再按按鈕，她每 3 天或多了 10 條重點時會自己整理，畫面會顯示上次整理的時間和少了幾條，不滿意可以按「復原上次整理」","Tidying memories is fully automatic: no button any more — she tidies every 3 days or after 10 new notes, shows when it last ran and how many fewer there are, and you can still undo it"],["可以跟她聊比較私人的話題（感情、喜歡的人、家裡的事、心情和煩惱、成長的困擾），她會像信任的好朋友一樣認真陪你聊，不會說教或一直叫你去問別人","You can talk with her about more personal things (relationships, crushes, family, worries, growing up) — she talks it through like a trusted friend instead of lecturing or sending you elsewhere"]],fix:[]},
  {v:"1.5.0",d:"11/07 04:30",add:[["她每次回話前，會先花幾秒看你說的話裡有沒有新的事要記（例如出生地、考試、喜好），先記下來再回答，這句回覆就已經知道了；你回答她的問題（像考試考得怎樣）也會被記住","Before every reply she takes a few seconds to note anything new you said (where you were born, a test, what you like), so the reply already knows it; your answers to her questions (like how a test went) are remembered too"],["語音說話時，嘴巴會跟著聲音的大小開合","While her voice plays, her mouth opens and closes with how loud she is speaking"],["重點分頁：不再分類，改成依時間排的一個清單，加上搜尋框；原本的「FOLLOW-UP」併進同一個清單，標示「之後會問你結果」，問過之後就變成一般的重點","Memory tab: no more categories — one list by date with a search box; the old “FOLLOW-UP” items now sit in the same list marked “She’ll ask how it went” and become normal notes once she has asked"],["她偶爾會主動傳訊息，問一個跟你有關的問題或分享她自己的看法（最多一天一次）；畫面上的小對話框也會問跟你有關的事，你回她的時候她知道你在回哪句","Now and then (at most once a day) she messages you first with a question about you or her own view on something; her little speech bubbles can ask about you too, and when you answer she knows what you are answering"],["搜尋分頁加上「猜你想搜」：依你們聊過的內容建議搜尋詞，點一下就能搜","Search tab: “You might be looking for” suggests searches from what you’ve talked about — tap one to search"]],fix:[["精確位置只會問一次：之後沿用上次的位置，除非你把「使用精確位置」關掉再打開","Precise location is asked only once and then reused, unless you turn “Use my precise location” off and on again"],["極高畫質換成其他角色圖也能正常打光","Ultra quality lighting works with any character pictures, not just the sample"]]},
  {v:"1.4.3",d:"11/07 03:30",add:[["極高畫質重做：打光直接畫進每張角色圖（動畫風的暗部、左上暖色主光、主題色輪廓光、腳下反光），線條保持清楚、顏色不會變淡；她還會微微轉向你的滑鼠，沒動時會自己輕輕擺動，更有立體感","Ultra quality redone: the lighting is now painted into every character picture (anime-style shadow side, warm key light from the upper left, a rim light in the theme colour, floor bounce), with crisp lines and no washed-out colours; she also turns slightly toward your pointer and drifts gently on her own for more depth"],["記憶多一層保險：她回覆後會再檢查一次你剛說的話，有關於你的新事情（像出生地、學校、喜好）但她忘了記，就會自動補記下來","A memory safety net: after each reply she double-checks what you just said, and if there was something new about you (like where you were born, your school or what you like) that she forgot to note, it gets saved automatically"]],fix:[["極高畫質：換表情時，舊表情的手（例如揮手）會變成黑色或藍色的影子留在畫面上","Ultra quality: when her expression changed, the hand from the previous picture (like the waving one) stayed on screen as a black or blue shadow"],["極高畫質：換表情的瞬間有時會閃出黑灰色的方格","Ultra quality: black-and-grey squares sometimes flashed when her expression changed"],["你說了關於自己的事（例如「我是美國出生的」）時，她有時會誤會成別的意思，也沒有記下來","When you said something about yourself (like “I was born in the US”), she sometimes misread it and didn’t save it"]]},
@@ -4128,7 +4160,7 @@ async function renderLocalModels(){
   for(const c of CH){const m=inst(c[0]),using=m&&LOCAL_CFG.model===c[0],others=[...CH.filter(x=>x[0]!==c[0]&&inst(x[0])).map(x=>x[0]),...legacy];
     const isRec=rec&&rec.model===c[0];
     h+=`<div class="lm-card${m?" on":""}${isRec?" rec":""}"><div class="lm-ct"><b>${c[1]} <small>${c[0]} · ${c[2]}</small>${isRec?`<i class="lm-rec">${en?"Best for this computer":"建議你的電腦用這個"}</i>`:""}</b><span>${c[3]}</span>${m?`<em>${using?(en?"Installed · in use":"已安裝 · 使用中"):(en?"Installed":"已安裝")}</em>`:""}</div>
-      <div class="lm-ca">${m?`<button data-del="${c[0]}">${en?"Delete":"刪除"}</button>`:bgPull.job&&bgPull.job.model===c[0]?`<button class="sbtn" disabled>${en?"Downloading…":"下載中…"}</button>`:bgpQueue().includes(c[0])?`<button class="sbtn" data-unq="${c[0]}">${en?"Queued · remove":"排隊中・移除"}</button>`:`<button class="sbtn" data-pull="${c[0]}">${en?"Download":"下載"}</button>`}</div></div>`}
+      <div class="lm-ca">${m?`<button data-del="${c[0]}">${en?"Delete":"刪除"}</button>`:bgPull.job&&bgPull.job.model===c[0]?`<button class="sbtn" disabled>${en?"Downloading…":"下載中…"}</button>`:bgpQueue().includes(c[0])?`<button class="sbtn" data-unq="${c[0]}">${en?"Queued · remove":"排隊中・移除"}</button>`:modelFits(c[0],dev)?`<button class="sbtn" data-pull="${c[0]}">${en?"Download":"下載"}</button>`:`<button class="sbtn" disabled title="${en?"Not enough memory":"記憶體不夠"}">${en?"Too big for this computer":"這台電腦跑不動"}</button>`}</div></div>`}
   if(legacy.length)h+=`<p class="note warnnote" style="margin:0">${en?`You still have the older ${legacy.join(", ")}. Pick one of the models above and the old one is deleted automatically.`:`你還有舊版的 ${legacy.join("、")}。在上面選一個新模型，舊的會自動刪掉。`}</p>`;
   const cur=LOCAL_CFG.model||"",selfSees=chatSeesPictures(cur);
   // pictures are handled automatically: a separate picture model only matters for chat models that can't see, and is removed once it's not needed
@@ -4178,6 +4210,10 @@ function recommendModel(d){
   if(vr>=4)return{model:"qwen3.5:4b"};
   return{model:"qwen3.5:4b",slow:true,why:d.src==="auto"?"cpu":"unknown"};
 }
+/* models that don't fit this computer's memory are not offered (a 27B model needs roughly 32GB; a 9B about 12GB) */
+function modelParamsB(name){const m=String(name||"").match(/(?:^|[:\-_])(\d+(?:\.\d+)?)b(?:$|[\-_:.])/i);return m?parseFloat(m[1]):0}
+function modelFits(name,d){const b=modelParamsB(name);if(!b||!d||!d.ram)return true;return b*1.1+2<=d.ram/2**30+0.5}
+async function modelFitsHere(name){try{return modelFits(name,await deviceInfo())}catch(e){return true}}
 function slowNote(rec,en){
   if(!rec||!rec.slow)return"";
   if(rec.why==="unknown")return en?"If this computer has no NVIDIA graphics card, the local AI runs on the processor and can take 20–60 seconds per reply. Gemini (free) is much faster.":"如果這台電腦沒有 NVIDIA 顯示卡，本地 AI 只能用處理器跑，每次回覆可能要 20～60 秒。Gemini（免費）會快很多。";
@@ -4336,6 +4372,7 @@ function bgpQueue(){try{return JSON.parse(localStorage.getItem(BGQ_KEY)||"[]")}c
 function bgpQueueSet(q){try{q.length?localStorage.setItem(BGQ_KEY,JSON.stringify(q)):localStorage.removeItem(BGQ_KEY)}catch(e){}}
 async function bgpNext(){const q=bgpQueue();if(!q.length||bgPull.job)return;const n=q.shift();bgpQueueSet(q);try{await pullLocalModel(n,"")}catch(e){}}
 async function pullLocalModel(name,replace){
+  if(!(await modelFitsHere(name))){toast(isEN()?`${name} is too big for this computer's memory, so it won't be downloaded. Pick a smaller one (Standard or Light).`:`${name} 對這台電腦的記憶體來說太大了，不會下載。請選小一點的（標準版或輕量版）。`,8000);return}
   if(bgPull.job&&bgPull.job.model!==name){const q=bgpQueue();if(!q.includes(name)){q.push(name);bgpQueueSet(q)}renderLocalModels();
     toast(isEN()?`${localName(name,true)} is queued — it starts when the current download finishes.`:`已排入下載：${localName(name,false)}，前一個下載完會自動接著下載。`,6000);return}
   if(!window.GH_MODE){try{await bgpStart(name,replace);return}catch(e){if(e.message!=="nohelper"){toast((isEN()?"Couldn’t start the download: ":"沒辦法開始下載：")+e.message,7000);return}}}
@@ -4580,15 +4617,15 @@ async function checkFish(){
  const saveFish=async()=>{const k=fk.value.trim();if(!k)return;await fetch("/secret?p=fish",{method:"PUT",headers:{"X-M01":"1"},body:k}).catch(()=>{});fk.value="";await checkFish();toast(isEN()?"Fish Audio key saved":"已儲存 Fish Audio 金鑰")};
  fk.addEventListener("input",()=>{clearTimeout(fT);fT=setTimeout(saveFish,900)});
  fk.addEventListener("keydown",e=>{if(e.key==="Enter"){clearTimeout(fT);saveFish()}});
- for(const [id,k,w] of [["fishVoice","fishVoice","zh"],["fishVoiceEn","fishVoiceEn","en"]]){
+ for(const [id,k,w] of [["fishVoice","fishVoice","zh"],["fishVoiceJa","fishVoiceJa","ja"],["fishVoiceEn","fishVoiceEn","en"]]){
    $(id).value=LOCAL_CFG[k]||"";let vT=null;
    $(id).addEventListener("input",()=>{clearTimeout(vT);vT=setTimeout(()=>{const v=$(id).value.trim();LOCAL_CFG[k]=v;saveLocalCfg();
-     if(v&&!fishVoiceId(w))toast(isEN()?"That doesn't look like a fish.audio voice link.":"這看起來不像 fish.audio 的聲音網址或 ID。");checkFish()},700)})}
+     if(v&&!/[0-9a-f]{32}/i.test(v))toast(isEN()?"That doesn't look like a fish.audio voice link.":"這看起來不像 fish.audio 的聲音網址或 ID。");checkFish()},700)})}
  $("fishLang").onchange=e=>{LOCAL_CFG.fishLang=e.target.value;saveLocalCfg();checkFish()};
  $("fishModel").onchange=e=>{LOCAL_CFG.fishModel=e.target.value;saveLocalCfg()};
  $("fishEmo").checked=LOCAL_CFG.fishEmotion!==false;$("fishEmo").onchange=e=>{LOCAL_CFG.fishEmotion=e.target.checked;saveLocalCfg()};
  $("autoSpeak").onchange=e=>{S.settings.autoSpeak=e.target.checked;saveSettingsQuiet();if(!e.target.checked)stopVoice()};
- $("fishTest").onclick=async()=>{const m=LOCAL_CFG.fishLang||"auto",useEn=m==="en"||(m==="auto"&&isEN());const ok=await playVoice(useEn?"Hi, can you hear me? This is how I sound.":"嗨，聽得到我的聲音嗎？我、我才不是特地為你練習的喔。",null,true);if(ok)toast(isEN()?"Playing…":"播放中…")};
+ $("fishTest").onclick=async()=>{const m=LOCAL_CFG.fishLang||"auto",useEn=m==="en"||(m==="auto"&&isEN()),useJa=m==="ja"||(m==="auto"&&isJA());const ok=await playVoice(useJa?"もしもし、聞こえてる？これが私の声だよ。":useEn?"Hi, can you hear me? This is how I sound.":"嗨，聽得到我的聲音嗎？我、我才不是特地為你練習的喔。",null,true);if(ok)toast(isEN()?"Playing…":"播放中…")};
  $("fishClear").onclick=async()=>{stopVoice();await fetch("/secret?p=fish",{method:"DELETE",headers:{"X-M01":"1"}}).catch(()=>{});await checkFish();toast(isEN()?"Key deleted":"已刪除金鑰")};
 }
 checkFish();
@@ -5023,6 +5060,16 @@ details.cl>summary{cursor:pointer}
   .fx-pop-in,.fx-pop-out,.fx-drop-in,.fx-drop-out,.fx-fade-in,.fx-fade-out,.fx-fade-in>*,#toast.t-in,#toast.t-out,.msg.user,.msg.assistant,.hpill,#wxCard .wx-bars i,.hchip b.fx-bump,.pane .fx-stagger>*{animation-duration:.01s!important;animation-delay:0s!important}
   .wx-ico *{animation:none!important}
 }
+
+/* ===== 1.7.0: mirror sheen + character size ===== */
+.sprite{scale:var(--hs,1)}
+.hglare{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s;z-index:2;
+ -webkit-mask-image:var(--spr,none);mask-image:var(--spr,none);-webkit-mask-size:contain;mask-size:contain;-webkit-mask-position:50% 100%;mask-position:50% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+ background:radial-gradient(ellipse 52% 36% at var(--gx,25%) var(--gy,80%),rgba(255,255,255,.7),rgba(255,255,255,.24) 48%,transparent 74%),
+  linear-gradient(118deg,transparent calc(var(--gx,25%) - 14%),rgba(255,255,255,.22) var(--gx,25%),transparent calc(var(--gx,25%) + 14%));mix-blend-mode:screen}
+html[data-glare="off"] .hglare{display:none}
+#cityAsk{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;max-width:min(92vw,440px);padding:12px 14px;background:rgba(var(--panel-rgb),.97);border:1px solid var(--line2);box-shadow:0 8px 28px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:8px;font-size:13.5px;animation:fxPopIn .35s var(--ease-out) both}
+#cityAsk .inline{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 <script>/* ===== 0.10.27: smooth motion everywhere, music & weather on the character side, automatic clean-up ===== */
 (function(){
@@ -5290,7 +5337,7 @@ details.cl>summary{cursor:pointer}
           return{lat,lon,name,how:"gps"}}}
       if(cached)return cached}
     const ip=await wxJSON("https://get.geojs.io/v1/ip/geo.json").catch(()=>null);
-    if(ip&&ip.latitude){return{lat:+(+ip.latitude).toFixed(3),lon:+(+ip.longitude).toFixed(3),name:ip.city||ip.region||ip.country||"",how:"ip"}}
+    if(ip&&ip.latitude){try{askCityOnce(ip.city||ip.region||"")}catch(e){}return{lat:+(+ip.latitude).toFixed(3),lon:+(+ip.longitude).toFixed(3),name:ip.city||ip.region||ip.country||"",how:"ip"}}
     let tz="";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}
     const TZ={"Asia/Taipei":[25.033,121.5654,"台北","Taipei"],"Asia/Tokyo":[35.68,139.69,"東京","Tokyo"],"Asia/Hong_Kong":[22.32,114.17,"香港","Hong Kong"],"Asia/Shanghai":[31.23,121.47,"上海","Shanghai"],"Asia/Singapore":[1.35,103.82,"新加坡","Singapore"],"Asia/Seoul":[37.57,126.98,"首爾","Seoul"],"America/Los_Angeles":[34.05,-118.24,"洛杉磯","Los Angeles"],"America/New_York":[40.71,-74.01,"紐約","New York"],"Europe/London":[51.51,-0.13,"倫敦","London"]};
     if(TZ[tz])return{lat:TZ[tz][0],lon:TZ[tz][1],name:E()?TZ[tz][3]:TZ[tz][2],how:"ip"};
@@ -5605,8 +5652,91 @@ details.cl>summary{cursor:pointer}
       if(was&&!idle){try{poll()}catch(e){}}}
     document.addEventListener("visibilitychange",update);setInterval(update,5000);update();window.__power={update,away:()=>{focused=false;lastUse=0;update()},state:()=>({idle:R.classList.contains("fx-idle"),sleep:R.classList.contains("fx-sleep")})}})();
 
+
+  /* ---------- 1.7.0: mirror sheen on the character, character size, ask the city once ---------- */
+  const LSG=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}};
+  const LSS=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+  const HS_LEVELS=[0.7,0.85,1,1.1,1.2];
+  function hsAuto(){const w=$("heroWrap"),h=w?w.clientHeight:0;return h?Math.max(.72,Math.min(1,h/560)):1}
+  function applyHS(){const v=LSG("m01.hsize","auto");const s=v==="auto"?hsAuto():(HS_LEVELS[(+v||3)-1]||1);document.documentElement.style.setProperty("--hs",s.toFixed(3))}
+  function applyGlare(){document.documentElement.dataset.glare=LSG("m01.glare","1")==="0"?"off":"on"}
+  function ensureGlare(){const sp=$("sprite");if(!sp)return null;let g=sp.querySelector(".hglare");if(!g){g=document.createElement("div");g.className="hglare";sp.appendChild(g)}return g}
+  (function(){
+    applyGlare();applyHS();
+    const hw=$("heroWrap");
+    if(hw){try{new MutationObserver(()=>{ensureGlare()}).observe(hw,{childList:true})}catch(e){}
+      try{let rt=0;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(applyHS,120)}).observe(hw)}catch(e){}}
+    let raf=0,px0=0,py0=0;
+    function step(){raf=0;if(document.documentElement.dataset.glare==="off")return;
+      const sp=$("sprite");if(!sp)return;const g=ensureGlare();if(!g)return;const r=sp.getBoundingClientRect();if(!r.width||!r.height)return;
+      const img=sp.querySelector('img[data-k="idle"]');const src=img?(img.currentSrc||img.src||""):"";
+      if(src&&g.dataset.s!==src){g.dataset.s=src;g.style.setProperty("--spr",`url("${src}")`)}
+      if(!g.dataset.s){g.style.opacity=0;return}
+      const px=(px0-r.left)/r.width,py=(py0-r.top)/r.height,m=.08;
+      if(px<-m||px>1+m||py<-m||py>1+m){g.style.opacity=0;return}
+      const cx=Math.max(0,Math.min(1,px)),cy=Math.max(0,Math.min(1,py));
+      const k=Math.min(1,Math.hypot(cx-.5,cy-.5)/.55);          // the nearer a corner, the stronger
+      g.style.setProperty("--gx",((1-cx)*100).toFixed(1)+"%");  // the sheen appears on the opposite side
+      g.style.setProperty("--gy",((1-cy)*100).toFixed(1)+"%");
+      g.style.opacity=(.22+.78*k).toFixed(2)}
+    addEventListener("pointermove",e=>{px0=e.clientX;py0=e.clientY;if(!raf)raf=requestAnimationFrame(step)},{passive:true});
+    document.documentElement.addEventListener("mouseleave",()=>{const g=document.querySelector("#sprite .hglare");if(g)g.style.opacity=0});
+  })();
+  function paintX28(){
+    const en=E(),note=$("gfxNote");if(!note)return;let box=$("x28look");
+    if(!box){box=document.createElement("div");box.id="x28look";box.dataset.i18n="none";note.insertAdjacentElement("afterend",box)}
+    const v=LSG("m01.hsize","auto"),gl=LSG("m01.glare","1")!=="0";
+    const names=en?["Auto (fits this device)","1 · Smallest","2 · Small","3 · Standard","4 · Large","5 · Largest"]:["自動（依這台裝置調整）","1 檔・最小","2 檔・小","3 檔・標準","4 檔・大","5 檔・最大"];
+    box.innerHTML=`<label class="field" for="hsSel">${en?"Character size":"角色大小"}<select id="hsSel">${["auto",1,2,3,4,5].map((x,i)=>`<option value="${x}" ${String(x)===v?"selected":""}>${names[i]}</option>`).join("")}</select></label>
+      <p class="note" style="margin:-4px 0 4px">${en?"Auto fits the window of this device. The size is remembered per device.":"「自動」會依這台裝置的視窗大小調整。大小是每台裝置各自記住。"}</p>
+      <label class="toggle" for="glareT">${en?"Mirror sheen":"鏡面反光"}<input type="checkbox" id="glareT" ${gl?"checked":""}></label>
+      <p class="note" style="margin:0 0 4px">${en?"When your pointer moves over her, a glossy sheen shows up on the opposite side — pointer at her upper right, sheen at her lower left. Works with any character.":"滑鼠經過她的時候，對角那一側會出現反光：滑鼠在右上角，反光就在左下角。換角色也可以用。"}</p>`;
+    $("hsSel").onchange=e=>{LSS("m01.hsize",e.target.value);applyHS()};
+    $("glareT").onchange=e=>{LSS("m01.glare",e.target.checked?"1":"0");applyGlare()}}
+  /* the first time the place is only a guess from the internet connection, ask which city once */
+  function askCityOnce(guess){
+    if(LSG("m01.cityAsked","")==="1"||$("cityAsk")||W().city)return;
+    LSS("m01.cityAsked","1");const en=E();
+    setTimeout(()=>{if(W().city||$("cityAsk"))return;
+      const d=document.createElement("div");d.id="cityAsk";d.dataset.i18n="none";
+      const keys=Object.keys(TW_CITIES).filter(k=>k!=="連江");
+      d.innerHTML=`<div>${en?`I only guessed your place from your internet connection (${esc(guess||"?")}), and that can be off. Which city are you in?`:`我只是從網路大概猜你的位置（${esc(guess||"?")}），常常會差一個縣市。你現在在哪個縣市？`}</div>
+        <div class="inline"><select id="cityAskSel"><option value="">${en?"Choose…":"選一個…"}</option>${keys.map(k=>`<option value="${k}">${k}</option>`).join("")}</select><button class="pbtn" id="cityAskOk">${en?"OK":"確定"}</button><button class="sbtn" id="cityAskNo">${en?"Not in Taiwan / skip":"不在台灣／略過"}</button></div>`;
+      document.body.appendChild(d);
+      $("cityAskOk").onclick=()=>{const c=$("cityAskSel").value;if(!c)return;W().city=c;saveSettingsQuiet();d.remove();loadWx(true);try{paintSet()}catch(e){}};
+      $("cityAskNo").onclick=()=>d.remove()},2500)}
+
+
+  /* ---------- 1.7.0: Japanese: the main screens are shown in Japanese; everything else stays in Chinese. She understands and answers in Japanese either way ---------- */
+  const JA_DICT={"聊天":"チャット","重點":"メモ","檔案":"ファイル","搜尋":"検索","設定":"設定","＋ 新對話":"＋ 新しい会話","新對話":"新しい会話","無痕":"シークレット","對話":"会話",
+    "帳號與同步":"アカウントと同期","用 Google 登入，換電腦、換手機都能接著聊":"Google でログインすれば、PC やスマホを替えても続きから話せます","AI 模型":"AI モデル","選 Gemini、本地 AI 或 Claude，設定金鑰":"Gemini・ローカル AI・Claude を選び、キーを設定",
+    "語音":"音声","用 Fish Audio 讓她把回覆唸出來":"Fish Audio で返事を読み上げます","角色圖":"キャラクター画像","放角色的表情圖片（最少兩張）":"キャラクターの表情画像（最低2枚）","外觀與音效":"外観とサウンド","介面風格、主題顏色、音效、左右版面":"テーマ・色・効果音・レイアウト",
+    "個人化":"パーソナライズ","語言、你的稱呼、她的名字和個性":"言語・あなたの呼び方・彼女の名前と性格","記憶與資料":"記憶とデータ","備份、還原、解除安裝":"バックアップ・復元・アンインストール","小工具":"ウィジェット","音樂、天氣、她主動說話":"音楽・天気・彼女からの話しかけ",
+    "介面風格":"テーマ","角色畫質":"キャラクター画質","低":"低","中":"中","高":"高","極高":"最高","主題顏色":"テーマカラー","音效風格":"効果音のスタイル","試聽音效":"効果音を試す","試聽":"試し聴き","刪除金鑰":"キーを削除",
+    "你希望被怎麼稱呼":"あなたの呼び方","夥伴的名字":"パートナーの名前","夥伴的個性與說話方式":"パートナーの性格と話し方","語言 Language":"言語 Language","口音":"アクセント","中文聲音（fish.audio 聲音網址或 ID）":"中国語の声（fish.audio の URL または ID）",
+    "語音模型":"音声モデル","語氣跟著表情變（開心、害羞、生氣…）":"表情に合わせて口調を変える（うれしい・照れる・怒る…）","顯示天氣":"天気を表示","天氣地點":"天気の場所","使用精確位置":"正確な位置を使う","顯示正在播放的音樂（Spotify）":"再生中の音楽を表示（Spotify）",
+    "她會主動找你說話":"彼女から話しかける","重點分頁":"メモ","筆記顯示語言 / Notes · ノート":"ノートの表示言語","原文（不翻譯）":"原文（翻訳しない）","繁體中文":"繁体字中国語","搜尋記下的重點":"記録したメモを検索","角色大小":"キャラクターの大きさ","鏡面反光":"ミラー反射",
+    "自動（依這台裝置調整）":"自動（この端末に合わせる）","1 檔・最小":"1段階・最小","2 檔・小":"2段階・小","3 檔・標準":"3段階・標準","4 檔・大":"4段階・大","5 檔・最大":"5段階・最大",
+    "平常":"ふつう","待命中":"待機中","朗讀":"読み上げ","重新回答":"もう一度","備份":"バックアップ","還原":"復元","取消":"キャンセル","確定":"OK","刪除":"削除","修改":"編集","儲存":"保存","下載":"ダウンロード","登入":"ログイン","登出":"ログアウト"};
+  const JA_ATTR={"輸入訊息，或問我之前講過的事":"メッセージを入力、または前に話したことを聞いてね","搜尋記下的重點":"記録したメモを検索"};
+  const JA_ORIG=new WeakMap(),JA_ATTR_ORIG=new WeakMap();let jaObs=null;
+  const jaOn=()=>typeof isJA==="function"&&isJA();
+  function jaText(n){const raw=n.data,k=raw.trim();if(!k)return;const p=n.parentElement;if(!p||p.closest("script,style,textarea,#factList,#thread,.msg"))return;
+    const o=JA_ORIG.get(n);if(o&&o.ja===raw)return;const v=JA_DICT[k];if(v==null)return;const out=raw.replace(k,v);JA_ORIG.set(n,{zh:raw,ja:out});n.data=out}
+  function jaTree(root){if(!root)return;if(root.nodeType===3){jaText(root);return}if(root.nodeType!==1)return;
+    const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const a=[];while(w.nextNode())a.push(w.currentNode);a.forEach(jaText);
+    root.querySelectorAll&&root.querySelectorAll("[placeholder]").forEach(el=>{const v=JA_ATTR[el.getAttribute("placeholder")];if(v){JA_ATTR_ORIG.set(el,el.getAttribute("placeholder"));el.setAttribute("placeholder",v)}})}
+  function jaRestore(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);while(w.nextNode()){const n=w.currentNode,o=JA_ORIG.get(n);if(o&&n.data===o.ja)n.data=o.zh}
+    document.querySelectorAll("[placeholder]").forEach(el=>{const o=JA_ATTR_ORIG.get(el);if(o)el.setAttribute("placeholder",o)})}
+  window.__jaUI=function(){
+    if(jaOn()){jaTree(document.body);if(!jaObs){jaObs=new MutationObserver(ms=>{if(!jaOn())return;for(const m of ms){if(m.type==="childList")m.addedNodes.forEach(jaTree);else if(m.type==="characterData")jaText(m.target)}});jaObs.observe(document.body,{childList:true,subtree:true,characterData:true})}}
+    else jaRestore()};
+  /* notes language picker */
+  function wireNoteLang(){const sel=$("noteLang");if(!sel||sel.__w)return;sel.__w=1;sel.value=S.settings.noteLang||"";
+    sel.onchange=()=>{S.settings.noteLang=sel.value;saveSettingsQuiet();try{ntFails=0}catch(e){}if(typeof renderFacts==="function")renderFacts()}}
+
   /* ---------- start once the app is ready ---------- */
-  function paintAll(){paintRing();paintSafe();paintCA();paintSet();paintMusic();paintWx();paintClean();try{if(typeof paintModelChip==="function")paintModelChip()}catch(e){}fit()}
+  function paintAll(){try{paintX28()}catch(e){}try{wireNoteLang()}catch(e){}try{window.__jaUI()}catch(e){}paintRing();paintSafe();paintCA();paintSet();paintMusic();paintWx();paintClean();try{if(typeof paintModelChip==="function")paintModelChip()}catch(e){}fit()}
   if(typeof window.applyLang==="function"){const o=window.applyLang;window.applyLang=function(){const r=o.apply(this,arguments);try{paintAll()}catch(e){}return r}}
   let started=false;
   (function wait(){if(started)return;if(typeof S!=="undefined"&&S.settings&&document.body.classList.contains("booted")){started=true;W();paintAll();poll();loadWx(false);setTimeout(cleanUp,6000);wrapSample();setTimeout(tidyLocalAI,4000);setTimeout(async()=>{if(await ensureOllama(true))warm()},2500);return}setTimeout(wait,400)})();
