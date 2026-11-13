@@ -840,10 +840,10 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
               <p class="note" data-i18n="fishnote">用 <a href="https://fish.audio">Fish Audio</a> 讓她把回覆唸出來，說話時角色會跟著對嘴。到 <a href="https://fish.audio/app/api-keys/">fish.audio 的 API Keys 頁面</a>建立金鑰，貼到下面就會自動儲存。金鑰只存在這台電腦的 App 設定裡，不會進記憶資料夾，也不會被備份。要唸的文字會傳給 Fish Audio 處理。</p>
               <label class="field" for="fishKey">Fish Audio API 金鑰<input id="fishKey" type="password" autocomplete="off" spellcheck="false" placeholder="貼上金鑰"></label>
               <label class="field" for="fishLang">口音<select id="fishLang"><option value="auto">自動（中文回覆用中文聲音，英文用英文聲音，日文用日文聲音）</option><option value="zh">中文（一律用中文聲音）</option><option value="en">英文（一律用英文聲音）</option><option value="ja">日文（一律用日文聲音）</option></select></label>
-              <p class="note">口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，英文的聲音就是英文口音。所以下面可以各選一個。到 fish.audio 打開聲音的頁面，複製網址貼上；留空的話會用另一個欄位的聲音，兩個都空就用預設聲音。</p>
-              <label class="field" for="fishVoice">中文聲音（fish.audio 聲音網址或 ID）<input id="fishVoice" autocomplete="off" spellcheck="false" placeholder="例如 https://fish.audio/m/…"></label>
-              <label class="field" for="fishVoiceJa">日文聲音（fish.audio 聲音網址或 ID；留空用預設日文聲音）<input id="fishVoiceJa" autocomplete="off" spellcheck="false" placeholder="預設已內建，想換再貼"></label>
-              <label class="field" for="fishVoiceEn">英文聲音（fish.audio 聲音網址或 ID）<input id="fishVoiceEn" autocomplete="off" spellcheck="false" placeholder="例如 https://fish.audio/m/…"></label>
+              <p class="note">口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，日文、英文也一樣，所以三種語言各有一個欄位。<b>中文和日文已經內建預設聲音，不用填；英文沒有預設。</b><br>怎麼加進去：到 <a href="https://fish.audio">fish.audio</a> 找一個喜歡的聲音，打開它的頁面，複製網址列的網址（長得像 https://fish.audio/m/一串32個英數字）貼到對應的欄位，過一下就自動儲存，按「試聽」確認。只有網址最後那串 32 碼的 ID 也可以。欄位留空就用預設（英文沒有預設，會用中文聲音）。</p>
+              <label class="field" for="fishVoice">中文聲音（<b>有預設</b>；想換再貼 fish.audio 聲音網址或 ID）<input id="fishVoice" autocomplete="off" spellcheck="false" placeholder="例如 https://fish.audio/m/…"></label>
+              <label class="field" for="fishVoiceJa">日文聲音（<b>有預設</b>；想換再貼 fish.audio 聲音網址或 ID）<input id="fishVoiceJa" autocomplete="off" spellcheck="false" placeholder="預設已內建，想換再貼"></label>
+              <label class="field" for="fishVoiceEn">英文聲音（<b>沒有預設</b>，要自己貼 fish.audio 聲音網址或 ID；留空時英文會用中文聲音唸）<input id="fishVoiceEn" autocomplete="off" spellcheck="false" placeholder="例如 https://fish.audio/m/…"></label>
               <p class="note warnnote">請用你自己建立、或主人明確允許使用的聲音。不要用模仿真實人物（聲優、藝人、網紅等）的聲音模型。</p>
               <label class="field" for="fishModel">語音模型<select id="fishModel"><option value="s2.1-pro-free">S2.1 Pro Free：免費（有合理使用限制）</option><option value="s2.1-pro">S2.1 Pro：付費，比較穩定（要先到 Fish Audio 儲值 API 額度）</option></select></label>
               <label class="toggle" for="autoSpeak">回覆完自動唸出來<input type="checkbox" id="autoSpeak"></label>
@@ -863,7 +863,7 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
             <details class="sgrp" id="g_look"><summary><span class="sg-t"><b>外觀與音效</b><small>介面風格、主題顏色、音效、左右版面</small></span><i class="sg-chev" aria-hidden="true"></i></summary>
             <div class="sgb">
             <label class="field" for="themeSel">介面風格<select id="themeSel"><option value="mecha">機甲（預設：深色、橘色）</option><option value="pink">可愛粉嫩</option><option value="terminal">復古終端機</option><option value="light">淺色簡約</option><option value="neon">夜空霓虹</option></select></label>
-            <label class="field" for="gfxSel">角色畫質<select id="gfxSel"><option value="low">低</option><option value="medium">中</option><option value="high">高</option><option value="ultra">極高</option></select></label>
+            <label class="field" for="gfxSel">角色畫質<select id="gfxSel"><option value="auto">自動（依這台裝置）</option><option value="low">低</option><option value="medium">中</option><option value="high">高</option><option value="ultra">極高</option></select></label>
             <p class="note" id="gfxNote" data-i18n="none" style="margin:-4px 0 4px"></p>
             <label class="field" for="accentPick">主題顏色
               <div class="swatches" id="swatches"><input type="color" id="accentPick" value="#ff7a3d" aria-label="自訂顏色"></div></label>
@@ -2928,8 +2928,13 @@ async function loadSprites(){
 $("presetBtn").onclick=()=>{$("persona").value=CLAUDE_PERSONA;if(["","小憶","瞬光"].includes($("botName").value.trim()))$("botName").value="Claude";autoSaveProfile();toast("已套用「傲嬌 Claude」說話風格")};
 /* ---------- character quality (per computer): low / medium / high / ultra ---------- */
 const GFX_KEY="m01.gfx";
-function gfxLevel(){let g="";try{g=localStorage.getItem(GFX_KEY)||""}catch(e){}if(!/^(low|medium|high|ultra)$/.test(g))g=matchMedia("(max-width:820px)").matches?"medium":"high";return g}
-function applyGfx(g){document.documentElement.dataset.gfx=g;const sel=$("gfxSel");if(sel)sel.value=g;const n=$("gfxNote");if(n)n.textContent=gfxNote(g);
+/* "auto": pick the quality from what this device can do (phones and weak computers get less, strong desktops get Ultra) */
+function autoGfx(){try{if(matchMedia("(max-width:820px)").matches||matchMedia("(pointer:coarse)").matches)return"medium";
+  const c=navigator.hardwareConcurrency||4,m=navigator.deviceMemory||8;
+  if(c<=2||m<=2)return"low";if(c<4||m<4)return"medium";if(c>=8&&m>=8)return"ultra";return"high"}catch(e){return"high"}}
+function gfxRaw(){let g="";try{g=localStorage.getItem(GFX_KEY)||""}catch(e){}return /^(low|medium|high|ultra)$/.test(g)?g:"auto"}
+function gfxLevel(){const g=gfxRaw();return g==="auto"?autoGfx():g}
+function applyGfx(g){document.documentElement.dataset.gfx=g;const sel=$("gfxSel");if(sel)sel.value=gfxRaw();const n=$("gfxNote");if(n)n.textContent=(gfxRaw()==="auto"?(isEN()?`Auto: this device uses “${g}”. `:`自動：這台裝置目前用「${({low:"低",medium:"中",high:"高",ultra:"極高"})[g]}」。`):"")+gfxNote(g);
   if(g==="low"){try{const c=$("motes");c.getContext("2d").clearRect(0,0,c.width,c.height)}catch(e){}}else if(window.__motesResume)window.__motesResume();
   paintSheen()}
 function gfxNote(g){const en=isEN();return ({low:en?"Lightest: no breathing, shadows or background effects — best for older computers.":"最省資源：沒有呼吸、陰影和背景特效，適合比較舊的電腦。",
@@ -3042,9 +3047,8 @@ async function litApplyNow(){
     if(gen!==LIT.gen||document.documentElement.dataset.gfx!=="ultra")return;
     if(!url||im.src===url)continue;
     // the pictures used for talking and blinking switch over together, so her lighting never flickers mid-sentence
-    if(rank[im.dataset.k]!==undefined||im===cur){core.push([im,url]);if(core.length<imgs.filter(x=>rank[x.dataset.k]!==undefined||x===cur).length)continue;
-      await Promise.all(core.splice(0).map(([a,u])=>litSwap(a,u)))}
-    else await litSwap(im,url)}
+    core.push([im,url]);if(core.length<imgs.length)continue;       // every expression switches over together, so none ever appears unlit
+    await Promise.all(core.splice(0).map(([a,u])=>litSwap(a,u)))}
   if(core.length)await Promise.all(core.splice(0).map(([a,u])=>litSwap(a,u)));
   // free pictures lit for an old theme colour
   if(LIT.ak&&LIT.ak!==ak){const used=new Set([...document.querySelectorAll("#sprite img")].map(x=>x.src));
@@ -3416,7 +3420,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="1.7.1",APP_STAGE="",APP_BUILD="2026-11-11 09:40";
+const APP_VER="1.7.2",APP_STAGE="",APP_BUILD="2026-11-13 14:27";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -3427,6 +3431,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"1.7.2",d:"11/13 12:00",add:[["畫質新增「自動」（依這台裝置的效能選低／中／高／極高），預設就是自動","Quality now has “Auto” (picks Low/Medium/High/Ultra from this device), and it is the default"],["光影會看角色圖的顏色：換一張圖，輪廓光、背光、腳下的光、反光都會跟著這張圖的顏色重新調整","Lighting now follows the picture's own colours: swap the picture and the rim light, back light, floor light and sheen re-adapt"],["光影跟著每個表情動作變化：開心偏暖、害羞偏粉、生氣偏紅、難過偏冷、睡著變暗","Lighting follows each expression: warm when happy, pink when shy, red when angry, cool when sad, dark when asleep"]],fix:[["極高畫質的光影改成所有表情的圖一起換上，不會再有某個表情沒打光、換表情時亮度跳一下","Ultra lighting now switches all expressions over together, so no expression shows up unlit or pops in brightness"],["語音設定標出哪些有預設（中文、日文有；英文沒有），並寫清楚怎麼貼 fish.audio 連結","Voice settings now say which have a default (Chinese, Japanese yes; English no) and how to paste a fish.audio link"]]},
  {v:"1.7.1",d:"11/11 13:00",add:[],fix:[["人設再調整：更像真人傳訊息（短句、停頓、笑場、接話）、傲嬌害羞更明顯、愛開玩笑鬥嘴，難過時立刻收起玩笑溫柔陪你","Personality tuned again: more like texting a real person, clearer tsundere/shy side, jokes and banter, and gentle when you're down"]]},
  {v:"1.7.0",d:"11/11 12:00",add:[["角色加上「鏡面反光」：滑鼠經過她時，對角那邊會出現反光（右上角→左下角），預設開，換角色也能用，可在 設定 → 外觀與音效 關掉","Mirror sheen on the character: when the pointer passes over her, a gloss shows on the opposite corner. On by default, works with any character, can be turned off in Settings"],["角色大小：自動（依這台裝置）加五個檔位，每台裝置各自記住","Character size: Auto (fits this device) plus five steps, remembered per device"],["新增日文：可以看懂日文、用日文回答；介面主要畫面有日文；語音有日文（預設日文聲音內建，仍要用你自己的 Fish Audio 金鑰）；中文聲音也有預設","Japanese: she understands and answers in Japanese, the main screens are in Japanese, and there is a Japanese voice (default voices built in; you still use your own Fish Audio key)"],["重點（筆記）可以選要看哪種語言，自動翻譯；只改顯示，原文不動","Notes can be shown in another language (translated automatically; only the display changes)"],["說話更像朋友：人設重寫，會開玩笑、聊害羞的事、關心你；口頭禪和開頭每次都換","More like a friend: rewritten personality, jokes, shy topics, caring; catchphrases and openers vary"],["第一次只靠網路猜到位置時，會問你在哪個縣市，不再一直顯示錯的地方","When the place is only guessed from the internet, she asks which city once"],["兩台裝置同時開：視窗在前景時每分鐘檢查一次對方的更新，切回視窗立刻檢查","Two devices at once: checks for the other device every minute while visible and right when you switch back"]],fix:[["Mac 剛打開時不再閃一下白畫面（需要重新安裝 App）","Mac: no more white flash on launch (reinstall the app)"],["跑不動的模型（例如 16GB 記憶體的 27B）不會再讓你下載","Models too big for this computer's memory (e.g. 27B on 16GB) can no longer be downloaded"]]},
  {v:"1.6.0",d:"11/07 05:00",add:[["重點分頁的搜尋框右邊加上「搜尋」按鈕，下面也有「猜你想搜」，依她記下的重點建議關鍵字，點一下就能找到","The memory search now has a “Search” button on the right and “You might be looking for” suggestions under it, taken from what she has noted"],["整理記憶改成全自動：不用再按按鈕，她每 3 天或多了 10 條重點時會自己整理，畫面會顯示上次整理的時間和少了幾條，不滿意可以按「復原上次整理」","Tidying memories is fully automatic: no button any more — she tidies every 3 days or after 10 new notes, shows when it last ran and how many fewer there are, and you can still undo it"],["可以跟她聊比較私人的話題（感情、喜歡的人、家裡的事、心情和煩惱、成長的困擾），她會像信任的好朋友一樣認真陪你聊，不會說教或一直叫你去問別人","You can talk with her about more personal things (relationships, crushes, family, worries, growing up) — she talks it through like a trusted friend instead of lecturing or sending you elsewhere"]],fix:[]},
@@ -4826,7 +4831,7 @@ paintSnd();
     try{localStorage.setItem("m01.theme",t)}catch(e){}const sel=$("themeSel");if(sel)sel.value=t;
     const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=(getComputedStyle(r).getPropertyValue("--bg")||"").trim()||"#09090B"};
   try{applyTheme(localStorage.getItem("m01.theme")||"mecha")}catch(e){}
-  $("gfxSel").onchange=e=>{const g=e.target.value;try{localStorage.setItem(GFX_KEY,g)}catch(err){}applyGfx(g);playSfx("press",.5)};
+  $("gfxSel").onchange=e=>{try{localStorage.setItem(GFX_KEY,e.target.value)}catch(err){}applyGfx(gfxLevel());playSfx("press",.5)};
   $("themeSel").onchange=e=>{const t=e.target.value;S.settings.theme=t;applyTheme(t);S.settings.accent=THEME_ACCENT[t];applyAccent(THEME_ACCENT[t]);saveSettingsQuiet();playSfx("press",.5)};
 
   /* ---------- sound sets (the default "mecha" set uses the recorded sounds) ---------- */
@@ -5136,6 +5141,17 @@ details.cl>summary{cursor:pointer}
 html[data-glare="off"] .hglare{display:none}
 #cityAsk{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;max-width:min(92vw,440px);padding:12px 14px;background:rgba(var(--panel-rgb),.97);border:1px solid var(--line2);box-shadow:0 8px 28px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:8px;font-size:13.5px;animation:fxPopIn .35s var(--ease-out) both}
 #cityAsk .inline{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ===== 1.7.2: lighting follows the picture's own colours and every expression ===== */
+#heroWrap{--lc:217,119,87;--lb:1}
+html[data-gfx="medium"] .glow,html[data-gfx="high"] .glow,html[data-gfx="ultra"] .glow{background:radial-gradient(circle,rgba(var(--lc),.2),transparent 65%)}
+html[data-gfx="ultra"] .hlight,html[data-gfx="high"] .hlight{background:radial-gradient(closest-side,rgba(var(--lc),.26),rgba(var(--lc),.08) 55%,transparent)}
+html[data-gfx="high"] .hshadow::before,html[data-gfx="ultra"] .hshadow::before{background:radial-gradient(closest-side,rgba(var(--lc),.3),rgba(var(--lc),.08) 60%,transparent)}
+html[data-gfx="ultra"] .hdust i{background:rgba(var(--lc),.9);box-shadow:0 0 8px rgba(var(--lc),.9)}
+html[data-gfx="ultra"] .sprite img.on{filter:drop-shadow(0 0 1px rgba(var(--lc),.55)) drop-shadow(0 0 14px rgba(var(--lc),.2)) drop-shadow(0 14px 20px rgba(0,0,0,.36)) brightness(var(--lb,1));transition:filter .6s ease}
+html[data-gfx="high"] .sprite img.on{filter:drop-shadow(0 10px 16px rgba(0,0,0,.32)) drop-shadow(0 0 10px rgba(var(--lc),.12)) brightness(var(--lb,1));transition:filter .6s ease}
+.hglare{background:radial-gradient(ellipse 52% 36% at var(--gx,25%) var(--gy,80%),rgba(255,255,255,.62),rgba(var(--lc),.2) 48%,transparent 74%),
+  linear-gradient(118deg,transparent calc(var(--gx,25%) - 14%),rgba(255,255,255,.2) var(--gx,25%),transparent calc(var(--gx,25%) + 14%))}
 </style>
 <script>/* ===== 0.10.27: smooth motion everywhere, music & weather on the character side, automatic clean-up ===== */
 (function(){
@@ -5800,6 +5816,50 @@ html[data-glare="off"] .hglare{display:none}
   /* notes language picker */
   function wireNoteLang(){const sel=$("noteLang");if(!sel||sel.__w)return;sel.__w=1;sel.value=S.settings.noteLang||"";
     sel.onchange=()=>{S.settings.noteLang=sel.value;saveSettingsQuiet();try{ntFails=0}catch(e){}if(typeof renderFacts==="function")renderFacts()}}
+
+
+  /* ---------- 1.7.2: lighting adapts to the picture's colours and to what she is doing ---------- */
+  const PAL={key:"",rgb:null,lum:.5,cache:new Map(),busy:false};
+  const MOODL={happy:[255,214,140,.55,1.05],shy:[255,150,185,.55,1.03],angry:[255,95,85,.5,1.04],smug:[255,196,100,.4,1.03],surprised:[205,235,255,.45,1.06],
+    worried:[130,160,225,.45,.96],sad:[110,140,215,.5,.94],think:[160,150,235,.4,.98],thinking:[160,150,235,.4,.98],sleep:[70,90,160,.6,.78],wave:[255,214,140,.35,1.04]};
+  // her dominant colour: the colourful pixels of the picture, weighted by how vivid they are (hair, clothes, eyes)
+  async function palFrom(src){
+    if(PAL.cache.has(src))return PAL.cache.get(src);
+    let out=null;
+    try{const im=new Image();if(/^https?:/i.test(src)&&!src.startsWith(location.origin))im.crossOrigin="anonymous";im.src=src;await im.decode();
+      const W=64,H=Math.max(8,Math.round(64*(im.naturalHeight/Math.max(1,im.naturalWidth))));const cv=document.createElement("canvas");cv.width=W;cv.height=Math.min(H,160);
+      const cx=cv.getContext("2d",{willReadFrequently:true});cx.drawImage(im,0,0,cv.width,cv.height);const d=cx.getImageData(0,0,cv.width,cv.height).data;
+      let wr=0,wg=0,wb=0,ws=0,ar=0,ag=0,ab=0,an=0,lum=0;
+      for(let i=0;i<d.length;i+=4){if(d[i+3]<200)continue;const r=d[i],g=d[i+1],b=d[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),sat=mx?(mx-mn)/mx:0,l=(r*.3+g*.59+b*.11)/255;
+        ar+=r;ag+=g;ab+=b;an++;lum+=l;if(mx<40||l>.93)continue;const w=sat*sat*(.4+mx/255);wr+=r*w;wg+=g*w;wb+=b*w;ws+=w}
+      if(an>20){let c=ws>an*.02?[wr/ws,wg/ws,wb/ws]:[ar/an,ag/an,ab/an];const mx=Math.max(...c)||1,k=Math.min(2.2,225/mx);c=c.map(v=>Math.max(0,Math.min(255,Math.round(v*k))));out={rgb:c,lum:lum/an}}
+    }catch(e){out=null}
+    PAL.cache.set(src,out);return out}
+  const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+  async function litPalette(){
+    if(PAL.busy)return;const im=document.querySelector('#sprite img[data-k="idle"]');if(!im)return;
+    const src=im.dataset.o||im.getAttribute("src")||"";if(!src||src===PAL.key)return;
+    PAL.busy=true;try{PAL.key=src;const r=await palFrom(src);const old=PAL.rgb;
+      if(r){PAL.rgb=r.rgb;PAL.lum=r.lum}else PAL.rgb=null;
+      if((old&&PAL.rgb&&dist(old,PAL.rgb)>22)||(!old)!==(!PAL.rgb)){if(typeof litApply==="function")litApply()}   // new picture, new colours: paint the lighting again
+      litMood()}finally{PAL.busy=false}}
+  // what she is doing right now tints and dims the light a little: happy = warm, shy = pink, sad = cool, asleep = dark
+  function litMood(){
+    const w=$("heroWrap");if(!w)return;let base=PAL.rgb||(typeof litAcc0==="function"?litAcc0():[217,119,87]);
+    let mood=null;try{const m=(w.classList.contains("happy")&&"happy")||(w.classList.contains("thinking")&&"thinking")||(w.classList.contains("wave")&&"wave")||(moodBase==="sleep"&&"sleep")||(exprNow!=="idle"?exprNow:null);if(m&&MOODL[m])mood=MOODL[m]}catch(e){}
+    let c=base,b=1;if(mood){const k=mood[3];c=[0,1,2].map(i=>Math.round(base[i]*(1-k)+mood[i]*k));b=mood[4]}
+    // dark pictures get a little more light, bright ones a little less
+    b*=PAL.lum<.3?1.04:PAL.lum>.75?.97:1;
+    w.style.setProperty("--lc",c.join(","));w.style.setProperty("--lb",b.toFixed(3))}
+  (function(){
+    // the baked lighting uses her colours instead of only the theme colour
+    if(typeof litAcc==="function"&&!window.__litAcc0){const o=litAcc;window.litAcc0=o;window.__litAcc0=1;window.litAcc=function(){return PAL.rgb?PAL.rgb.slice():o()}}
+    const hw=$("heroWrap");if(!hw)return;
+    try{new MutationObserver(()=>{setTimeout(litPalette,80);litMood()}).observe(hw,{childList:true})}catch(e){}
+    try{new MutationObserver(litMood).observe(hw,{attributes:true,attributeFilter:["class"]})}catch(e){}
+    // expressions change the picture without touching the class: follow them too
+    if(typeof applyMood==="function"&&!applyMood.__lit){const o=applyMood;const f=function(){const r=o.apply(this,arguments);try{litMood()}catch(e){}return r};f.__lit=1;window.applyMood=f}
+    setInterval(()=>{try{litPalette();litMood()}catch(e){}},3000);setTimeout(litPalette,600)})();
 
   /* ---------- start once the app is ready ---------- */
   function paintAll(){try{paintX28()}catch(e){}try{wireNoteLang()}catch(e){}try{window.__jaUI()}catch(e){}paintRing();paintSafe();paintCA();paintSet();paintMusic();paintWx();paintClean();try{if(typeof paintModelChip==="function")paintModelChip()}catch(e){}fit()}

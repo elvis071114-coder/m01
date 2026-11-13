@@ -1,7 +1,7 @@
 {
- "version": "1.7.1",
- "notes": "1.7.1：人設再調整，更像真人聊天、更傲嬌害羞、更愛開玩笑、難過時更溫柔。（也包含 1.7.0 的鏡面反光、角色大小、日文、筆記翻譯等。）",
- "notes_en": "1.7.1: personality tuned again: more like real chat, more tsundere/shy, more jokes, gentler when you're down. (Includes 1.7.0 features.)",
+ "version": "1.7.2",
+ "notes": "1.7.2：畫質可選「自動」；光影會依角色圖的顏色自動調整，並跟著每個表情變化；修正換表情時光影跳動；語音設定標示預設並說明怎麼加連結。",
+ "notes_en": "1.7.2: Auto quality; lighting adapts to the picture's colours and each expression; fixed lighting popping between expressions; voice settings show defaults and how to add links.",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
@@ -12,6 +12,6 @@
  "helper_win": "https://elvis071114-coder.github.io/m01/helper/server.ps1",
  "helper_win_sha": "59b575798bda566f3db95a517e9da730f53079fca747a76f2241a1606b3e8bfe",
  "pkg": 4,
- "windows_sha": "931f9ac8e5de0c4a70d4997914b54638538038322297fa52c210735817bf29fe",
- "mac_sha": "d71f3393dc61bc700600ce5b93d60c341ca1c36874db7c8bab8e6ed813dbf7db"
+ "windows_sha": "d971568c6c5c1f27f4cbff853e51f3a1972110482221d8a4ff689f6a6a75068c",
+ "mac_sha": "8602ebaf51fd11780d24a3a7a8d2c97435e0660af4739bd5e5f8b7499de0ba79"
 }
