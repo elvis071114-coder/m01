@@ -841,9 +841,9 @@ html.fx-idle .rig,html.fx-idle .hshadow,html.fx-idle .hlight,html.fx-idle .hdust
               <label class="field" for="fishKey">Fish Audio API 金鑰<input id="fishKey" type="password" autocomplete="off" spellcheck="false" placeholder="貼上金鑰"></label>
               <label class="field" for="fishLang">口音<select id="fishLang"><option value="auto">自動（中文回覆用中文聲音，英文用英文聲音，日文用日文聲音）</option><option value="zh">中文（一律用中文聲音）</option><option value="en">英文（一律用英文聲音）</option><option value="ja">日文（一律用日文聲音）</option></select></label>
               <p class="note">口音是跟著「聲音」走的：中文的聲音唸起來就是中文口音，日文、英文也一樣，所以三種語言各有一個欄位。<b>中文和日文已經內建預設聲音，不用填；英文沒有預設。</b><br>怎麼加進去：到 <a href="https://fish.audio">fish.audio</a> 找一個喜歡的聲音，打開它的頁面，複製網址列的網址（長得像 https://fish.audio/m/一串32個英數字）貼到對應的欄位，過一下就自動儲存，按「試聽」確認。只有網址最後那串 32 碼的 ID 也可以。欄位留空就用預設（英文沒有預設，會用中文聲音）。</p>
-              <label class="field" for="fishVoice">中文聲音（<b>有預設</b>；想換再貼 fish.audio 聲音網址或 ID）<input id="fishVoice" autocomplete="off" spellcheck="false" placeholder="例如 https://fish.audio/m/…"></label>
-              <label class="field" for="fishVoiceJa">日文聲音（<b>有預設</b>；想換再貼 fish.audio 聲音網址或 ID）<input id="fishVoiceJa" autocomplete="off" spellcheck="false" placeholder="預設已內建，想換再貼"></label>
-              <label class="field" for="fishVoiceEn">英文聲音（<b>沒有預設</b>，要自己貼 fish.audio 聲音網址或 ID；留空時英文會用中文聲音唸）<input id="fishVoiceEn" autocomplete="off" spellcheck="false" placeholder="例如 https://fish.audio/m/…"></label>
+              <label class="field" for="fishVoice">中文聲音（有內建）<input id="fishVoice" autocomplete="off" spellcheck="false" placeholder="貼上 fish.audio 連結"></label>
+              <label class="field" for="fishVoiceJa">日文聲音（有內建）<input id="fishVoiceJa" autocomplete="off" spellcheck="false" placeholder="貼上 fish.audio 連結"></label>
+              <label class="field" for="fishVoiceEn">英文聲音<input id="fishVoiceEn" autocomplete="off" spellcheck="false" placeholder="貼上 fish.audio 連結"></label>
               <p class="note warnnote">請用你自己建立、或主人明確允許使用的聲音。不要用模仿真實人物（聲優、藝人、網紅等）的聲音模型。</p>
               <label class="field" for="fishModel">語音模型<select id="fishModel"><option value="s2.1-pro-free">S2.1 Pro Free：免費（有合理使用限制）</option><option value="s2.1-pro">S2.1 Pro：付費，比較穩定（要先到 Fish Audio 儲值 API 額度）</option></select></label>
               <label class="toggle" for="autoSpeak">回覆完自動唸出來<input type="checkbox" id="autoSpeak"></label>
@@ -3420,7 +3420,7 @@ function showBatt(level,charging){
 })();
 
 /* ---------- version info, notes, memory folder, first-run setup ---------- */
-const APP_VER="1.7.2",APP_STAGE="",APP_BUILD="2026-11-13 14:27";
+const APP_VER="1.7.3",APP_STAGE="",APP_BUILD="2026-11-13 19:06";
 function isDesk(){return typeof FS!=="undefined"&&!!(FS.dir&&FS.dir.server)}
 function deskPath(){return isDesk()?(FS.dir.path||""):""}
 function edition(en){
@@ -3431,6 +3431,7 @@ function edition(en){
   return (os?os+" ":"")+(en?"desktop app":"電腦版 App")+" · "+m;
 }
 const CHANGELOG=[
+ {v:"1.7.3",d:"11/13 14:00",add:[],fix:[["鏡面反光改成跟著目前這個表情的圖：換姿勢時反光不會再出現在沒有手的地方","Mirror sheen now follows the picture of the current pose, so it no longer shows where there is no hand"],["語音設定的欄位改簡單：中文、日文標「有內建」，三個欄位都直接貼 fish.audio 連結","Voice settings simplified: Chinese and Japanese say “built in”, all three fields take a fish.audio link"]]},
  {v:"1.7.2",d:"11/13 12:00",add:[["畫質新增「自動」（依這台裝置的效能選低／中／高／極高），預設就是自動","Quality now has “Auto” (picks Low/Medium/High/Ultra from this device), and it is the default"],["光影會看角色圖的顏色：換一張圖，輪廓光、背光、腳下的光、反光都會跟著這張圖的顏色重新調整","Lighting now follows the picture's own colours: swap the picture and the rim light, back light, floor light and sheen re-adapt"],["光影跟著每個表情動作變化：開心偏暖、害羞偏粉、生氣偏紅、難過偏冷、睡著變暗","Lighting follows each expression: warm when happy, pink when shy, red when angry, cool when sad, dark when asleep"]],fix:[["極高畫質的光影改成所有表情的圖一起換上，不會再有某個表情沒打光、換表情時亮度跳一下","Ultra lighting now switches all expressions over together, so no expression shows up unlit or pops in brightness"],["語音設定標出哪些有預設（中文、日文有；英文沒有），並寫清楚怎麼貼 fish.audio 連結","Voice settings now say which have a default (Chinese, Japanese yes; English no) and how to paste a fish.audio link"]]},
  {v:"1.7.1",d:"11/11 13:00",add:[],fix:[["人設再調整：更像真人傳訊息（短句、停頓、笑場、接話）、傲嬌害羞更明顯、愛開玩笑鬥嘴，難過時立刻收起玩笑溫柔陪你","Personality tuned again: more like texting a real person, clearer tsundere/shy side, jokes and banter, and gentle when you're down"]]},
  {v:"1.7.0",d:"11/11 12:00",add:[["角色加上「鏡面反光」：滑鼠經過她時，對角那邊會出現反光（右上角→左下角），預設開，換角色也能用，可在 設定 → 外觀與音效 關掉","Mirror sheen on the character: when the pointer passes over her, a gloss shows on the opposite corner. On by default, works with any character, can be turned off in Settings"],["角色大小：自動（依這台裝置）加五個檔位，每台裝置各自記住","Character size: Auto (fits this device) plus five steps, remembered per device"],["新增日文：可以看懂日文、用日文回答；介面主要畫面有日文；語音有日文（預設日文聲音內建，仍要用你自己的 Fish Audio 金鑰）；中文聲音也有預設","Japanese: she understands and answers in Japanese, the main screens are in Japanese, and there is a Japanese voice (default voices built in; you still use your own Fish Audio key)"],["重點（筆記）可以選要看哪種語言，自動翻譯；只改顯示，原文不動","Notes can be shown in another language (translated automatically; only the display changes)"],["說話更像朋友：人設重寫，會開玩笑、聊害羞的事、關心你；口頭禪和開頭每次都換","More like a friend: rewritten personality, jokes, shy topics, caring; catchphrases and openers vary"],["第一次只靠網路猜到位置時，會問你在哪個縣市，不再一直顯示錯的地方","When the place is only guessed from the internet, she asks which city once"],["兩台裝置同時開：視窗在前景時每分鐘檢查一次對方的更新，切回視窗立刻檢查","Two devices at once: checks for the other device every minute while visible and right when you switch back"]],fix:[["Mac 剛打開時不再閃一下白畫面（需要重新安裝 App）","Mac: no more white flash on launch (reinstall the app)"],["跑不動的模型（例如 16GB 記憶體的 27B）不會再讓你下載","Models too big for this computer's memory (e.g. 27B on 16GB) can no longer be downloaded"]]},
@@ -5751,7 +5752,7 @@ html[data-gfx="high"] .sprite img.on{filter:drop-shadow(0 10px 16px rgba(0,0,0,.
     let raf=0,px0=0,py0=0;
     function step(){raf=0;if(document.documentElement.dataset.glare==="off")return;
       const sp=$("sprite");if(!sp)return;const g=ensureGlare();if(!g)return;const r=sp.getBoundingClientRect();if(!r.width||!r.height)return;
-      const img=sp.querySelector('img[data-k="idle"]');const src=img?(img.currentSrc||img.src||""):"";
+      const img=sp.querySelector("img.on")||sp.querySelector('img[data-k="idle"]');const src=img?(img.currentSrc||img.src||""):"";   // the picture on screen right now, so the sheen follows every pose
       if(src&&g.dataset.s!==src){g.dataset.s=src;g.style.setProperty("--spr",`url("${src}")`)}
       if(!g.dataset.s){g.style.opacity=0;return}
       const px=(px0-r.left)/r.width,py=(py0-r.top)/r.height,m=.08;
@@ -5762,6 +5763,9 @@ html[data-gfx="high"] .sprite img.on{filter:drop-shadow(0 10px 16px rgba(0,0,0,.
       g.style.setProperty("--gy",((1-cy)*100).toFixed(1)+"%");
       g.style.opacity=(.22+.78*k).toFixed(2)}
     addEventListener("pointermove",e=>{px0=e.clientX;py0=e.clientY;if(!raf)raf=requestAnimationFrame(step)},{passive:true});
+    // she changes pose while the pointer rests: redo the sheen with the new picture
+    let fo=null;const watch=()=>{const sp=$("sprite");if(!sp||sp.__gw)return;sp.__gw=1;try{new MutationObserver(()=>{if(!raf)raf=requestAnimationFrame(step)}).observe(sp,{attributes:true,attributeFilter:["class"],subtree:true})}catch(e){}};
+    setInterval(watch,1500);
     document.documentElement.addEventListener("mouseleave",()=>{const g=document.querySelector("#sprite .hglare");if(g)g.style.opacity=0});
   })();
   function paintX28(){

@@ -1,7 +1,7 @@
 {
- "version": "1.7.2",
- "notes": "1.7.2：畫質可選「自動」；光影會依角色圖的顏色自動調整，並跟著每個表情變化；修正換表情時光影跳動；語音設定標示預設並說明怎麼加連結。",
- "notes_en": "1.7.2: Auto quality; lighting adapts to the picture's colours and each expression; fixed lighting popping between expressions; voice settings show defaults and how to add links.",
+ "version": "1.7.3",
+ "notes": "1.7.3：修正換表情時反光出現在錯的位置；語音欄位簡化（中文、日文有內建，直接貼連結）。（也包含 1.7.2 的自動畫質與光影適配。）",
+ "notes_en": "1.7.3: fixed the sheen showing in the wrong place on other poses; simpler voice fields. (Includes 1.7.2.)",
  "url": "https://elvis071114-coder.github.io/m01/",
  "mac": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Mac.zip",
  "windows": "https://elvis071114-coder.github.io/m01/downloads/M-01-Companion-Windows.zip",
@@ -12,6 +12,6 @@
  "helper_win": "https://elvis071114-coder.github.io/m01/helper/server.ps1",
  "helper_win_sha": "59b575798bda566f3db95a517e9da730f53079fca747a76f2241a1606b3e8bfe",
  "pkg": 4,
- "windows_sha": "d971568c6c5c1f27f4cbff853e51f3a1972110482221d8a4ff689f6a6a75068c",
- "mac_sha": "8602ebaf51fd11780d24a3a7a8d2c97435e0660af4739bd5e5f8b7499de0ba79"
+ "windows_sha": "b6f6ad96487e18e3ccd5e07c97c6f88a13001b05e3523f61a7e2605b3bd13b3c",
+ "mac_sha": "c74ca5fc71a316b5535f351111fe7393b29ffe1d1e09ab3aab026bbd5b93c4c5"
 }
